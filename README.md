@@ -11,7 +11,7 @@ This repo holds our code for the 2025 Robot. Our test drivebase is a swerve driv
 ## Prerequisites (Install this stuff first)
 - Python 3 (not installed from Windows store. Please install from Python website)
 - Visual Studio 2022 with C++ workload
-- [Latest Stable 2025 WPILib Version](https://github.com/wpilibsuite/allwpilib/release)
+- [Latest Stable 2025 WPILib Version](https://github.com/wpilibsuite/allwpilib/releases)
 
 ## Install steps: 
 - Create your virtual environment
