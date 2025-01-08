@@ -12,6 +12,8 @@
 #include <ctre/phoenix6/SignalLogger.hpp>
 
 #include "constants/SwerveConstants.h"
+#include <wpinet/WebServer.h>
+#include <frc/Filesystem.h>
 
 Robot::Robot() {
   // DANGEROUS MAKE SURE CODE DOESN'T BLOCK!!!
@@ -22,6 +24,8 @@ Robot::Robot() {
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
   AddPeriodic([this] { m_container.GetDrive().UpdateOdom(); },
               1 / consts::swerve::ODOM_UPDATE_RATE, 2_ms);
+  wpi::WebServer::GetInstance().Start(5800,
+                                      frc::filesystem::GetDeployDirectory());
 }
 
 void Robot::RobotPeriodic() {
