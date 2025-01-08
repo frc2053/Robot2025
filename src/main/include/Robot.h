@@ -33,7 +33,4 @@ class Robot : public frc::TimedRobot {
   std::optional<frc2::CommandPtr> m_autonomousCommand;
 
   RobotContainer m_container;
-
-  rev::spark::SparkMax spark{12,
-                             rev::spark::SparkLowLevel::MotorType::kBrushless};
 };
