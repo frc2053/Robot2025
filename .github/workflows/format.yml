@@ -46,7 +46,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.51
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.51
       - name: Create compile_commands.json
         run: |
           ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
