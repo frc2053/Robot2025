@@ -6,7 +6,7 @@
 
 #include <frc/TimedRobot.h>
 #include <frc2/command/CommandPtr.h>
-#include <rev/SparkMax.h>
+#include <str/swerve/SwerveDrive.h>
 
 #include <optional>
 
@@ -16,6 +16,7 @@ class Robot : public frc::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
+  void SimulationPeriodic() override;
   void DisabledInit() override;
   void DisabledPeriodic() override;
   void DisabledExit() override;
@@ -30,7 +31,23 @@ class Robot : public frc::TimedRobot {
   void TestExit() override;
 
  private:
-  std::optional<frc2::CommandPtr> m_autonomousCommand;
+  void UpdateVision();
+
+  frc2::Command* m_autonomousCommand = nullptr;
 
   RobotContainer m_container;
+
+  units::second_t lastTotalLoopTime;
+  nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault()
+                                      .GetTable("Metadata")
+                                      ->GetDoubleTopic("RobotPeriodicLoopRate")
+                                      .Publish()};
+  nt::DoublePublisher matchTimePub{nt::NetworkTableInstance::GetDefault()
+                                       .GetTable("Metadata")
+                                       ->GetDoubleTopic("MatchTime")
+                                       .Publish()};
+  nt::DoublePublisher battVoltagePub{nt::NetworkTableInstance::GetDefault()
+                                         .GetTable("Metadata")
+                                         ->GetDoubleTopic("BatteryVoltage")
+                                         .Publish()};
 };

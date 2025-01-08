@@ -1,0 +1,78 @@
+{
+ "name":"robotchoreo",
+ "version":1,
+ "type":"Swerve",
+ "variables":{
+  "expressions":{},
+  "poses":{}
+ },
+ "config":{
+  "frontLeft":{
+   "x":{
+    "exp":"0.200025 m",
+    "val":0.200025
+   },
+   "y":{
+    "exp":"0.276225 m",
+    "val":0.276225
+   }
+  },
+  "backLeft":{
+   "x":{
+    "exp":"-0.200025 m",
+    "val":-0.200025
+   },
+   "y":{
+    "exp":"-0.276225 m",
+    "val":-0.276225
+   }
+  },
+  "mass":{
+   "exp":"135 lb",
+   "val":61.23496995
+  },
+  "inertia":{
+   "exp":"6 kg m ^ 2",
+   "val":6.0
+  },
+  "gearing":{
+   "exp":"6.75",
+   "val":6.75
+  },
+  "radius":{
+   "exp":"0.049 m",
+   "val":0.049
+  },
+  "vmax":{
+   "exp":"5800 rpm",
+   "val":607.3745796940267
+  },
+  "tmax":{
+   "exp":"0.9 N * m",
+   "val":0.9
+  },
+  "cof":{
+   "exp":"1.2",
+   "val":1.2
+  },
+  "bumper":{
+   "front":{
+    "exp":"13.875 in",
+    "val":0.352425
+   },
+   "side":{
+    "exp":"17.095 in",
+    "val":0.434213
+   },
+   "back":{
+    "exp":"19.875 in",
+    "val":0.504825
+   }
+  },
+  "differentialTrackWidth":{
+   "exp":"22 in",
+   "val":0.5588
+  }
+ },
+ "generationFeatures":[]
+}
