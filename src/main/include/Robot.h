@@ -11,6 +11,7 @@
 #include <optional>
 
 #include "RobotContainer.h"
+#include "str/armtraj/armtraj.h"
 
 class Robot : public frc::TimedRobot {
  public:
@@ -36,6 +37,7 @@ class Robot : public frc::TimedRobot {
   frc2::Command* m_autonomousCommand = nullptr;
 
   RobotContainer m_container;
+  str::ArmTraj elevatorArm;
 
   units::second_t lastTotalLoopTime;
   nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault()

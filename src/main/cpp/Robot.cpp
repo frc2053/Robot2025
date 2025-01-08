@@ -39,6 +39,8 @@ void Robot::RobotPeriodic() {
   lastTotalLoopTime = now;
   matchTimePub.Set(frc::DriverStation::GetMatchTime().value());
   battVoltagePub.Set(frc::RobotController::GetBatteryVoltage().value());
+
+  elevatorArm.Periodic();
 }
 
 void Robot::SimulationPeriodic() {
@@ -88,6 +90,8 @@ void Robot::TeleopInit() {
   if (m_autonomousCommand) {
     m_autonomousCommand->Cancel();
   }
+
+  elevatorArm.CalculateTraj();
 }
 
 void Robot::TeleopPeriodic() {}
