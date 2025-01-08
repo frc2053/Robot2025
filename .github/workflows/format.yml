@@ -21,9 +21,10 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install wpiformat
-        run: pip3 install wpiformat==2024.51
-      - name: Run
-        run: wpiformat
+        run: |
+          python -m venv ${{ runner.temp }}/wpiformat
+          ${{ runner.temp }}/wpiformat/bin/pip3 install wpiformat==2024.51
+        run: ${{ runner.temp }}/wpiformat/bin/wpiformat
       - name: Check output
         run: git --no-pager diff --exit-code HEAD
   tidy:
