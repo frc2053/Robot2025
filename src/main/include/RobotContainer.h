@@ -1,6 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FRC 2053.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// the MIT License file in the root of this project
 
 #pragma once
 

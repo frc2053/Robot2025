@@ -17,5 +17,6 @@
   "C_Cpp.default.configurationProvider": "vscode-wpilib",
   "C_Cpp.autoAddFileAssociations": false,
   "python.terminal.activateEnvInCurrentTerminal": true,
+  "editor.formatOnSave": true,
   "python.defaultInterpreterPath": "${workspaceFolder}/venv/Scripts/python.exe"
 }
