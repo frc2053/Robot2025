@@ -1,0 +1,47 @@
+name: Run Sanitizers on Robot Code
+
+on:
+  push:
+  pull_request:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: asan
+            gradle-flags: "-Pasan"
+          - name: tsan
+            gradle-flags: "-Ptsan"
+          - name: ubsan
+            gradle-flags: "-Pubsan"
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # This grabs the WPILib docker container
+    container: wpilib/roborio-cross-ubuntu:2024-22.04
+
+    name: "${{ matrix.name }}"
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v4
+
+    # Declares the repository safe and not under dubious ownership.
+    - name: Add repository to git safe directories
+      run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+    - name: Setup proper env for folder
+      shell: bash
+      run: |
+        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
+    # Runs a single command using the runners shell
+    - name: Compile and run tests on robot code
+      env: 
+        TSAN_OPTIONS: suppressions=${{ env.GITHUB_WORKSPACE }}/.github/workflows/tsan_suppressions
+      run: ./gradlew build ${{ matrix.gradle-flags }}

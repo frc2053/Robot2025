@@ -1,0 +1,32 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+modifiableFileExclude {
+  gradle/
+  requirements.txt
+  src/main/deploy/
+  img/
+  .wpilib/
+  .gitignore
+  .github/
+  README.md
+  .pre-commit-config.yaml
+  .clang-tidy
+  \.wpilog$
+  networktables.json
+  simgui-ds.json
+  simgui.json
+  simgui-window.json
+  vendordeps/
+  ctre_sim/
+  .pathplanner/
+  choreoproj.chor
+}

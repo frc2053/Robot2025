@@ -1,0 +1,58 @@
+name: Lint and Format
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  wpiformat:
+    name: "wpiformat"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch all history and metadata
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f main origin/main
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install wpiformat
+        run: pip3 install wpiformat==2024.51
+      - name: Run
+        run: wpiformat
+      - name: Check output
+        run: git --no-pager diff --exit-code HEAD
+  tidy:
+    name: "clang-tidy"
+    runs-on: ubuntu-24.04
+    container: wpilib/roborio-cross-ubuntu:2025-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch all history and metadata
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git checkout -b pr
+          git branch -f main origin/main
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install wpiformat
+        run: pip3 install wpiformat==2024.51
+      - name: Create compile_commands.json
+        run: |
+          ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
+          ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64release/compile_commands.json
+          ./.github/workflows/fix_compile_commands.py build/TargetedCompileCommands/linuxx86-64debug/compile_commands.json
+      - name: List changed files
+        run: wpiformat -list-changed-files
+      - name: Run clang-tidy release
+        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64release -vv
+      - name: Run clang-tidy debug
+        run: wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug -vv
