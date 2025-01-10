@@ -119,10 +119,13 @@ class SwerveDrive {
   static constexpr std::string_view imuConfigAlertStr = "Imu Configuration";
   static constexpr std::string_view imuOptimizeAlertStr = "Imu Optimization";
   static constexpr std::string_view imuZeroAlertStr = "Imu Zeroing";
+  static constexpr std::string_view updateFreqAlertStr =
+      "Swerve Signal Update Frequency";
 
   frc::Alert imuConfigAlert;
   frc::Alert imuOptimizeAlert;
   frc::Alert imuZeroAlert;
+  frc::Alert updateFreqAlert;
 
   frc::Field2d swerveField{};
   std::shared_ptr<nt::NetworkTable> nt{

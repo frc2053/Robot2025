@@ -11,6 +11,7 @@
 
 #include "constants/SwerveConstants.h"
 #include "ctre/phoenix/StatusCodes.h"
+#include "ctre/phoenix6/StatusSignal.hpp"
 #include "frc/Alert.h"
 #include "frc/RobotController.h"
 #include "frc/geometry/Pose2d.h"
@@ -31,7 +32,8 @@ using namespace str::swerve;
 SwerveDrive::SwerveDrive()
     : imuConfigAlert{imuConfigAlertStr, frc::Alert::AlertType::kError},
       imuOptimizeAlert{imuOptimizeAlertStr, frc::Alert::AlertType::kError},
-      imuZeroAlert(imuZeroAlertStr, frc::Alert::AlertType::kError) {
+      imuZeroAlert(imuZeroAlertStr, frc::Alert::AlertType::kError),
+      updateFreqAlert(updateFreqAlertStr, frc::Alert::AlertType::kError) {
   ConfigureImu();
   SetupSignals();
   frc::SmartDashboard::PutData("SwerveField", &swerveField);
@@ -135,9 +137,6 @@ void SwerveDrive::UpdateNTEntries() {
   odomUpdateRatePub.Set(odomUpdateRate.value());
   estimatorPub.Set(poseEstimator.GetEstimatedPosition());
   odomPosePub.Set(odom.GetPose());
-  // TODO: Remove transform when lynk chassis is removed
-  swerveField.SetRobotPose(poseEstimator.GetEstimatedPosition().TransformBy(
-      frc::Transform2d{-3_in, 0_in, frc::Rotation2d{}}));
   swerveField.GetObject("FL Pos")->SetPose(
       poseEstimator.GetEstimatedPosition().TransformBy(
           frc::Transform2d{consts::swerve::physical::WHEELBASE_LENGTH / 2,
@@ -177,8 +176,16 @@ void SwerveDrive::SetupSignals() {
   allSignals[allSignals.size() - 2] = &imu.GetYaw();
   allSignals[allSignals.size() - 1] = &imu.GetAngularVelocityZWorld();
 
-  for (const auto& sig : allSignals) {
-    sig->SetUpdateFrequency(consts::swerve::ODOM_UPDATE_RATE);
+  ctre::phoenix::StatusCode setFreqStatus =
+      ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
+          consts::swerve::ODOM_UPDATE_RATE, allSignals);
+
+  frc::DataLogManager::Log(
+      fmt::format("Set update frequency for swerve signals. Result was: {}",
+                  setFreqStatus.GetName()));
+
+  if (!setFreqStatus.IsOK()) {
+    updateFreqAlert.Set(true);
   }
 
   for (auto& mod : modules) {

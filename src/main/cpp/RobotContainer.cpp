@@ -34,6 +34,13 @@ void RobotContainer::ConfigureBindings() {
         return frc::ApplyDeadband<double>(-driverJoystick.GetRightX(), .1) *
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
+
+  elevatorSub.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        elevatorSub.SetVoltage(
+            frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) * 12_V);
+      },
+      {&elevatorSub}));
 }
 
 void RobotContainer::ConfigureSysIdBinds() {

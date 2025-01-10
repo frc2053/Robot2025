@@ -6,32 +6,67 @@
 
 #include <frc2/command/SubsystemBase.h>
 
+#include <numbers>
+
 #include <ctre/phoenix6/TalonFX.hpp>
 
 #include "constants/ElevatorConstants.h"
+#include "frc/Alert.h"
 #include "frc/simulation/ElevatorSim.h"
-#include "frc/system/plant/DCMotor.h"
 #include "str/SuperstructureDisplay.h"
+#include "units/voltage.h"
 
 class Elevator : public frc2::SubsystemBase {
  public:
-  explicit Elevator(str::SuperstructureDisplay& display) : display{display} {}
+  explicit Elevator(str::SuperstructureDisplay& display);
+  void OptimizeBusSignals();
+
   void Periodic() override;
   void SimulationPeriodic() override;
+  units::meter_t GetHeight();
+  void GoToHeight();
+  void SetVoltage(units::volt_t volts);
 
  private:
+  void ConfigureMotors();
+  void ConfigureControlSignals();
+
   ctre::phoenix6::hardware::TalonFX leftMotor{
       consts::elevator::can_ids::LEFT_MOTOR};
   ctre::phoenix6::hardware::TalonFX rightMotor{
-      consts::elevator::can_ids::LEFT_MOTOR};
+      consts::elevator::can_ids::RIGHT_MOTOR};
 
   ctre::phoenix6::sim::TalonFXSimState& leftMotorSim = leftMotor.GetSimState();
   ctre::phoenix6::sim::TalonFXSimState& rightMotorSim =
       rightMotor.GetSimState();
 
-  frc::DCMotor elevatorGearbox{frc::DCMotor::Falcon500FOC(2)};
+  ctre::phoenix6::StatusSignal<units::turn_t> leftPositionSig =
+      leftMotor.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> leftVelocitySig =
+      leftMotor.GetVelocity();
+  ctre::phoenix6::StatusSignal<units::ampere_t> leftTorqueCurrentSig =
+      leftMotor.GetTorqueCurrent();
+  ctre::phoenix6::StatusSignal<units::volt_t> leftVoltageSig =
+      leftMotor.GetMotorVoltage();
 
-  frc::sim::ElevatorSim elevatorSim{elevatorGearbox,
+  ctre::phoenix6::StatusSignal<units::turn_t> rightPositionSig =
+      rightMotor.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> rightVelocitySig =
+      rightMotor.GetVelocity();
+  ctre::phoenix6::StatusSignal<units::ampere_t> rightTorqueCurrentSig =
+      rightMotor.GetTorqueCurrent();
+  ctre::phoenix6::StatusSignal<units::volt_t> rightVoltageSig =
+      rightMotor.GetMotorVoltage();
+
+  ctre::phoenix6::controls::MotionMagicExpoTorqueCurrentFOC
+      elevatorHeightSetter{0_rad};
+  ctre::phoenix6::controls::VoltageOut elevatorVoltageSetter{0_V};
+  ctre::phoenix6::controls::TorqueCurrentFOC elevatorTorqueCurrentSetter{0_A};
+
+  consts::elevator::gains::holder currentGains{
+      consts::elevator::gains::ELEVATOR_GAINS};
+
+  frc::sim::ElevatorSim elevatorSim{consts::elevator::physical::MOTOR,
                                     consts::elevator::physical::GEARING,
                                     consts::elevator::physical::CARRIAGE_MASS,
                                     consts::elevator::physical::PULLEY_DIAM / 2,
@@ -42,4 +77,15 @@ class Elevator : public frc2::SubsystemBase {
                                     {0.005}};
 
   str::SuperstructureDisplay& display;
+  std::string leftAlertMsg{"Elevator Left Motor Config"};
+  std::string rightAlertMsg{"Elevator Right Motor Config"};
+  frc::Alert configureLeftAlert{leftAlertMsg, frc::Alert::AlertType::kError};
+  frc::Alert configureRightAlert{rightAlertMsg, frc::Alert::AlertType::kError};
+  std::string leftOptiAlertMsg{"Elevator Left Bus Optimization"};
+  std::string rightOptiAlertMsg{"Elevator Right Bus Optimization"};
+  frc::Alert optiLeftAlert{leftOptiAlertMsg, frc::Alert::AlertType::kError};
+  frc::Alert optiRightAlert{rightOptiAlertMsg, frc::Alert::AlertType::kError};
+  std::string signalFrequencyAlertStr{"Elevator Signal Frequency Set"};
+  frc::Alert signalFrequencyAlert{signalFrequencyAlertStr,
+                                  frc::Alert::AlertType::kError};
 };
