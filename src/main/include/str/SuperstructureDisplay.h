@@ -1,15 +1,20 @@
+// Copyright (c) FRC 2053.
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License file in the root of this project
+
 #pragma once
 
+#include <units/length.h>
+
+#include "constants/ArmConstants.h"
+#include "constants/SwerveConstants.h"
 #include "frc/RobotController.h"
 #include "frc/smartdashboard/Mechanism2d.h"
 #include "frc/smartdashboard/MechanismLigament2d.h"
-#include <units/length.h>
 #include "frc/smartdashboard/MechanismObject2d.h"
 #include "frc/smartdashboard/MechanismRoot2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "frc/util/Color.h"
-#include "constants/SwerveConstants.h"
-#include "constants/ArmConstants.h"
 #include "units/angle.h"
 
 namespace str {

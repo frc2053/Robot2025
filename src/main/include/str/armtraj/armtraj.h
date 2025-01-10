@@ -1,10 +1,15 @@
+// Copyright (c) FRC 2053.
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License file in the root of this project
+
 #pragma once
+
+#include <frc/smartdashboard/Mechanism2d.h>
+#include <frc/smartdashboard/MechanismLigament2d.h>
 
 #include <sleipnir/optimization/OptimizationProblem.hpp>
 
-#include <frc/smartdashboard/Mechanism2d.h>
 #include "frc/smartdashboard/MechanismRoot2d.h"
-#include <frc/smartdashboard/MechanismLigament2d.h>
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "frc/util/Color.h"
 #include "frc/util/Color8Bit.h"

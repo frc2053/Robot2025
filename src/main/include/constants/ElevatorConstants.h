@@ -6,8 +6,9 @@
 
 #include <units/current.h>
 #include <units/length.h>
-#include "units/dimensionless.h"
 #include <units/mass.h>
+
+#include "units/dimensionless.h"
 
 namespace consts::elevator {
 namespace can_ids {
@@ -29,5 +30,5 @@ inline constexpr units::kilogram_t CARRIAGE_MASS = 20_lb;
 inline constexpr units::meter_t EXTENDED_HEIGHT = 6_ft;
 }  // namespace physical
 
-namespace gains {}
+namespace gains {}  // namespace gains
 }  // namespace consts::elevator

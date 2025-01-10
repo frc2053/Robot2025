@@ -6,8 +6,9 @@
 
 #include <units/current.h>
 #include <units/length.h>
-#include "units/dimensionless.h"
 #include <units/mass.h>
+
+#include "units/dimensionless.h"
 
 namespace consts::arm {
 namespace can_ids {
@@ -28,5 +29,5 @@ inline constexpr units::meter_t ARM_LENGTH = 18_in;
 inline constexpr units::meter_t END_EFFECTOR_LENGTH = 12_in;
 }  // namespace physical
 
-namespace gains {}
+namespace gains {}  // namespace gains
 }  // namespace consts::arm

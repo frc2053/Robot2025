@@ -1,8 +1,14 @@
+// Copyright (c) FRC 2053.
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License file in the root of this project
+
+#include "str/armtraj/armtraj.h"
+
 #include <chrono>
 #include <iostream>
 #include <numbers>
+
 #include "units/angle.h"
-#include "str/armtraj/armtraj.h"
 
 using namespace str;
 

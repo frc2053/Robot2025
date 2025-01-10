@@ -6,14 +6,14 @@
 
 #include <frc/DataLogManager.h>
 #include <frc/DriverStation.h>
+#include <frc/Filesystem.h>
 #include <frc/Threads.h>
 #include <frc2/command/CommandScheduler.h>
+#include <wpinet/WebServer.h>
 
 #include <ctre/phoenix6/SignalLogger.hpp>
 
 #include "constants/SwerveConstants.h"
-#include <wpinet/WebServer.h>
-#include <frc/Filesystem.h>
 
 Robot::Robot() {
   // DANGEROUS MAKE SURE CODE DOESN'T BLOCK!!!
