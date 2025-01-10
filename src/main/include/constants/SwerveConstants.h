@@ -50,14 +50,14 @@ inline constexpr frc::DCMotor DRIVE_MOTOR = frc::DCMotor::KrakenX60FOC(1);
 inline constexpr frc::DCMotor STEER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 
 inline constexpr units::scalar_t STEER_GEARING = (50.0 / 14.0) * (60.0 / 10.0);
-// L3 with 16T pinion
+// L2
 inline constexpr units::scalar_t DRIVE_GEARING =
     (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 inline constexpr units::scalar_t COUPLING_RATIO = (50.0 / 14.0);
 inline constexpr units::meter_t WHEEL_RADIUS = 1.9154_in;
 
-inline constexpr units::meter_t WHEELBASE_WIDTH = 21.75_in;
-inline constexpr units::meter_t WHEELBASE_LENGTH = 15.75_in;
+inline constexpr units::meter_t WHEELBASE_WIDTH = 20.75_in;
+inline constexpr units::meter_t WHEELBASE_LENGTH = 20.75_in;
 
 inline const units::meter_t DRIVEBASE_RADIUS{
     units::math::hypot(WHEELBASE_WIDTH / 2, WHEELBASE_LENGTH / 2)};
@@ -73,8 +73,8 @@ inline frc::SwerveDriveKinematics<4> KINEMATICS{
     MODULE_LOCATIONS[3]};
 
 // Total outside frame size
-inline constexpr units::meter_t DRIVEBASE_WIDTH = 27.440000_in;
-inline constexpr units::meter_t DRIVEBASE_LENGTH = 27_in;
+inline constexpr units::meter_t DRIVEBASE_WIDTH = 26.44_in;
+inline constexpr units::meter_t DRIVEBASE_LENGTH = 26.44_in;
 
 // 3/4 in plywood + 2.5 in diameter pool noodles + 1/8 slop
 inline constexpr units::meter_t BUMPER_THICKNESS = .75_in + 2.5_in + .125_in;

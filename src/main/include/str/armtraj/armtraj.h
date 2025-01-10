@@ -6,12 +6,18 @@
 #include "frc/smartdashboard/MechanismRoot2d.h"
 #include <frc/smartdashboard/MechanismLigament2d.h>
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "frc/util/Color.h"
+#include "frc/util/Color8Bit.h"
 
 namespace str {
 
 class ArmTraj {
  public:
-  ArmTraj() { frc::SmartDashboard::PutData("ArmVator", &armvator); };
+  ArmTraj() {
+    frc::SmartDashboard::PutData("ArmVator", &armvator);
+    elevatorVis->SetColor(frc::Color::kBlue);
+    armVis->SetColor(frc::Color::kRed);
+  };
   int CalculateTraj();
   void Periodic();
 
@@ -25,7 +31,6 @@ class ArmTraj {
   // Existing mechanical state variables
   sleipnir::VariableMatrix elevator = problem.DecisionVariable(2, N + 1);
   sleipnir::VariableMatrix elevatorAccel = problem.DecisionVariable(1, N);
-
   sleipnir::VariableMatrix arm = problem.DecisionVariable(2, N + 1);
   sleipnir::VariableMatrix armAccel = problem.DecisionVariable(1, N);
 

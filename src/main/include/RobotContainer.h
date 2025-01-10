@@ -12,8 +12,10 @@
 #include <memory>
 
 #include "Autos.h"
+#include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
 #include "subsystems/Drive.h"
+#include "subsystems/Elevator.h"
 
 class RobotContainer {
  public:
@@ -21,7 +23,9 @@ class RobotContainer {
 
   frc2::Command* GetAutonomousCommand();
   Drive& GetDrive();
+  Elevator& GetElevator();
   // str::vision::VisionSystem& GetVision();
+  str::SuperstructureDisplay& GetSuperStructureDisplay();
 
  private:
   void ConfigureBindings();
@@ -36,7 +40,10 @@ class RobotContainer {
 
   frc2::CommandXboxController driverJoystick{0};
 
-  Drive driveSub;
+  str::SuperstructureDisplay display{};
+
+  Drive driveSub{};
+  Elevator elevatorSub{display};
   // str::vision::VisionSystem vision;
 
   Autos autos{driveSub};
