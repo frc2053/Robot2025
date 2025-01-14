@@ -56,8 +56,8 @@ inline constexpr units::scalar_t DRIVE_GEARING =
 inline constexpr units::scalar_t COUPLING_RATIO = (50.0 / 14.0);
 inline constexpr units::meter_t WHEEL_RADIUS = 1.9154_in;
 
-inline constexpr units::meter_t WHEELBASE_WIDTH = 20.75_in;
-inline constexpr units::meter_t WHEELBASE_LENGTH = 20.75_in;
+inline constexpr units::meter_t WHEELBASE_WIDTH = 22.75_in;
+inline constexpr units::meter_t WHEELBASE_LENGTH = 22.75_in;
 
 inline const units::meter_t DRIVEBASE_RADIUS{
     units::math::hypot(WHEELBASE_WIDTH / 2, WHEELBASE_LENGTH / 2)};
@@ -73,8 +73,8 @@ inline frc::SwerveDriveKinematics<4> KINEMATICS{
     MODULE_LOCATIONS[3]};
 
 // Total outside frame size
-inline constexpr units::meter_t DRIVEBASE_WIDTH = 26.44_in;
-inline constexpr units::meter_t DRIVEBASE_LENGTH = 26.44_in;
+inline constexpr units::meter_t DRIVEBASE_WIDTH = 28.44_in;
+inline constexpr units::meter_t DRIVEBASE_LENGTH = 28.44_in;
 
 // 3/4 in plywood + 2.5 in diameter pool noodles + 1/8 slop
 inline constexpr units::meter_t BUMPER_THICKNESS = .75_in + 2.5_in + .125_in;
