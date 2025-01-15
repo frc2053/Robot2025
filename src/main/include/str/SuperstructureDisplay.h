@@ -6,9 +6,7 @@
 
 #include <units/length.h>
 
-#include "constants/ArmConstants.h"
 #include "constants/SwerveConstants.h"
-#include "frc/RobotController.h"
 #include "frc/smartdashboard/Mechanism2d.h"
 #include "frc/smartdashboard/MechanismLigament2d.h"
 #include "frc/smartdashboard/MechanismObject2d.h"
@@ -55,14 +53,16 @@ class SuperstructureDisplay {
     elevatorCarriage->SetColor(frc::Color::kRed);
 
     armJoint->SetColor(frc::Color::kBlue);
-
-    // endEffectorFront->SetColor(frc::Color::kOrange);
-    // endEffectorBack->SetColor(frc::Color::kOrange);
+    uShapeBack->SetColor(frc::Color::kOrange);
+    uShapeAround->SetColor(frc::Color::kOrange);
   }
   void SetElevatorHeight(units::meter_t newHeight) {
     elevatorCarriage->SetLength(newHeight / 1_m);
   }
-  void SetArmAngle(units::radian_t newAngle) { armJoint->SetAngle(newAngle); }
+  void SetArmAngle(units::radian_t newAngle) {
+    armJoint->SetAngle(newAngle);
+    uShapeBack->SetAngle(newAngle + 116.16_deg);
+  }
 
  private:
   inline static constexpr units::meter_t TOTAL_SCREEN_WIDTH = 60_in;
@@ -144,18 +144,12 @@ class SuperstructureDisplay {
   // Arm
   frc::MechanismLigament2d* armJoint{
       elevatorCarriage->Append<frc::MechanismLigament2d>(
-          "ArmJoint", consts::arm::physical::ARM_LENGTH.value(), 0_deg)};
-
-  // End Effector
-  //   frc::MechanismLigament2d* endEffectorFront{
-  //       armJoint->Append<frc::MechanismLigament2d>(
-  //           "EndEffectorFront",
-  //           (consts::arm::physical::END_EFFECTOR_LENGTH / 2).value(),
-  //           -55_deg)};
-  //   frc::MechanismLigament2d* endEffectorBack{
-  //       armJoint->Append<frc::MechanismLigament2d>(
-  //           "EndEffectorBack",
-  //           (consts::arm::physical::END_EFFECTOR_LENGTH / 2).value(),
-  //           -235_deg)};
+          "ArmJoint", 9.508097_in / 1_m, 0_deg)};
+  frc::MechanismLigament2d* uShapeBack{
+      elevatorCarriage->Append<frc::MechanismLigament2d>(
+          "uShapeBack", 9.508097_in / 1_m, 0_deg)};
+  frc::MechanismLigament2d* uShapeAround{
+      uShapeBack->Append<frc::MechanismLigament2d>(
+          "uShapeAround", 13.808011_in / 1_m, -66.28_deg)};
 };
 }  // namespace str

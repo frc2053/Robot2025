@@ -83,7 +83,7 @@ class Elevator : public frc2::SubsystemBase {
                                     consts::elevator::physical::EXTENDED_HEIGHT,
                                     true,
                                     0_m,
-                                    {0.005}};
+                                    {0.00}};
 
   str::SuperstructureDisplay& display;
   std::string leftAlertMsg{"Elevator Left Motor Config"};
