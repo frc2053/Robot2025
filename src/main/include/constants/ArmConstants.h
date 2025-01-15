@@ -13,6 +13,7 @@
 #include "units/angle.h"
 #include "units/dimensionless.h"
 #include "units/moment_of_inertia.h"
+#include "str/GainTypes.h"
 
 namespace consts::arm {
 
@@ -42,5 +43,17 @@ inline constexpr units::radian_t MIN_ANGLE = -180_deg;
 inline constexpr units::radian_t MAX_ANGLE = 180_deg;
 }  // namespace physical
 
-namespace gains {}  // namespace gains
+namespace gains {
+inline const str::gains::radial::RadialGainsHolder PIVOT_GAINS{
+    consts::arm::physical::MOTOR.freeSpeed / consts::arm::physical::GEARING,
+    str::gains::radial::turn_volt_ka_unit_t{0},
+    str::gains::radial::turn_volt_kv_unit_t{0},
+    str::gains::radial::turn_amp_ka_unit_t{0},
+    str::gains::radial::turn_amp_kv_unit_t{0},
+    0_A,
+    str::gains::radial::turn_amp_kp_unit_t{0},
+    str::gains::radial::turn_amp_ki_unit_t{0},
+    str::gains::radial::turn_amp_kd_unit_t{0},
+};
+}  // namespace gains
 }  // namespace consts::arm

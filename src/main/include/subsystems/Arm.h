@@ -6,13 +6,12 @@
 
 #include <frc2/command/SubsystemBase.h>
 
-#include <numbers>
-
 #include <ctre/phoenix6/TalonFX.hpp>
 
 #include "constants/ArmConstants.h"
 #include "frc/Alert.h"
 #include "frc/simulation/SingleJointedArmSim.h"
+#include "str/GainTypes.h"
 #include "str/SuperstructureDisplay.h"
 #include "units/voltage.h"
 
@@ -51,7 +50,8 @@ class Arm : public frc2::SubsystemBase {
   ctre::phoenix6::controls::VoltageOut pivotVoltageSetter{0_V};
   ctre::phoenix6::controls::TorqueCurrentFOC pivotTorqueCurrentSetter{0_A};
 
-  consts::arm::gains::holder currentGains{consts::arm::gains::ARM_GAINS};
+  str::gains::radial::RadialGainsHolder currentGains{
+      consts::arm::gains::PIVOT_GAINS};
 
   frc::sim::SingleJointedArmSim armSim{consts::arm::physical::MOTOR,
                                        consts::arm::physical::GEARING,

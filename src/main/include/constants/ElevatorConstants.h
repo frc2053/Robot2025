@@ -12,7 +12,6 @@
 
 #include "frc/system/plant/DCMotor.h"
 #include "str/GainTypes.h"
-#include "str/Units.h"
 #include "units/dimensionless.h"
 
 namespace consts::elevator {
@@ -36,26 +35,25 @@ inline constexpr bool INVERT_RIGHT = true;
 
 inline constexpr units::meter_t PULLEY_DIAM = 1.75_in;
 inline constexpr int NUM_OF_STAGES = 3;
-inline constexpr units::scalar_t GEARING = (20) * (1.0 / NUM_OF_STAGES);
+inline constexpr units::scalar_t GEARING = 20;
 
-inline constexpr units::kilogram_t CARRIAGE_MASS = 24.5_lb;
+inline constexpr units::kilogram_t CARRIAGE_MASS = 201.54_lb;
 
-inline constexpr units::meter_t EXTENDED_HEIGHT = 80_in;
+inline constexpr units::meter_t EXTENDED_HEIGHT = 26_in;
 }  // namespace physical
 
 namespace gains {
 
-inline const holder ARM_GAINS{
-    (physical::MOTOR.freeSpeed / physical::GEARING) / (1_rad) *
-        (physical::PULLEY_DIAM / 2),
-    str::gains::linear::meter_volt_ka_unit_t{0},
-    str::gains::linear::meter_volt_kv_unit_t{0},
-    str::gains::linear::meter_amp_ka_unit_t{0},
-    str::gains::linear::meter_amp_kv_unit_t{0},
+inline const str::gains::radial::RadialGainsHolder ELEVATOR_GAINS{
+    (physical::MOTOR.freeSpeed / physical::GEARING),
+    str::gains::radial::turn_volt_ka_unit_t{0},
+    str::gains::radial::turn_volt_kv_unit_t{0},
+    str::gains::radial::turn_amp_ka_unit_t{0},
+    str::gains::radial::turn_amp_kv_unit_t{0},
     0_A,
-    str::gains::linear::meter_amp_kp_unit_t{250},
-    str::gains::linear::meter_amp_ki_unit_t{0},
-    str::gains::linear::meter_amp_kd_unit_t{0},
+    str::gains::radial::turn_amp_kp_unit_t{250},
+    str::gains::radial::turn_amp_ki_unit_t{0},
+    str::gains::radial::turn_amp_kd_unit_t{0},
 };
 
 }  // namespace gains

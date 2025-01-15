@@ -6,14 +6,17 @@
 
 #include <frc2/command/SubsystemBase.h>
 
-#include <numbers>
-
 #include <ctre/phoenix6/TalonFX.hpp>
 
 #include "constants/ElevatorConstants.h"
 #include "frc/Alert.h"
 #include "frc/simulation/ElevatorSim.h"
+#include "str/GainTypes.h"
 #include "str/SuperstructureDisplay.h"
+#include "units/angle.h"
+#include "units/angular_velocity.h"
+#include "units/length.h"
+#include "units/velocity.h"
 #include "units/voltage.h"
 
 class Elevator : public frc2::SubsystemBase {
@@ -30,6 +33,12 @@ class Elevator : public frc2::SubsystemBase {
  private:
   void ConfigureMotors();
   void ConfigureControlSignals();
+  units::meter_t ConvertRadiansToHeight(units::radian_t rots);
+  units::radian_t ConvertHeightToRadians(units::meter_t height);
+  units::meters_per_second_t ConvertRadianVelToHeightVel(
+      units::radians_per_second_t radialVel);
+  units::radians_per_second_t ConvertHeightVelToRadianVel(
+      units::meters_per_second_t vel);
 
   ctre::phoenix6::hardware::TalonFX leftMotor{
       consts::elevator::can_ids::LEFT_MOTOR};
@@ -63,7 +72,7 @@ class Elevator : public frc2::SubsystemBase {
   ctre::phoenix6::controls::VoltageOut elevatorVoltageSetter{0_V};
   ctre::phoenix6::controls::TorqueCurrentFOC elevatorTorqueCurrentSetter{0_A};
 
-  consts::elevator::gains::holder currentGains{
+  str::gains::radial::RadialGainsHolder currentGains{
       consts::elevator::gains::ELEVATOR_GAINS};
 
   frc::sim::ElevatorSim elevatorSim{consts::elevator::physical::MOTOR,

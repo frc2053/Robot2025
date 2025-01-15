@@ -153,7 +153,7 @@ inline constexpr units::meters_per_second_squared_t MAX_ACCEL = 2000_fps_sq;
 }  // namespace physical
 
 namespace gains {
-inline const str::swerve::SteerGains STEER{
+inline const str::gains::radial::RadialGainsHolder STEER{
     consts::swerve::physical::STEER_MOTOR.freeSpeed /
         consts::swerve::physical::STEER_GEARING,
     str::gains::radial::turn_volt_ka_unit_t{0.017218},

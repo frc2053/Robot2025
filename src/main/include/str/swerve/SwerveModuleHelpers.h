@@ -81,63 +81,6 @@ struct ModulePhysicalCharacteristics {
         wheelRadius{wheelRad} {}
 };
 
-struct SteerGains {
-  units::turns_per_second_t motionMagicCruiseVel;
-  str::gains::radial::turn_volt_ka_unit_t motionMagicExpoKa;
-  str::gains::radial::turn_volt_kv_unit_t motionMagicExpoKv;
-  str::gains::radial::turn_amp_ka_unit_t kA;
-  str::gains::radial::turn_amp_kv_unit_t kV;
-  units::ampere_t kS;
-  str::gains::radial::turn_amp_kp_unit_t kP;
-  str::gains::radial::turn_amp_ki_unit_t kI;
-  str::gains::radial::turn_amp_kd_unit_t kD;
-
-  SteerGains& operator=(const SteerGains& other) = default;
-  SteerGains(const SteerGains& other)
-      : motionMagicCruiseVel{other.motionMagicCruiseVel},
-        motionMagicExpoKa{other.motionMagicExpoKa},
-        motionMagicExpoKv{other.motionMagicExpoKv},
-        kA{other.kA},
-        kV{other.kV},
-        kS{other.kS},
-        kP{other.kP},
-        kI{other.kI},
-        kD{other.kD} {}
-  SteerGains(units::turns_per_second_t mmCv,
-             str::gains::radial::turn_volt_ka_unit_t mmKa,
-             str::gains::radial::turn_volt_kv_unit_t mmKv,
-             str::gains::radial::turn_amp_ka_unit_t ka,
-             str::gains::radial::turn_amp_kv_unit_t kv, units::ampere_t ks,
-             str::gains::radial::turn_amp_kp_unit_t kp,
-             str::gains::radial::turn_amp_ki_unit_t ki,
-             str::gains::radial::turn_amp_kd_unit_t kd)
-      : motionMagicCruiseVel{mmCv},
-        motionMagicExpoKa{mmKa},
-        motionMagicExpoKv{mmKv},
-        kA{ka},
-        kV{kv},
-        kS{ks},
-        kP{kp},
-        kI{ki},
-        kD{kd} {}
-
-  bool operator==(const SteerGains& rhs) const {
-    return units::essentiallyEqual(motionMagicCruiseVel,
-                                   rhs.motionMagicCruiseVel, 1e-6),
-           units::essentiallyEqual(motionMagicExpoKa, rhs.motionMagicExpoKa,
-                                   1e-6),
-           units::essentiallyEqual(motionMagicExpoKv, rhs.motionMagicExpoKv,
-                                   1e-6),
-           units::essentiallyEqual(kA, rhs.kA, 1e-6) &&
-               units::essentiallyEqual(kV, rhs.kV, 1e-6) &&
-               units::essentiallyEqual(kS, rhs.kS, 1e-6) &&
-               units::essentiallyEqual(kP, rhs.kP, 1e-6) &&
-               units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
-               units::essentiallyEqual(kD, rhs.kD, 1e-6);
-  }
-  bool operator!=(const SteerGains& rhs) const { return !operator==(rhs); }
-};
-
 struct DriveGains {
   str::gains::radial::turn_amp_ka_unit_t kA;
   str::gains::radial::turn_amp_kv_unit_t kV;

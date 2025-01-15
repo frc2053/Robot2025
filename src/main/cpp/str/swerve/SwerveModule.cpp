@@ -13,6 +13,7 @@
 #include "frc/Alert.h"
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
+#include "str/GainTypes.h"
 #include "str/swerve/SwerveModuleSim.h"
 #include "units/angle.h"
 #include "units/current.h"
@@ -21,7 +22,8 @@ using namespace str::swerve;
 
 SwerveModule::SwerveModule(const ModuleConstants& consts,
                            const ModulePhysicalCharacteristics& physical,
-                           SteerGains steer, DriveGains drive)
+                           str::gains::radial::RadialGainsHolder steer,
+                           DriveGains drive)
     : moduleNamePrefix{consts.moduleName},
       encoderAlertMsg{moduleNamePrefix + " Steer Encoder Configuration"},
       steerAlertMsg{moduleNamePrefix + " Steer Motor Configuration"},
@@ -163,7 +165,8 @@ frc::SwerveModuleState SwerveModule::UpdateSimulatedModule(
   return moduleSim.Update(batteryVoltage);
 }
 
-void SwerveModule::SetSteerGains(str::swerve::SteerGains newGains) {
+void SwerveModule::SetSteerGains(
+    str::gains::radial::RadialGainsHolder newGains) {
   steerGains = newGains;
   ctre::phoenix6::configs::Slot0Configs steerSlotConfig{};
   steerSlotConfig.kV = steerGains.kV.value();
@@ -217,7 +220,7 @@ void SwerveModule::SetDriveGains(str::swerve::DriveGains newGains) {
   }
 }
 
-str::swerve::SteerGains SwerveModule::GetSteerGains() const {
+str::gains::radial::RadialGainsHolder SwerveModule::GetSteerGains() const {
   return steerGains;
 }
 

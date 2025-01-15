@@ -48,7 +48,7 @@ void RobotContainer::ConfigureBindings() {
         armSub.SetVoltage(
             frc::ApplyDeadband<double>(-driverJoystick.GetRightX(), .1) * 12_V);
       },
-      {&elevatorSub}));
+      {&armSub}));
 }
 
 void RobotContainer::ConfigureSysIdBinds() {

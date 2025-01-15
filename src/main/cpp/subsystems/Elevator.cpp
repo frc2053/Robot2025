@@ -47,35 +47,33 @@ void Elevator::SimulationPeriodic() {
 
   elevatorSim.Update(20_ms);
 
-  double motorPos =
-      (elevatorSim.GetPosition().value() /
-       (consts::elevator::physical::PULLEY_DIAM.value() * std::numbers::pi)) *
-      (consts::elevator::physical::GEARING);
+  units::turn_t pulleyTurns = ConvertHeightToRadians(elevatorSim.GetPosition());
+  units::turns_per_second_t pulleyRadialVel =
+      ConvertHeightVelToRadianVel(elevatorSim.GetVelocity());
 
-  double motorVel =
-      (elevatorSim.GetVelocity().value() /
-       (consts::elevator::physical::PULLEY_DIAM.value() * std::numbers::pi)) *
-      (consts::elevator::physical::GEARING);
+  units::turn_t motorPos = pulleyTurns * consts::elevator::physical::GEARING;
 
-  leftMotorSim.SetRawRotorPosition(units::turn_t{motorPos});
-  leftMotorSim.SetRotorVelocity(units::turns_per_second_t{motorVel});
+  units::turns_per_second_t motorVel =
+      pulleyRadialVel * consts::elevator::physical::GEARING;
 
-  rightMotorSim.SetRawRotorPosition(units::turn_t{motorPos});
-  rightMotorSim.SetRotorVelocity(units::turns_per_second_t{motorVel});
+  leftMotorSim.SetRawRotorPosition(motorPos);
+  leftMotorSim.SetRotorVelocity(motorVel);
+
+  rightMotorSim.SetRawRotorPosition(motorPos);
+  rightMotorSim.SetRotorVelocity(motorVel);
 }
 
 units::meter_t Elevator::GetHeight() {
-  units::meter_t latencyCompLeftHeight = units::meter_t{
+  units::turn_t latencyCompLeft =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
-          leftPositionSig, leftVelocitySig)
-          .value()};
-  units::meter_t latencyCompRightHeight = units::meter_t{
+          leftPositionSig, leftVelocitySig);
+  units::turn_t latencyCompRight =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
-          rightPositionSig, rightVelocitySig)
-          .value()};
+          rightPositionSig, rightVelocitySig);
 
   units::meter_t avgHeight =
-      (latencyCompLeftHeight + latencyCompRightHeight) / 2;
+      ConvertRadiansToHeight((latencyCompLeft + latencyCompRight) / 2) *
+      consts::elevator::physical::NUM_OF_STAGES;
 
   return avgHeight;
 };
@@ -128,21 +126,14 @@ void Elevator::ConfigureMotors() {
   gains.kD = currentGains.kD.value();
   config.Slot0 = gains;
 
-  // Maybe scuffed because I want the talon to report linear distance
   config.MotionMagic.MotionMagicCruiseVelocity =
-      units::turns_per_second_t{currentGains.motionMagicCruiseVel.value()};
-  config.MotionMagic.MotionMagicExpo_kV =
-      ctre::unit::volts_per_turn_per_second_t{
-          currentGains.motionMagicExpoKv.value()};
-  config.MotionMagic.MotionMagicExpo_kA =
-      ctre::unit::volts_per_turn_per_second_squared_t{
-          currentGains.motionMagicExpoKa.value()};
+      currentGains.motionMagicCruiseVel;
+  config.MotionMagic.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
+  config.MotionMagic.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
 
   config.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
-  config.Feedback.SensorToMechanismRatio =
-      consts::elevator::physical::GEARING /
-      (std::numbers::pi * consts::elevator::physical::PULLEY_DIAM.value());
+  config.Feedback.SensorToMechanismRatio = consts::elevator::physical::GEARING;
   config.MotorOutput.Inverted =
       consts::elevator::physical::INVERT_LEFT
           ? ctre::phoenix6::signals::InvertedValue::Clockwise_Positive
@@ -197,4 +188,22 @@ void Elevator::ConfigureControlSignals() {
   elevatorTorqueCurrentSetter.UpdateFreqHz = 0_Hz;
   elevatorTorqueCurrentSetter.OverrideCoastDurNeutral = true;
   elevatorHeightSetter.OverrideCoastDurNeutral = true;
+}
+
+units::meter_t Elevator::ConvertRadiansToHeight(units::radian_t rots) {
+  return (rots / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2);
+}
+
+units::radian_t Elevator::ConvertHeightToRadians(units::meter_t height) {
+  return 1_rad * (height / (consts::elevator::physical::PULLEY_DIAM / 2));
+}
+
+units::meters_per_second_t Elevator::ConvertRadianVelToHeightVel(
+    units::radians_per_second_t radialVel) {
+  return (radialVel / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2);
+}
+
+units::radians_per_second_t Elevator::ConvertHeightVelToRadianVel(
+    units::meters_per_second_t vel) {
+  return 1_rad * (vel / (consts::elevator::physical::PULLEY_DIAM / 2));
 }
