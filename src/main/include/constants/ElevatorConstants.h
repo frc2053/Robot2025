@@ -44,17 +44,21 @@ inline constexpr units::meter_t EXTENDED_HEIGHT = 26_in;
 
 namespace gains {
 
+inline constexpr units::meter_t HEIGHT_TOLERANCE = .25_in;
+
 inline const str::gains::radial::RadialGainsHolder ELEVATOR_GAINS{
     (physical::MOTOR.freeSpeed / physical::GEARING),
-    str::gains::radial::turn_volt_ka_unit_t{0},
-    str::gains::radial::turn_volt_kv_unit_t{0},
+    str::gains::radial::turn_volt_ka_unit_t{0.017336},
+    str::gains::radial::turn_volt_kv_unit_t{2.2977},
     str::gains::radial::turn_amp_ka_unit_t{0},
     str::gains::radial::turn_amp_kv_unit_t{0},
     0_A,
-    str::gains::radial::turn_amp_kp_unit_t{250},
+    str::gains::radial::turn_amp_kp_unit_t{0},
     str::gains::radial::turn_amp_ki_unit_t{0},
     str::gains::radial::turn_amp_kd_unit_t{0},
 };
+
+inline constexpr units::ampere_t kG = 1.1181_A;
 
 }  // namespace gains
 }  // namespace consts::elevator

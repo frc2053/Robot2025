@@ -36,12 +36,8 @@ void RobotContainer::ConfigureBindings() {
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
 
-  elevatorSub.SetDefaultCommand(frc2::cmd::Run(
-      [this] {
-        elevatorSub.SetVoltage(
-            frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) * 12_V);
-      },
-      {&elevatorSub}));
+  driverJoystick.A().OnTrue(elevatorSub.GoToHeight([] { return 5.5_ft; }));
+  driverJoystick.B().OnTrue(elevatorSub.GoToHeight([] { return 0_ft; }));
 
   armSub.SetDefaultCommand(frc2::cmd::Run(
       [this] {
@@ -58,6 +54,8 @@ void RobotContainer::ConfigureSysIdBinds() {
   tuningTable->PutBoolean("SteerSysIdTorqueCurrent", false);
   tuningTable->PutBoolean("DriveSysId", false);
   tuningTable->PutBoolean("WheelRadius", false);
+  tuningTable->PutBoolean("ElevatorSysIdVolts", false);
+  tuningTable->PutBoolean("ElevatorSysIdTorqueCurrent", false);
   tuningTable->PutBoolean("Quasistatic", true);
   tuningTable->PutBoolean("Forward", true);
 
@@ -69,14 +67,25 @@ void RobotContainer::ConfigureSysIdBinds() {
   steerSysIdVoltsBtn.WhileTrue(SteerVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+
   steerSysIdTorqueCurrentBtn.WhileTrue(SteerTorqueCurrentSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+
   driveSysIdBtn.WhileTrue(DriveSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+
   wheelRadiusBtn.WhileTrue(WheelRadiusSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); }));
+
+  elevatorSysIdVoltsBtn.WhileTrue(ElevatorVoltsSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+
+  elevatorSysIdTorqueCurrentBtn.WhileTrue(ElevatorTorqueCurrentSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 }
 
 frc2::CommandPtr RobotContainer::SteerVoltsSysIdCommands(
@@ -106,6 +115,38 @@ frc2::CommandPtr RobotContainer::SteerTorqueCurrentSysIdCommands(
       frc2::cmd::Either(driveSub.SysIdSteerQuasistaticTorqueCurrent(
                             frc2::sysid::Direction::kReverse),
                         driveSub.SysIdSteerDynamicTorqueCurrent(
+                            frc2::sysid::Direction::kReverse),
+                        quasistatic),
+      fwd);
+}
+
+frc2::CommandPtr RobotContainer::ElevatorVoltsSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
+                            frc2::sysid::Direction::kForward),
+                        elevatorSub.SysIdElevatorDynamicVoltage(
+                            frc2::sysid::Direction::kForward),
+                        quasistatic),
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        elevatorSub.SysIdElevatorDynamicVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        quasistatic),
+      fwd);
+}
+
+frc2::CommandPtr RobotContainer::ElevatorTorqueCurrentSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticTorqueCurrent(
+                            frc2::sysid::Direction::kForward),
+                        elevatorSub.SysIdElevatorDynamicTorqueCurrent(
+                            frc2::sysid::Direction::kForward),
+                        quasistatic),
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticTorqueCurrent(
+                            frc2::sysid::Direction::kReverse),
+                        elevatorSub.SysIdElevatorDynamicTorqueCurrent(
                             frc2::sysid::Direction::kReverse),
                         quasistatic),
       fwd);

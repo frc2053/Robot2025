@@ -10,8 +10,11 @@
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
 #include "frc/RobotController.h"
+#include "frc2/command/CommandPtr.h"
+#include "frc2/command/Commands.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
+#include "units/current.h"
 #include "units/length.h"
 #include "units/voltage.h"
 
@@ -35,7 +38,15 @@ void Elevator::Periodic() {
         "Error updating elevator positions! Error was: {}", status.GetName()));
   }
 
-  display.SetElevatorHeight(GetHeight());
+  currentHeight = GetHeight();
+
+  display.SetElevatorHeight(currentHeight);
+  UpdateNTEntries();
+}
+
+void Elevator::UpdateNTEntries() {
+  currentHeightPub.Set(currentHeight.convert<units::inches>().value());
+  heightSetpointPub.Set(goalHeight.convert<units::inches>().value());
 }
 
 void Elevator::SimulationPeriodic() {
@@ -78,13 +89,79 @@ units::meter_t Elevator::GetHeight() {
   return avgHeight;
 };
 
-void Elevator::GoToHeight() {}
+bool Elevator::IsAtGoalHeight() {
+  bool isAtHeight = units::math::abs(goalHeight - currentHeight) <
+                    consts::elevator::gains::HEIGHT_TOLERANCE;
+  return isAtHeight;
+}
+
+frc2::CommandPtr Elevator::GoToHeight(
+    std::function<units::meter_t()> newHeight) {
+  return frc2::cmd::Run([this, newHeight] { GoToHeight(newHeight()); }, {this})
+      .Until([this] { return IsAtGoalHeight(); });
+}
+
+void Elevator::GoToHeight(units::meter_t newHeight) {
+  goalHeight = newHeight;
+  leftMotor.SetControl(elevatorHeightSetter.WithPosition(
+      ConvertHeightToRadians(newHeight) /
+      consts::elevator::physical::NUM_OF_STAGES));
+  rightMotor.SetControl(elevatorHeightSetter.WithPosition(
+      ConvertHeightToRadians(newHeight) /
+      consts::elevator::physical::NUM_OF_STAGES));
+}
 
 void Elevator::SetVoltage(units::volt_t volts) {
   leftMotor.SetControl(
       elevatorVoltageSetter.WithEnableFOC(true).WithOutput(volts));
   rightMotor.SetControl(
       elevatorVoltageSetter.WithEnableFOC(true).WithOutput(volts));
+}
+
+void Elevator::SetTorqueCurrent(units::ampere_t amps) {
+  leftMotor.SetControl(elevatorTorqueCurrentSetter.WithOutput(amps));
+  rightMotor.SetControl(elevatorTorqueCurrentSetter.WithOutput(amps));
+}
+
+frc2::CommandPtr Elevator::SysIdElevatorQuasistaticVoltage(
+    frc2::sysid::Direction dir) {
+  return elevatorSysIdVoltage.Quasistatic(dir).WithName(
+      "Elevator Quasistatic Voltage");
+}
+frc2::CommandPtr Elevator::SysIdElevatorDynamicVoltage(
+    frc2::sysid::Direction dir) {
+  return elevatorSysIdVoltage.Dynamic(dir).WithName("Elevator Dynamic Voltage");
+}
+
+frc2::CommandPtr Elevator::SysIdElevatorQuasistaticTorqueCurrent(
+    frc2::sysid::Direction dir) {
+  return elevatorSysIdTorqueCurrent.Quasistatic(dir).WithName(
+      "Elevator Quasistatic Torque Current");
+}
+frc2::CommandPtr Elevator::SysIdElevatorDynamicTorqueCurrent(
+    frc2::sysid::Direction dir) {
+  return elevatorSysIdTorqueCurrent.Dynamic(dir).WithName(
+      "Elevator Dynamic Torque Current");
+}
+
+void Elevator::LogElevatorVolts(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("elevator")
+      .voltage((leftVoltageSig.GetValue() + rightVoltageSig.GetValue()) / 2.0)
+      .position((leftPositionSig.GetValue() + rightPositionSig.GetValue()) /
+                2.0)
+      .velocity((leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) /
+                2.0);
+}
+
+void Elevator::LogElevatorTorqueCurrent(frc::sysid::SysIdRoutineLog* log) {
+  log->Motor("elevator")
+      .voltage(units::volt_t{(leftTorqueCurrentSig.GetValueAsDouble() +
+                              rightTorqueCurrentSig.GetValueAsDouble()) /
+                             2.0})
+      .position((leftPositionSig.GetValue() + rightPositionSig.GetValue()) /
+                2.0)
+      .velocity((leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) /
+                2.0);
 }
 
 void Elevator::OptimizeBusSignals() {
@@ -114,6 +191,43 @@ void Elevator::OptimizeBusSignals() {
   optiRightAlert.Set(!optimizeRightResult.IsOK());
 }
 
+void Elevator::SetElevatorGains(str::gains::radial::RadialGainsHolder newGains,
+                                units::ampere_t kg) {
+  currentGains = newGains;
+  ctre::phoenix6::configs::Slot0Configs slotConfig{};
+  slotConfig.kV = currentGains.kV.value();
+  slotConfig.kA = currentGains.kA.value();
+  slotConfig.kS = currentGains.kS.value();
+  slotConfig.kP = currentGains.kP.value();
+  slotConfig.kI = currentGains.kI.value();
+  slotConfig.kD = currentGains.kD.value();
+  slotConfig.kG = kg.value();
+
+  ctre::phoenix6::configs::MotionMagicConfigs mmConfig{};
+
+  mmConfig.MotionMagicCruiseVelocity = currentGains.motionMagicCruiseVel;
+  mmConfig.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
+  mmConfig.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
+
+  ctre::phoenix::StatusCode statusGains =
+      leftMotor.GetConfigurator().Apply(slotConfig);
+  if (!statusGains.IsOK()) {
+    frc::DataLogManager::Log(
+        fmt::format("Left Elevator Motor was unable to set new gains! "
+                    "Error: {}, More Info: {}",
+                    statusGains.GetName(), statusGains.GetDescription()));
+  }
+
+  ctre::phoenix::StatusCode statusMM =
+      leftMotor.GetConfigurator().Apply(mmConfig);
+  if (!statusMM.IsOK()) {
+    frc::DataLogManager::Log(fmt::format(
+        "Left Elevator Motor was unable to set new motion magic config! "
+        "Error: {}, More Info: {}",
+        statusMM.GetName(), statusMM.GetDescription()));
+  }
+}
+
 void Elevator::ConfigureMotors() {
   ctre::phoenix6::configs::TalonFXConfiguration config{};
   ctre::phoenix6::configs::Slot0Configs gains{};
@@ -124,6 +238,7 @@ void Elevator::ConfigureMotors() {
   gains.kP = currentGains.kP.value();
   gains.kI = currentGains.kI.value();
   gains.kD = currentGains.kD.value();
+  gains.kG = currentKg.value();
   config.Slot0 = gains;
 
   config.MotionMagic.MotionMagicCruiseVelocity =
