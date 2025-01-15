@@ -56,8 +56,8 @@ class SuperstructureDisplay {
 
     armJoint->SetColor(frc::Color::kBlue);
 
-    endEffectorFront->SetColor(frc::Color::kOrange);
-    endEffectorBack->SetColor(frc::Color::kOrange);
+    // endEffectorFront->SetColor(frc::Color::kOrange);
+    // endEffectorBack->SetColor(frc::Color::kOrange);
   }
   void SetElevatorHeight(units::meter_t newHeight) {
     elevatorCarriage->SetLength(newHeight / 1_m);
@@ -72,8 +72,8 @@ class SuperstructureDisplay {
   inline static constexpr units::meter_t MIDDLE_OF_SWERVE =
       TOTAL_SCREEN_WIDTH / 2;
   inline static constexpr units::meter_t MIDDLE_OF_CARRIAGE =
-      MIDDLE_OF_SWERVE - 9_in;
-  inline static constexpr units::meter_t LOWEST_CARRIAGE_HEIGHT = 9_in;
+      MIDDLE_OF_SWERVE - 4_in;
+  inline static constexpr units::meter_t LOWEST_CARRIAGE_HEIGHT = 9.875000_in;
 
   frc::Mechanism2d superstructureDisplay{TOTAL_SCREEN_WIDTH.value(),
                                          TOTAL_SCREEN_HEIGHT.value()};
@@ -147,13 +147,15 @@ class SuperstructureDisplay {
           "ArmJoint", consts::arm::physical::ARM_LENGTH.value(), 0_deg)};
 
   // End Effector
-  frc::MechanismLigament2d* endEffectorFront{
-      armJoint->Append<frc::MechanismLigament2d>(
-          "EndEffectorFront",
-          (consts::arm::physical::END_EFFECTOR_LENGTH / 2).value(), -55_deg)};
-  frc::MechanismLigament2d* endEffectorBack{
-      armJoint->Append<frc::MechanismLigament2d>(
-          "EndEffectorBack",
-          (consts::arm::physical::END_EFFECTOR_LENGTH / 2).value(), -235_deg)};
+  //   frc::MechanismLigament2d* endEffectorFront{
+  //       armJoint->Append<frc::MechanismLigament2d>(
+  //           "EndEffectorFront",
+  //           (consts::arm::physical::END_EFFECTOR_LENGTH / 2).value(),
+  //           -55_deg)};
+  //   frc::MechanismLigament2d* endEffectorBack{
+  //       armJoint->Append<frc::MechanismLigament2d>(
+  //           "EndEffectorBack",
+  //           (consts::arm::physical::END_EFFECTOR_LENGTH / 2).value(),
+  //           -235_deg)};
 };
 }  // namespace str

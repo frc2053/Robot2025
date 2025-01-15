@@ -148,10 +148,10 @@ void Elevator::ConfigureMotors() {
           ? ctre::phoenix6::signals::InvertedValue::Clockwise_Positive
           : ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
 
-  // config.TorqueCurrent.PeakForwardTorqueCurrent =
-  //     consts::elevator::current_limits::STATOR_LIMIT;
-  // config.TorqueCurrent.PeakReverseTorqueCurrent =
-  //     -consts::elevator::current_limits::STATOR_LIMIT;
+  config.TorqueCurrent.PeakForwardTorqueCurrent =
+      consts::elevator::current_limits::STATOR_LIMIT;
+  config.TorqueCurrent.PeakReverseTorqueCurrent =
+      -consts::elevator::current_limits::STATOR_LIMIT;
 
   config.CurrentLimits.SupplyCurrentLimitEnable = true;
   config.CurrentLimits.SupplyCurrentLimit =

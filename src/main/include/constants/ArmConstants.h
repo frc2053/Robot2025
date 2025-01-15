@@ -7,26 +7,39 @@
 #include <units/current.h>
 #include <units/length.h>
 #include <units/mass.h>
+#include <units/frequency.h>
 
+#include "frc/system/plant/DCMotor.h"
+#include "units/angle.h"
 #include "units/dimensionless.h"
+#include "units/moment_of_inertia.h"
 
 namespace consts::arm {
+
+inline constexpr units::hertz_t BUS_UPDATE_FREQ = 100_Hz;
+
 namespace can_ids {
-inline constexpr int PIVOT = 17;
+inline constexpr int PIVOT_MOTOR = 17;
 }  // namespace can_ids
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_LIMIT = 40_A;
-inline constexpr units::ampere_t STATOR_LIMIT = 60_A;
+inline constexpr units::ampere_t STATOR_LIMIT = 10_A;
 }  // namespace current_limits
 
 namespace physical {
+inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(1);
+inline constexpr bool INVERT_PIVOT = false;
+
 inline constexpr units::scalar_t GEARING = 60;
 
-inline constexpr units::kilogram_t MASS = 20_lb;
+inline constexpr units::kilogram_t MASS = 10_lb;
+inline constexpr units::kilogram_square_meter_t MOI = 0.12009477_kg_sq_m;
 
-inline constexpr units::meter_t ARM_LENGTH = 18_in;
-inline constexpr units::meter_t END_EFFECTOR_LENGTH = 12_in;
+inline constexpr units::meter_t ARM_LENGTH = 4.37480954214_in;
+
+inline constexpr units::radian_t MIN_ANGLE = -180_deg;
+inline constexpr units::radian_t MAX_ANGLE = 180_deg;
 }  // namespace physical
 
 namespace gains {}  // namespace gains

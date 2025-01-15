@@ -12,6 +12,7 @@
 #include "str/DriverstationUtils.h"
 #include "str/vision/VisionSystem.h"
 #include "subsystems/Drive.h"
+#include "subsystems/Elevator.h"
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -39,6 +40,13 @@ void RobotContainer::ConfigureBindings() {
       [this] {
         elevatorSub.SetVoltage(
             frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) * 12_V);
+      },
+      {&elevatorSub}));
+
+  armSub.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        armSub.SetVoltage(
+            frc::ApplyDeadband<double>(-driverJoystick.GetRightX(), .1) * 12_V);
       },
       {&elevatorSub}));
 }
@@ -132,6 +140,14 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
 Drive& RobotContainer::GetDrive() {
   return driveSub;
+}
+
+Elevator& RobotContainer::GetElevator() {
+  return elevatorSub;
+}
+
+Arm& RobotContainer::GetArm() {
+  return armSub;
 }
 
 // str::vision::VisionSystem& RobotContainer::GetVision() {
