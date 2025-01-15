@@ -137,6 +137,7 @@ void SwerveDrive::UpdateNTEntries() {
   odomUpdateRatePub.Set(odomUpdateRate.value());
   estimatorPub.Set(poseEstimator.GetEstimatedPosition());
   odomPosePub.Set(odom.GetPose());
+  swerveField.SetRobotPose(poseEstimator.GetEstimatedPosition());
   swerveField.GetObject("FL Pos")->SetPose(
       poseEstimator.GetEstimatedPosition().TransformBy(
           frc::Transform2d{consts::swerve::physical::WHEELBASE_LENGTH / 2,

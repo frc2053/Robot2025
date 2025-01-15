@@ -1,0 +1,117 @@
+{
+    "name": "20532025",
+    "rotations": [
+        {
+            "axis": "x",
+            "degrees": 90
+        },
+        {
+            "axis": "y",
+            "degrees": 0
+        },
+        {
+            "axis": "z",
+            "degrees": -90
+        }
+    ],
+    "position": [
+        0,
+        0,
+        0
+    ],
+    "cameras": [
+        {
+            "name": "fl_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -20
+                },
+                {
+                    "axis": "z",
+                    "degrees": -20.0
+                }
+            ],
+            "position": [
+                0.265256,
+                0.2770,
+                0.209751
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        },
+        {
+            "name": "fr_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -20
+                },
+                {
+                    "axis": "z",
+                    "degrees": 20.0
+                }
+            ],
+            "position": [
+                0.265256,
+                -0.2770,
+                0.209751
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        },
+        {
+            "name": "bl_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -20
+                },
+                {
+                    "axis": "z",
+                    "degrees": 160
+                }
+            ],
+            "position": [
+                -0.265256,
+                0.2770,
+                0.209751
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        },
+        {
+            "name": "br_cam",
+            "rotations": [
+                {
+                    "axis": "y",
+                    "degrees": -20
+                },
+                {
+                    "axis": "z",
+                    "degrees": -160
+                }
+            ],
+            "position": [
+                -0.265256,
+                -0.2770,
+                0.209751
+            ],
+            "resolution": [
+                1600,
+                1200
+            ],
+            "fov": 75
+        }
+    ],
+    "components": []
+}
