@@ -7,11 +7,13 @@
 #include "constants/ElevatorConstants.h"
 #include "ctre/phoenix/StatusCodes.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
+#include "ctre/phoenix6/signals/SpnEnums.hpp"
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
 #include "frc/RobotController.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
+#include "str/Units.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
@@ -38,7 +40,17 @@ void Elevator::Periodic() {
         "Error updating elevator positions! Error was: {}", status.GetName()));
   }
 
+  // sim is not inverted
+  if (frc::RobotBase::IsSimulation()) {
+    rightMotor.SetControl(followerSetter.WithOpposeMasterDirection(false));
+  } else {
+    rightMotor.SetControl(followerSetter);
+  }
+
   currentHeight = GetHeight();
+
+  isAtGoalHeight = units::math::abs(goalHeight - currentHeight) <
+                   consts::elevator::gains::HEIGHT_TOLERANCE;
 
   display.SetElevatorHeight(currentHeight);
   UpdateNTEntries();
@@ -47,6 +59,7 @@ void Elevator::Periodic() {
 void Elevator::UpdateNTEntries() {
   currentHeightPub.Set(currentHeight.convert<units::inches>().value());
   heightSetpointPub.Set(goalHeight.convert<units::inches>().value());
+  isAtSetpointPub.Set(isAtGoalHeight);
 }
 
 void Elevator::SimulationPeriodic() {
@@ -90,12 +103,10 @@ units::meter_t Elevator::GetHeight() {
 };
 
 bool Elevator::IsAtGoalHeight() {
-  bool isAtHeight = units::math::abs(goalHeight - currentHeight) <
-                    consts::elevator::gains::HEIGHT_TOLERANCE;
-  return isAtHeight;
+  return isAtGoalHeight;
 }
 
-frc2::CommandPtr Elevator::GoToHeight(
+frc2::CommandPtr Elevator::GoToHeightCmd(
     std::function<units::meter_t()> newHeight) {
   return frc2::cmd::Run([this, newHeight] { GoToHeight(newHeight()); }, {this})
       .Until([this] { return IsAtGoalHeight(); });
@@ -106,21 +117,15 @@ void Elevator::GoToHeight(units::meter_t newHeight) {
   leftMotor.SetControl(elevatorHeightSetter.WithPosition(
       ConvertHeightToRadians(newHeight) /
       consts::elevator::physical::NUM_OF_STAGES));
-  rightMotor.SetControl(elevatorHeightSetter.WithPosition(
-      ConvertHeightToRadians(newHeight) /
-      consts::elevator::physical::NUM_OF_STAGES));
 }
 
 void Elevator::SetVoltage(units::volt_t volts) {
   leftMotor.SetControl(
       elevatorVoltageSetter.WithEnableFOC(true).WithOutput(volts));
-  rightMotor.SetControl(
-      elevatorVoltageSetter.WithEnableFOC(true).WithOutput(volts));
 }
 
 void Elevator::SetTorqueCurrent(units::ampere_t amps) {
   leftMotor.SetControl(elevatorTorqueCurrentSetter.WithOutput(amps));
-  rightMotor.SetControl(elevatorTorqueCurrentSetter.WithOutput(amps));
 }
 
 frc2::CommandPtr Elevator::SysIdElevatorQuasistaticVoltage(
@@ -142,6 +147,82 @@ frc2::CommandPtr Elevator::SysIdElevatorDynamicTorqueCurrent(
     frc2::sysid::Direction dir) {
   return elevatorSysIdTorqueCurrent.Dynamic(dir).WithName(
       "Elevator Dynamic Torque Current");
+}
+
+frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
+  std::string tablePrefix = "Elevator/gains/";
+  return frc2::cmd::Sequence(
+      frc2::cmd::RunOnce(
+          [tablePrefix, this] {
+            frc::SmartDashboard::PutNumber(tablePrefix + "setpoint", 0);
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "mmCruiseVel",
+                consts::elevator::gains::ELEVATOR_GAINS.motionMagicCruiseVel
+                    .value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "mmKA", consts::elevator::gains::ELEVATOR_GAINS
+                                          .motionMagicExpoKa.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "mmKV", consts::elevator::gains::ELEVATOR_GAINS
+                                          .motionMagicExpoKv.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kA",
+                consts::elevator::gains::ELEVATOR_GAINS.kA.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kV",
+                consts::elevator::gains::ELEVATOR_GAINS.kV.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kS",
+                consts::elevator::gains::ELEVATOR_GAINS.kS.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kP",
+                consts::elevator::gains::ELEVATOR_GAINS.kP.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kI",
+                consts::elevator::gains::ELEVATOR_GAINS.kI.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kD",
+                consts::elevator::gains::ELEVATOR_GAINS.kD.value());
+            frc::SmartDashboard::PutNumber(tablePrefix + "kG",
+                                           consts::elevator::gains::kG.value());
+            GoToHeight(0_m);
+          },
+          {this}),
+      frc2::cmd::Run(
+          [this, tablePrefix] {
+            str::gains::radial::RadialGainsHolder newGains{
+                units::turns_per_second_t{frc::SmartDashboard::GetNumber(
+                    tablePrefix + "mmCruiseVel", 0)},
+                str::gains::radial::turn_volt_ka_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
+                str::gains::radial::turn_volt_kv_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
+                str::gains::radial::turn_amp_ka_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
+                str::gains::radial::turn_amp_kv_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
+                units::ampere_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
+                str::gains::radial::turn_amp_kp_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
+                str::gains::radial::turn_amp_ki_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
+                str::gains::radial::turn_amp_kd_unit_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
+
+            units::ampere_t newKg = units::ampere_t{
+                frc::SmartDashboard::GetNumber(tablePrefix + "kG", 0)};
+
+            if (newGains != currentGains ||
+                !(units::essentiallyEqual(newKg, currentKg, 1e-6))) {
+              SetElevatorGains(newGains, newKg);
+            }
+
+            GoToHeight(units::inch_t{
+                frc::SmartDashboard::GetNumber(tablePrefix + "setpoint", 0)});
+          },
+          {this})
+          .Until(isDone));
 }
 
 void Elevator::LogElevatorVolts(frc::sysid::SysIdRoutineLog* log) {
@@ -201,6 +282,8 @@ void Elevator::SetElevatorGains(str::gains::radial::RadialGainsHolder newGains,
   slotConfig.kP = currentGains.kP.value();
   slotConfig.kI = currentGains.kI.value();
   slotConfig.kD = currentGains.kD.value();
+  slotConfig.GravityType =
+      ctre::phoenix6::signals::GravityTypeValue::Elevator_Static;
   slotConfig.kG = kg.value();
 
   ctre::phoenix6::configs::MotionMagicConfigs mmConfig{};
@@ -239,6 +322,8 @@ void Elevator::ConfigureMotors() {
   gains.kI = currentGains.kI.value();
   gains.kD = currentGains.kD.value();
   gains.kG = currentKg.value();
+  gains.GravityType =
+      ctre::phoenix6::signals::GravityTypeValue::Elevator_Static;
   config.Slot0 = gains;
 
   config.MotionMagic.MotionMagicCruiseVelocity =
@@ -277,18 +362,13 @@ void Elevator::ConfigureMotors() {
 
   configureLeftAlert.Set(!configLeftResult.IsOK());
 
-  config.MotorOutput.Inverted =
-      consts::elevator::physical::INVERT_RIGHT
-          ? ctre::phoenix6::signals::InvertedValue::Clockwise_Positive
-          : ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
-
-  if (frc::RobotBase::IsSimulation()) {
-    config.MotorOutput.Inverted =
-        ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
-  }
-
+  // Empty config because we only want to follow left and report output shaft
+  // pos
+  ctre::phoenix6::configs::TalonFXConfiguration rightConfig{};
+  rightConfig.Feedback.SensorToMechanismRatio =
+      consts::elevator::physical::GEARING;
   ctre::phoenix::StatusCode configRightResult =
-      rightMotor.GetConfigurator().Apply(config);
+      rightMotor.GetConfigurator().Apply(rightConfig);
 
   frc::DataLogManager::Log(
       fmt::format("Configured right motor on elevator. Result was: {}",
@@ -301,6 +381,7 @@ void Elevator::ConfigureControlSignals() {
   elevatorHeightSetter.UpdateFreqHz = 0_Hz;
   elevatorVoltageSetter.UpdateFreqHz = 0_Hz;
   elevatorTorqueCurrentSetter.UpdateFreqHz = 0_Hz;
+  followerSetter.UpdateFreqHz = 0_Hz;
   elevatorTorqueCurrentSetter.OverrideCoastDurNeutral = true;
   elevatorHeightSetter.OverrideCoastDurNeutral = true;
 }

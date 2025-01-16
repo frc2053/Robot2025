@@ -36,8 +36,15 @@ void RobotContainer::ConfigureBindings() {
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
 
-  driverJoystick.A().OnTrue(elevatorSub.GoToHeight([] { return 5.5_ft; }));
-  driverJoystick.B().OnTrue(elevatorSub.GoToHeight([] { return 0_ft; }));
+  driverJoystick.A().OnTrue(elevatorSub.GoToHeightCmd([] { return 5.5_ft; }));
+  driverJoystick.B().OnTrue(elevatorSub.GoToHeightCmd([] { return 0_ft; }));
+
+  elevatorSub.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        elevatorSub.SetVoltage(
+            frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) * 12_V);
+      },
+      {&elevatorSub}));
 
   armSub.SetDefaultCommand(frc2::cmd::Run(
       [this] {
@@ -54,6 +61,7 @@ void RobotContainer::ConfigureSysIdBinds() {
   tuningTable->PutBoolean("SteerSysIdTorqueCurrent", false);
   tuningTable->PutBoolean("DriveSysId", false);
   tuningTable->PutBoolean("WheelRadius", false);
+  tuningTable->PutBoolean("ElevatorPidTuning", false);
   tuningTable->PutBoolean("ElevatorSysIdVolts", false);
   tuningTable->PutBoolean("ElevatorSysIdTorqueCurrent", false);
   tuningTable->PutBoolean("Quasistatic", true);
@@ -63,6 +71,8 @@ void RobotContainer::ConfigureSysIdBinds() {
       driveSub.TuneSteerPID([this] { return !steerTuneBtn.Get(); }));
   driveTuneBtn.OnTrue(
       driveSub.TuneDrivePID([this] { return !driveTuneBtn.Get(); }));
+  elevatorTuneBtn.OnTrue(
+      elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get(); }));
 
   steerSysIdVoltsBtn.WhileTrue(SteerVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },

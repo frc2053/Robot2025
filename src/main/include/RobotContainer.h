@@ -64,6 +64,7 @@ class RobotContainer {
                                                  "SteerSysIdTorqueCurrent"};
   frc2::NetworkButton driveSysIdBtn{tuningTable, "DriveSysId"};
   frc2::NetworkButton wheelRadiusBtn{tuningTable, "WheelRadius"};
+  frc2::NetworkButton elevatorTuneBtn{tuningTable, "ElevatorPidTuning"};
   frc2::NetworkButton elevatorSysIdVoltsBtn{tuningTable, "ElevatorSysIdVolts"};
   frc2::NetworkButton elevatorSysIdTorqueCurrentBtn{
       tuningTable, "ElevatorSysIdTorqueCurrent"};

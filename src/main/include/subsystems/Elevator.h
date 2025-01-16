@@ -10,9 +10,15 @@
 
 #include "constants/ElevatorConstants.h"
 #include "ctre/phoenix6/SignalLogger.hpp"
+#include "ctre/phoenix6/controls/Follower.hpp"
+#include "ctre/phoenix6/controls/MotionMagicExpoTorqueCurrentFOC.hpp"
+#include "ctre/phoenix6/controls/MotionMagicTorqueCurrentFOC.hpp"
+#include "ctre/phoenix6/controls/PositionTorqueCurrentFOC.hpp"
 #include "frc/Alert.h"
 #include "frc/simulation/ElevatorSim.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
+#include "networktables/BooleanTopic.h"
 #include "networktables/DoubleTopic.h"
 #include "networktables/NetworkTableInstance.h"
 #include "str/GainTypes.h"
@@ -36,13 +42,14 @@ class Elevator : public frc2::SubsystemBase {
   bool IsAtGoalHeight();
   void SetVoltage(units::volt_t volts);
   void SetTorqueCurrent(units::ampere_t amps);
-  frc2::CommandPtr GoToHeight(std::function<units::meter_t()> newHeight);
+  frc2::CommandPtr GoToHeightCmd(std::function<units::meter_t()> newHeight);
   frc2::CommandPtr SysIdElevatorQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdElevatorDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdElevatorQuasistaticTorqueCurrent(
       frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdElevatorDynamicTorqueCurrent(
       frc2::sysid::Direction dir);
+  frc2::CommandPtr TuneElevatorPID(std::function<bool()> isDone);
 
  private:
   void ConfigureMotors();
@@ -65,6 +72,7 @@ class Elevator : public frc2::SubsystemBase {
 
   units::meter_t goalHeight = 0_m;
   units::meter_t currentHeight = 0_m;
+  bool isAtGoalHeight = false;
 
   ctre::phoenix6::sim::TalonFXSimState& leftMotorSim = leftMotor.GetSimState();
   ctre::phoenix6::sim::TalonFXSimState& rightMotorSim =
@@ -92,6 +100,8 @@ class Elevator : public frc2::SubsystemBase {
       elevatorHeightSetter{0_rad};
   ctre::phoenix6::controls::VoltageOut elevatorVoltageSetter{0_V};
   ctre::phoenix6::controls::TorqueCurrentFOC elevatorTorqueCurrentSetter{0_A};
+  ctre::phoenix6::controls::Follower followerSetter{
+      consts::elevator::can_ids::LEFT_MOTOR, true};
 
   str::gains::radial::RadialGainsHolder currentGains{
       consts::elevator::gains::ELEVATOR_GAINS};
@@ -143,7 +153,8 @@ class Elevator : public frc2::SubsystemBase {
       nt->GetDoubleTopic("CurrentHeight").Publish()};
   nt::DoublePublisher heightSetpointPub{
       nt->GetDoubleTopic("HeightSetpoint").Publish()};
-
+  nt::BooleanPublisher isAtSetpointPub{
+      nt->GetBooleanTopic("IsAtRequestedHeight").Publish()};
   str::SuperstructureDisplay& display;
   std::string leftAlertMsg{"Elevator Left Motor Config"};
   std::string rightAlertMsg{"Elevator Right Motor Config"};
