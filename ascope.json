@@ -8,12 +8,10 @@
       "state": {
         "sidebar": {
           "width": 300,
-          "expanded": [
-            "/PathPlanner"
-          ]
+          "expanded": []
         },
         "tabs": {
-          "selected": 3,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -27,9 +25,40 @@
               "type": 1,
               "title": "Line Graph",
               "controller": {
-                "leftSources": [],
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Elevator/CurrentHeight",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Elevator/HeightSetpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
                 "rightSources": [],
-                "discreteSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Elevator/IsAtRequestedHeight",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  }
+                ],
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
@@ -164,6 +193,13 @@
                     }
                   },
                   {
+                    "type": "mechanism",
+                    "logKey": "NT:/SmartDashboard/Superstructure Display",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
                     "type": "trajectory",
                     "logKey": "NT:/Swerve/ActivePath",
                     "logType": "Pose2d[]",
@@ -182,6 +218,53 @@
                       "model": "20532025",
                       "color": "#00ffff"
                     }
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "NT:/Vision/CameraLocations",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/str_fl_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "20532025",
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/str_fr_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "20532025",
+                      "color": "#ff0000"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/str_bl_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "20532025",
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Vision/str_br_camPoseEstimation",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "20532025",
+                      "color": "#ff8c00"
+                    }
                   }
                 ],
                 "game": "2025 Field",
@@ -189,20 +272,36 @@
               },
               "controllerUUID": "987bqt8uyy95kylzdnynkpma8u744yj1",
               "renderer": {
-                "cameraIndex": -1,
+                "cameraIndex": -2,
                 "orbitFov": 75,
                 "cameraPosition": [
-                  0.7882590562399452,
-                  5.635086932468488,
-                  -7.362292105278245
+                  0.9757742929844002,
+                  1.8651937025403793,
+                  -4.01379634434857
                 ],
                 "cameraTarget": [
-                  -1.800885752209779,
-                  -2.608930850343126,
-                  1.8737810852760854
+                  0,
+                  0.5,
+                  0
                 ]
               },
-              "controlsHeight": 272
+              "controlsHeight": 370
+            },
+            {
+              "type": 10,
+              "title": "Mechanism",
+              "controller": [
+                {
+                  "type": "mechanism",
+                  "logKey": "NT:/SmartDashboard/Superstructure Display",
+                  "logType": "Mechanism2d",
+                  "visible": true,
+                  "options": {}
+                }
+              ],
+              "controllerUUID": "5sr3a60crcbvxk0iukd2zw1cf6uj7li4",
+              "renderer": null,
+              "controlsHeight": 200
             }
           ]
         }

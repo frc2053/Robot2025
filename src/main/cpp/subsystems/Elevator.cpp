@@ -393,9 +393,9 @@ void Elevator::ConfigureMotors() {
 }
 
 void Elevator::ConfigureControlSignals() {
-  elevatorHeightSetter.UpdateFreqHz = 250_Hz;
-  elevatorVoltageSetter.UpdateFreqHz = 250_Hz;
-  followerSetter.UpdateFreqHz = 250_Hz;
+  elevatorHeightSetter.UpdateFreqHz = 0_Hz;
+  elevatorVoltageSetter.UpdateFreqHz = 0_Hz;
+  followerSetter.UpdateFreqHz = 0_Hz;
 }
 
 units::meter_t Elevator::ConvertEncPosToHeight(units::turn_t turns) {
