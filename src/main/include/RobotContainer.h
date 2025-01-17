@@ -14,7 +14,7 @@
 #include "Autos.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
-#include "subsystems/Arm.h"
+#include "subsystems/Pivot.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
 
@@ -25,7 +25,7 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
   Drive& GetDrive();
   Elevator& GetElevator();
-  Arm& GetArm();
+  Pivot& GetPivot();
   str::vision::VisionSystem& GetVision();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
@@ -48,7 +48,7 @@ class RobotContainer {
 
   Drive driveSub{};
   Elevator elevatorSub{display};
-  Arm armSub{display};
+  Pivot pivotSub{display};
   str::vision::VisionSystem vision;
 
   Autos autos{driveSub};

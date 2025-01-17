@@ -52,15 +52,15 @@ class SuperstructureDisplay {
 
     elevatorCarriage->SetColor(frc::Color::kRed);
 
-    armJoint->SetColor(frc::Color::kBlue);
+    pivotJoint->SetColor(frc::Color::kBlue);
     uShapeBack->SetColor(frc::Color::kOrange);
     uShapeAround->SetColor(frc::Color::kOrange);
   }
   void SetElevatorHeight(units::meter_t newHeight) {
     elevatorCarriage->SetLength(newHeight / 1_m);
   }
-  void SetArmAngle(units::radian_t newAngle) {
-    armJoint->SetAngle(newAngle);
+  void SetPivotAngle(units::radian_t newAngle) {
+    pivotJoint->SetAngle(newAngle);
     uShapeBack->SetAngle(newAngle + 116.16_deg);
   }
 
@@ -141,10 +141,10 @@ class SuperstructureDisplay {
       elevatorRoot->Append<frc::MechanismLigament2d>("ElevatorCarriage", 0,
                                                      90_deg)};
 
-  // Arm
-  frc::MechanismLigament2d* armJoint{
+  // Pivot
+  frc::MechanismLigament2d* pivotJoint{
       elevatorCarriage->Append<frc::MechanismLigament2d>(
-          "ArmJoint", 9.508097_in / 1_m, 0_deg)};
+          "PivotJoint", 9.508097_in / 1_m, 0_deg)};
   frc::MechanismLigament2d* uShapeBack{
       elevatorCarriage->Append<frc::MechanismLigament2d>(
           "uShapeBack", 9.508097_in / 1_m, 0_deg)};
