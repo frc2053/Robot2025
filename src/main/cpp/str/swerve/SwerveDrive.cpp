@@ -102,8 +102,9 @@ void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& measurement,
     addedVisionPosesPub.Set(measurement);
     poseEstimator.AddVisionMeasurement(measurement, timestamp, newStdDevs);
   } else {
-    frc::DataLogManager::Log(
-        "WARNING: Vision pose was outside of field! Not adding to estimator!");
+    // frc::DataLogManager::Log(
+    //     "WARNING: Vision pose was outside of field! Not adding to
+    //     estimator!");
   }
 }
 

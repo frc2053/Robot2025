@@ -45,7 +45,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       consts::yearspecific::TAG_LAYOUT,
       photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
   camera = std::make_unique<photon::PhotonCamera>(cameraName);
-  camera->SetVersionCheckEnabled(true);
+  camera->SetVersionCheckEnabled(false);
   photonEstimator->SetMultiTagFallbackStrategy(
       photon::PoseStrategy::LOWEST_AMBIGUITY);
 

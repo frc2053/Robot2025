@@ -4,8 +4,6 @@
 
 #include "subsystems/Elevator.h"
 
-#include <string>
-
 #include "constants/ElevatorConstants.h"
 #include "ctre/phoenix/StatusCodes.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
@@ -21,6 +19,7 @@
 #include "units/current.h"
 #include "units/length.h"
 #include "units/voltage.h"
+#include <string>
 
 Elevator::Elevator(str::SuperstructureDisplay& display) : display{display} {
   ConfigureMotors();
@@ -100,14 +99,17 @@ units::meter_t Elevator::GetHeight() {
           rightPositionSig, rightVelocitySig);
 
   units::meter_t avgHeight =
-      ConvertEncPosToHeight((latencyCompLeft + latencyCompRight) / 2.0);
+      ConvertEncPosToHeight((latencyCompLeft + latencyCompRight) / 2.0) *
+      consts::elevator::physical::NUM_OF_STAGES;
 
   return avgHeight;
 }
 
 units::meters_per_second_t Elevator::GetElevatorVel() {
-  units::meters_per_second_t avgVel = ConvertEncVelToHeightVel(
-      (leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) / 2.0);
+  units::meters_per_second_t avgVel =
+      ConvertEncVelToHeightVel(
+          (leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) / 2.0) *
+      consts::elevator::physical::NUM_OF_STAGES;
   return avgVel;
 }
 
@@ -123,8 +125,8 @@ frc2::CommandPtr Elevator::GoToHeightCmd(
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
   goalHeight = newHeight;
-  leftMotor.SetControl(
-      elevatorHeightSetter.WithPosition(ConvertHeightToEncPos(newHeight)));
+  leftMotor.SetControl(elevatorHeightSetter.WithPosition(ConvertHeightToEncPos(
+      newHeight / consts::elevator::physical::NUM_OF_STAGES)));
 }
 
 void Elevator::SetVoltage(units::volt_t volts) {
@@ -416,31 +418,27 @@ void Elevator::ConfigureControlSignals() {
 }
 
 units::meter_t Elevator::ConvertEncPosToHeight(units::turn_t turns) {
-  units::meter_t ret = (turns / 1_rad) *
-                       (consts::elevator::physical::PULLEY_DIAM / 2.0) *
-                       consts::elevator::physical::NUM_OF_STAGES;
+  units::meter_t ret =
+      (turns / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2.0);
   return ret;
 }
 
 units::turn_t Elevator::ConvertHeightToEncPos(units::meter_t height) {
   units::turn_t ret =
-      1_rad * (height / (consts::elevator::physical::PULLEY_DIAM / 2.0)) /
-      consts::elevator::physical::NUM_OF_STAGES;
+      1_rad * (height / (consts::elevator::physical::PULLEY_DIAM / 2.0));
   return ret;
 }
 
 units::meters_per_second_t Elevator::ConvertEncVelToHeightVel(
     units::turns_per_second_t radialVel) {
   units::meters_per_second_t ret =
-      (radialVel / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2.0) *
-      consts::elevator::physical::NUM_OF_STAGES;
+      (radialVel / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2.0);
   return ret;
 }
 
 units::turns_per_second_t Elevator::ConvertHeightVelToEncVel(
     units::meters_per_second_t vel) {
   units::turns_per_second_t ret =
-      1_rad * (vel / (consts::elevator::physical::PULLEY_DIAM / 2.0)) /
-      consts::elevator::physical::NUM_OF_STAGES;
+      1_rad * (vel / (consts::elevator::physical::PULLEY_DIAM / 2.0));
   return ret;
 }
