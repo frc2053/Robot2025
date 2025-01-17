@@ -68,7 +68,6 @@ void Elevator::UpdateNTEntries() {
 void Elevator::SimulationPeriodic() {
   leftMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
   rightMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
-  outputEncoderSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
   elevatorSim.SetInputVoltage(
       (leftMotorSim.GetMotorVoltage() + rightMotorSim.GetMotorVoltage()) / 2.0);
@@ -79,9 +78,6 @@ void Elevator::SimulationPeriodic() {
 
   units::turns_per_second_t encVel =
       ConvertHeightVelToEncVel(elevatorSim.GetVelocity());
-
-  outputEncoderSim.SetRawPosition(encPos);
-  outputEncoderSim.SetVelocity(encVel);
 
   leftMotorSim.SetRawRotorPosition(encPos *
                                    consts::elevator::physical::GEARING);
@@ -300,25 +296,6 @@ void Elevator::SetElevatorGains(
 }
 
 void Elevator::ConfigureMotors() {
-  ctre::phoenix6::configs::CANcoderConfiguration encCfg{};
-
-  encCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1_tr;
-  encCfg.MagnetSensor.SensorDirection =
-      ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
-  if (frc::RobotBase::IsSimulation()) {
-    encCfg.MagnetSensor.MagnetOffset = 0_tr;
-  } else {
-    encCfg.MagnetSensor.MagnetOffset = consts::elevator::physical::ENC_OFFSET;
-  }
-  ctre::phoenix::StatusCode configEncoderResult =
-      outputEncoder.GetConfigurator().Apply(encCfg);
-
-  frc::DataLogManager::Log(
-      fmt::format("Configured encoder on elevator. Result was: {}",
-                  configEncoderResult.GetName()));
-
-  configureEncoderAlert.Set(!configEncoderResult.IsOK());
-
   ctre::phoenix6::configs::TalonFXConfiguration config{};
   ctre::phoenix6::configs::Slot0Configs gains{};
 
@@ -359,11 +336,7 @@ void Elevator::ConfigureMotors() {
         ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
   }
 
-  config.Feedback.FeedbackRemoteSensorID = outputEncoder.GetDeviceID();
-  config.Feedback.FeedbackSensorSource =
-      ctre::phoenix6::signals::FeedbackSensorSourceValue::FusedCANcoder;
-  config.Feedback.SensorToMechanismRatio = 1.0;
-  config.Feedback.RotorToSensorRatio = consts::elevator::physical::GEARING;
+  config.Feedback.SensorToMechanismRatio = consts::elevator::physical::GEARING;
 
   ctre::phoenix::StatusCode configLeftResult =
       leftMotor.GetConfigurator().Apply(config);
@@ -377,11 +350,9 @@ void Elevator::ConfigureMotors() {
   // Empty config because we only want to follow left
   ctre::phoenix6::configs::TalonFXConfiguration rightConfig{};
 
-  rightConfig.Feedback.FeedbackRemoteSensorID = outputEncoder.GetDeviceID();
-  rightConfig.Feedback.FeedbackSensorSource =
-      ctre::phoenix6::signals::FeedbackSensorSourceValue::FusedCANcoder;
-  rightConfig.Feedback.SensorToMechanismRatio = 1.0;
-  rightConfig.Feedback.RotorToSensorRatio = consts::elevator::physical::GEARING;
+  rightConfig.Feedback.SensorToMechanismRatio =
+      consts::elevator::physical::GEARING;
+
   ctre::phoenix::StatusCode configRightResult =
       rightMotor.GetConfigurator().Apply(rightConfig);
 

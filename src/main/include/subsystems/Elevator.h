@@ -67,8 +67,6 @@ class Elevator : public frc2::SubsystemBase {
       consts::elevator::can_ids::LEFT_MOTOR};
   ctre::phoenix6::hardware::TalonFX rightMotor{
       consts::elevator::can_ids::RIGHT_MOTOR};
-  ctre::phoenix6::hardware::CANcoder outputEncoder{
-      consts::elevator::can_ids::OUTPUT_ENC};
 
   units::meter_t goalHeight = 0_m;
   units::meter_t currentHeight = 0_m;
@@ -77,9 +75,6 @@ class Elevator : public frc2::SubsystemBase {
   ctre::phoenix6::sim::TalonFXSimState& leftMotorSim = leftMotor.GetSimState();
   ctre::phoenix6::sim::TalonFXSimState& rightMotorSim =
       rightMotor.GetSimState();
-
-  ctre::phoenix6::sim::CANcoderSimState& outputEncoderSim =
-      outputEncoder.GetSimState();
 
   ctre::phoenix6::StatusSignal<units::turn_t> leftPositionSig =
       leftMotor.GetPosition();
@@ -137,12 +132,9 @@ class Elevator : public frc2::SubsystemBase {
       nt->GetBooleanTopic("IsAtRequestedHeight").Publish()};
   str::SuperstructureDisplay& display;
   std::string leftAlertMsg{"Elevator Left Motor Config"};
-  std::string encoderAlertMsg{"Elevator Encoder Config"};
   std::string rightAlertMsg{"Elevator Right Motor Config"};
   frc::Alert configureLeftAlert{leftAlertMsg, frc::Alert::AlertType::kError};
   frc::Alert configureRightAlert{rightAlertMsg, frc::Alert::AlertType::kError};
-  frc::Alert configureEncoderAlert{encoderAlertMsg,
-                                   frc::Alert::AlertType::kError};
   std::string leftOptiAlertMsg{"Elevator Left Bus Optimization"};
   std::string rightOptiAlertMsg{"Elevator Right Bus Optimization"};
   frc::Alert optiLeftAlert{leftOptiAlertMsg, frc::Alert::AlertType::kError};

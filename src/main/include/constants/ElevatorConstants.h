@@ -21,7 +21,6 @@ inline constexpr units::hertz_t BUS_UPDATE_FREQ = 250_Hz;
 namespace can_ids {
 inline constexpr int LEFT_MOTOR = 15;
 inline constexpr int RIGHT_MOTOR = 16;
-inline constexpr int OUTPUT_ENC = 17;
 }  // namespace can_ids
 
 namespace current_limits {
@@ -41,8 +40,6 @@ inline constexpr units::scalar_t GEARING = 20;
 inline constexpr units::kilogram_t CARRIAGE_MASS = 201.54_lb;
 
 inline constexpr units::meter_t EXTENDED_HEIGHT = 26_in;
-
-inline constexpr units::turn_t ENC_OFFSET = .32_tr;
 }  // namespace physical
 
 namespace gains {
