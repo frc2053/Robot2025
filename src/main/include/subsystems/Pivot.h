@@ -53,16 +53,13 @@ class Pivot : public frc2::SubsystemBase {
   units::radians_per_second_t GetPivotVel();
   void SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
                      units::volt_t kg);
-  units::radian_t ConvertEncPosToAngle(units::turn_t rots);
-  units::turn_t ConvertAngleToEncPos(units::radian angle);
-  units::radians_per_second_t ConvertEncVelToAngleVel(
-      units::turns_per_second_t radialVel);
-  units::turns_per_second_t ConvertAngleVelToEncVel(
-      units::radians_per_second_t vel);
   void LogPivotVolts(frc::sysid::SysIdRoutineLog* log);
 
   ctre::phoenix6::hardware::TalonFX pivotMotor{
       consts::pivot::can_ids::PIVOT_MOTOR};
+
+  ctre::phoenix6::hardware::CANcoder pivotEncoder{
+      consts::pivot::can_ids::PIVOT_ENC};
 
   units::radian_t goalAngle = 0_rad;
   units::radian_t currentAngle = 0_rad;
@@ -70,6 +67,8 @@ class Pivot : public frc2::SubsystemBase {
 
   ctre::phoenix6::sim::TalonFXSimState& pivotMotorSim =
       pivotMotor.GetSimState();
+  ctre::phoenix6::sim::CANcoderSimState& encoderSim =
+      pivotEncoder.GetSimState();
 
   ctre::phoenix6::StatusSignal<units::turn_t> positionSig =
       pivotMotor.GetPosition();
@@ -85,16 +84,14 @@ class Pivot : public frc2::SubsystemBase {
       consts::pivot::gains::PIVOT_GAINS};
   units::volt_t currentKg{consts::pivot::gains::kG};
 
-  //   frc::sim::SingleJointedArmSim pivotSim{
-  //       consts::pivot::physical::MOTOR,
-  //       consts::pivot::physical::GEARING,
-  //       consts::pivot::physical::CARRIAGE_MASS,
-  //       consts::pivot::physical::PULLEY_DIAM / 2,
-  //       0_m,
-  //       consts::pivot::physical::EXTENDED_HEIGHT,
-  //       true,
-  //       0_m,
-  //       {0.00}};
+  frc::sim::SingleJointedArmSim pivotSim{consts::pivot::physical::MOTOR,
+                                         consts::pivot::physical::GEARING,
+                                         consts::pivot::physical::MOI,
+                                         consts::pivot::physical::ARM_LENGTH,
+                                         consts::pivot::physical::MIN_ANGLE,
+                                         consts::pivot::physical::MAX_ANGLE,
+                                         true,
+                                         0_rad};
 
   frc2::sysid::SysIdRoutine pivotSysIdVoltage{
       frc2::sysid::Config{
@@ -118,6 +115,9 @@ class Pivot : public frc2::SubsystemBase {
   nt::BooleanPublisher isAtSetpointPub{
       nt->GetBooleanTopic("IsAtRequestedAngle").Publish()};
   str::SuperstructureDisplay& display;
+  std::string pivotEncoderAlertMsg{"Pivot Encoder Config"};
+  frc::Alert configureEncoderAlert{pivotEncoderAlertMsg,
+                                   frc::Alert::AlertType::kError};
   std::string pivotAlertMsg{"Pivot Motor Config"};
   frc::Alert configurePivotAlert{pivotAlertMsg, frc::Alert::AlertType::kError};
   std::string pivotOptiAlertMsg{"Pivot Bus Optimization"};

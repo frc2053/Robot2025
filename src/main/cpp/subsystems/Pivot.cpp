@@ -21,7 +21,6 @@
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
-#include "units/length.h"
 #include "units/voltage.h"
 
 Pivot::Pivot(str::SuperstructureDisplay& display) : display{display} {
@@ -58,34 +57,31 @@ void Pivot::UpdateNTEntries() {
 
 void Pivot::SimulationPeriodic() {
   pivotMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  encoderSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
   pivotSim.SetInputVoltage(pivotMotorSim.GetMotorVoltage());
 
   pivotSim.Update(20_ms);
 
-  units::turn_t encPos = ConvertHeightToEncPos(pivotSim.GetPosition());
+  units::turn_t encPos = pivotSim.GetAngle();
+  units::turns_per_second_t encVel = pivotSim.GetVelocity();
 
-  units::turns_per_second_t encVel =
-      ConvertHeightVelToEncVel(pivotSim.GetVelocity());
+  encoderSim.SetRawPosition(encPos);
+  encoderSim.SetVelocity(encVel);
 
   pivotMotorSim.SetRawRotorPosition(encPos * consts::pivot::physical::GEARING);
   pivotMotorSim.SetRotorVelocity(encVel * consts::pivot::physical::GEARING);
 }
 
 units::radian_t Pivot::GetAngle() {
-  units::turn_t latencyCompLeft =
+  units::turn_t latencyCompPosition =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(positionSig,
                                                                    velocitySig);
-
-  units::radian_t angle = ConvertEncPosToHeight(latencyCompLeft);
-
-  return angle;
+  return latencyCompPosition;
 }
 
 units::radians_per_second_t Pivot::GetPivotVel() {
-  units::radians_per_second_t avgVel =
-      ConvertEncVelToHeightVel(velocitySig.GetValue());
-  return avgVel;
+  return velocitySig.GetValue();
 }
 
 frc2::Trigger Pivot::IsAtGoalAngle() {
@@ -100,8 +96,7 @@ frc2::CommandPtr Pivot::GoToAngleCmd(
 void Pivot::GoToAngle(units::radian_t newAngle) {
   goalAngle = newAngle;
   pivotMotor.SetControl(
-      pivotAngleSetter.WithPosition(ConvertHeightToEncPos(newAngle))
-          .WithEnableFOC(true));
+      pivotAngleSetter.WithPosition(newAngle).WithEnableFOC(true));
 }
 
 void Pivot::SetVoltage(units::volt_t volts) {
@@ -260,6 +255,29 @@ void Pivot::SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
 }
 
 void Pivot::ConfigureMotors() {
+  ctre::phoenix6::configs::CANcoderConfiguration encoderCfg{};
+
+  encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
+
+  encoderCfg.MagnetSensor.SensorDirection =
+      ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
+
+  if (frc::RobotBase::IsSimulation()) {
+    encoderCfg.MagnetSensor.MagnetOffset = 0_tr;
+  } else {
+    encoderCfg.MagnetSensor.MagnetOffset =
+        consts::pivot::physical::ENCODER_OFFSET;
+  }
+
+  ctre::phoenix::StatusCode configEncoderResult =
+      pivotEncoder.GetConfigurator().Apply(encoderCfg);
+
+  frc::DataLogManager::Log(
+      fmt::format("Configured pivot encoder. Result was: {}",
+                  configEncoderResult.GetName()));
+
+  configureEncoderAlert.Set(!configEncoderResult.IsOK());
+
   ctre::phoenix6::configs::TalonFXConfiguration config{};
   ctre::phoenix6::configs::Slot0Configs gains{};
 
@@ -299,7 +317,11 @@ void Pivot::ConfigureMotors() {
         ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
   }
 
-  config.Feedback.SensorToMechanismRatio = consts::pivot::physical::GEARING;
+  config.Feedback.FeedbackRemoteSensorID = pivotEncoder.GetDeviceID();
+  config.Feedback.FeedbackSensorSource =
+      ctre::phoenix6::signals::FeedbackSensorSourceValue::FusedCANcoder;
+  config.Feedback.SensorToMechanismRatio = 1.0;
+  config.Feedback.RotorToSensorRatio = consts::pivot::physical::GEARING;
 
   ctre::phoenix::StatusCode configPivotResult =
       pivotMotor.GetConfigurator().Apply(config);
@@ -313,30 +335,4 @@ void Pivot::ConfigureMotors() {
 void Pivot::ConfigureControlSignals() {
   pivotAngleSetter.UpdateFreqHz = 0_Hz;
   pivotVoltageSetter.UpdateFreqHz = 0_Hz;
-}
-
-units::radian_t Pivot::ConvertEncPosToAngle(units::turn_t turns) {
-  units::meter_t ret =
-      (turns / 1_rad) * (consts::pivot::physical::PULLEY_DIAM / 2.0);
-  return ret;
-}
-
-units::turn_t Pivot::ConvertAngleToEncPos(units::radian_t angle) {
-  units::turn_t ret =
-      1_rad * (angle / (consts::pivot::physical::PULLEY_DIAM / 2.0));
-  return ret;
-}
-
-units::meters_per_second_t Pivot::ConvertEncVelToHeightVel(
-    units::turns_per_second_t radialVel) {
-  units::meters_per_second_t ret =
-      (radialVel / 1_rad) * (consts::pivot::physical::PULLEY_DIAM / 2.0);
-  return ret;
-}
-
-units::turns_per_second_t Pivot::ConvertHeightVelToEncVel(
-    units::meters_per_second_t vel) {
-  units::turns_per_second_t ret =
-      1_rad * (vel / (consts::pivot::physical::PULLEY_DIAM / 2.0));
-  return ret;
 }

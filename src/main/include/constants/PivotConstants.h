@@ -26,7 +26,7 @@ inline constexpr int PIVOT_ENC = 18;
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_LIMIT = 40_A;
-inline constexpr units::ampere_t STATOR_LIMIT = 10_A;
+inline constexpr units::ampere_t STATOR_LIMIT = 40_A;
 }  // namespace current_limits
 
 namespace physical {
@@ -40,8 +40,10 @@ inline constexpr units::kilogram_square_meter_t MOI = 0.12009477_kg_sq_m;
 
 inline constexpr units::meter_t ARM_LENGTH = 4.37480954214_in;
 
-inline constexpr units::radian_t MIN_ANGLE = -359_deg;
-inline constexpr units::radian_t MAX_ANGLE = 360_deg;
+inline constexpr units::radian_t MIN_ANGLE = -180_deg;
+inline constexpr units::radian_t MAX_ANGLE = 180_deg;
+
+inline constexpr units::turn_t ENCODER_OFFSET = .32_tr;
 }  // namespace physical
 
 namespace gains {
