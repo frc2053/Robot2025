@@ -139,9 +139,12 @@ class Elevator : public frc2::SubsystemBase {
       nt->GetBooleanTopic("IsAtRequestedHeight").Publish()};
   str::SuperstructureDisplay& display;
   std::string leftAlertMsg{"Elevator Left Motor Config"};
+  std::string encoderAlertMsg{"Elevator Encoder Config"};
   std::string rightAlertMsg{"Elevator Right Motor Config"};
   frc::Alert configureLeftAlert{leftAlertMsg, frc::Alert::AlertType::kError};
   frc::Alert configureRightAlert{rightAlertMsg, frc::Alert::AlertType::kError};
+  frc::Alert configureEncoderAlert{encoderAlertMsg,
+                                   frc::Alert::AlertType::kError};
   std::string leftOptiAlertMsg{"Elevator Left Bus Optimization"};
   std::string rightOptiAlertMsg{"Elevator Right Bus Optimization"};
   frc::Alert optiLeftAlert{leftOptiAlertMsg, frc::Alert::AlertType::kError};

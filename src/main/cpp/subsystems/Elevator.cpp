@@ -310,7 +310,14 @@ void Elevator::ConfigureMotors() {
   } else {
     encCfg.MagnetSensor.MagnetOffset = consts::elevator::physical::ENC_OFFSET;
   }
-  outputEncoder.GetConfigurator().Apply(encCfg);
+  ctre::phoenix::StatusCode configEncoderResult =
+      outputEncoder.GetConfigurator().Apply(encCfg);
+
+  frc::DataLogManager::Log(
+      fmt::format("Configured encoder on elevator. Result was: {}",
+                  configEncoderResult.GetName()));
+
+  configureEncoderAlert.Set(!configEncoderResult.IsOK());
 
   ctre::phoenix6::configs::TalonFXConfiguration config{};
   ctre::phoenix6::configs::Slot0Configs gains{};
