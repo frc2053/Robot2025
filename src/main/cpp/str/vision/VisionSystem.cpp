@@ -15,7 +15,6 @@ void VisionSystem::UpdateCameraPositionVis(frc::Pose3d robotPose) {
   cameraLocations[1] = robotPose.TransformBy(consts::vision::FR_ROBOT_TO_CAM);
   cameraLocations[2] = robotPose.TransformBy(consts::vision::BL_ROBOT_TO_CAM);
   cameraLocations[3] = robotPose.TransformBy(consts::vision::BR_ROBOT_TO_CAM);
-  cameraLocations[4] = robotPose.TransformBy(consts::vision::ROBOT_TO_NOTE_CAM);
 
   cameraLocationsPub.Set(cameraLocations);
 }

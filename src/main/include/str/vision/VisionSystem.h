@@ -23,7 +23,7 @@ class VisionSystem {
       const std::vector<std::optional<photon::EstimatedRobotPose>>& poses);
 
  private:
-  std::array<frc::Pose3d, 5> cameraLocations;
+  std::array<frc::Pose3d, 4> cameraLocations;
   nt::StructArrayPublisher<frc::Pose3d> cameraLocationsPub{
       nt::NetworkTableInstance::GetDefault()
           .GetTable("Vision")
