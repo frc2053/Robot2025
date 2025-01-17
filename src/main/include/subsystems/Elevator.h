@@ -6,14 +6,20 @@
 
 #include <frc2/command/SubsystemBase.h>
 
+#include <memory>
+#include <string>
+
 #include <ctre/phoenix6/TalonFX.hpp>
 
 #include "constants/ElevatorConstants.h"
+#include "ctre/phoenix6/CANcoder.hpp"
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "ctre/phoenix6/controls/Follower.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoTorqueCurrentFOC.hpp"
+#include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
 #include "ctre/phoenix6/controls/MotionMagicTorqueCurrentFOC.hpp"
 #include "ctre/phoenix6/controls/PositionTorqueCurrentFOC.hpp"
+#include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
 #include "frc/simulation/ElevatorSim.h"
 #include "frc2/command/CommandPtr.h"
@@ -55,13 +61,14 @@ class Elevator : public frc2::SubsystemBase {
   void ConfigureMotors();
   void ConfigureControlSignals();
   void UpdateNTEntries();
+  units::meters_per_second_t GetElevatorVel();
   void SetElevatorGains(str::gains::radial::RadialGainsHolder newGains,
                         units::ampere_t kg);
-  units::meter_t ConvertRadiansToHeight(units::radian_t rots);
-  units::radian_t ConvertHeightToRadians(units::meter_t height);
-  units::meters_per_second_t ConvertRadianVelToHeightVel(
-      units::radians_per_second_t radialVel);
-  units::radians_per_second_t ConvertHeightVelToRadianVel(
+  units::meter_t ConvertEncPosToHeight(units::turn_t rots);
+  units::turn_t ConvertHeightToEncPos(units::meter_t height);
+  units::meters_per_second_t ConvertEncVelToHeightVel(
+      units::turns_per_second_t radialVel);
+  units::turns_per_second_t ConvertHeightVelToEncVel(
       units::meters_per_second_t vel);
   void LogElevatorVolts(frc::sysid::SysIdRoutineLog* log);
   void LogElevatorTorqueCurrent(frc::sysid::SysIdRoutineLog* log);
@@ -69,6 +76,8 @@ class Elevator : public frc2::SubsystemBase {
       consts::elevator::can_ids::LEFT_MOTOR};
   ctre::phoenix6::hardware::TalonFX rightMotor{
       consts::elevator::can_ids::RIGHT_MOTOR};
+  ctre::phoenix6::hardware::CANcoder outputEncoder{
+      consts::elevator::can_ids::OUTPUT_ENC};
 
   units::meter_t goalHeight = 0_m;
   units::meter_t currentHeight = 0_m;
@@ -77,6 +86,9 @@ class Elevator : public frc2::SubsystemBase {
   ctre::phoenix6::sim::TalonFXSimState& leftMotorSim = leftMotor.GetSimState();
   ctre::phoenix6::sim::TalonFXSimState& rightMotorSim =
       rightMotor.GetSimState();
+
+  ctre::phoenix6::sim::CANcoderSimState& outputEncoderSim =
+      outputEncoder.GetSimState();
 
   ctre::phoenix6::StatusSignal<units::turn_t> leftPositionSig =
       leftMotor.GetPosition();

@@ -22,7 +22,7 @@ class ArmTraj {
     frc::SmartDashboard::PutData("ArmVator", &armvator);
     elevatorVis->SetColor(frc::Color::kBlue);
     armVis->SetColor(frc::Color::kRed);
-  };
+  }
   int CalculateTraj();
   void Periodic();
 

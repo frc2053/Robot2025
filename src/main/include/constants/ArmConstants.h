@@ -5,22 +5,22 @@
 #pragma once
 
 #include <units/current.h>
+#include <units/frequency.h>
 #include <units/length.h>
 #include <units/mass.h>
-#include <units/frequency.h>
 
 #include "frc/system/plant/DCMotor.h"
+#include "str/GainTypes.h"
 #include "units/angle.h"
 #include "units/dimensionless.h"
 #include "units/moment_of_inertia.h"
-#include "str/GainTypes.h"
 
 namespace consts::arm {
 
 inline constexpr units::hertz_t BUS_UPDATE_FREQ = 100_Hz;
 
 namespace can_ids {
-inline constexpr int PIVOT_MOTOR = 17;
+inline constexpr int PIVOT_MOTOR = 18;
 }  // namespace can_ids
 
 namespace current_limits {

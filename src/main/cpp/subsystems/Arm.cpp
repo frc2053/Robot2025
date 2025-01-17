@@ -57,7 +57,7 @@ units::radian_t Arm::GetAngle() {
           pivotPositionSig, pivotVelocitySig);
 
   return latencyCompPivotAngle;
-};
+}
 
 void Arm::GoToAngle() {}
 

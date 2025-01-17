@@ -10,5 +10,5 @@
 
 namespace consts::yearspecific {
 inline const frc::AprilTagFieldLayout TAG_LAYOUT =
-    frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo);
+    frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025Reefscape);
 }  // namespace consts::yearspecific

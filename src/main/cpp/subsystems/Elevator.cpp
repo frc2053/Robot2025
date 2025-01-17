@@ -4,6 +4,8 @@
 
 #include "subsystems/Elevator.h"
 
+#include <string>
+
 #include "constants/ElevatorConstants.h"
 #include "ctre/phoenix/StatusCodes.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
@@ -65,26 +67,28 @@ void Elevator::UpdateNTEntries() {
 void Elevator::SimulationPeriodic() {
   leftMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
   rightMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  outputEncoderSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
   elevatorSim.SetInputVoltage(
-      (leftMotorSim.GetMotorVoltage() + rightMotorSim.GetMotorVoltage()) / 2);
+      (leftMotorSim.GetMotorVoltage() + rightMotorSim.GetMotorVoltage()) / 2.0);
 
   elevatorSim.Update(20_ms);
 
-  units::turn_t pulleyTurns = ConvertHeightToRadians(elevatorSim.GetPosition());
-  units::turns_per_second_t pulleyRadialVel =
-      ConvertHeightVelToRadianVel(elevatorSim.GetVelocity());
+  units::turn_t encPos = ConvertHeightToEncPos(elevatorSim.GetPosition());
 
-  units::turn_t motorPos = pulleyTurns * consts::elevator::physical::GEARING;
+  units::turns_per_second_t encVel =
+      ConvertHeightVelToEncVel(elevatorSim.GetVelocity());
 
-  units::turns_per_second_t motorVel =
-      pulleyRadialVel * consts::elevator::physical::GEARING;
+  outputEncoderSim.SetRawPosition(encPos);
+  outputEncoderSim.SetVelocity(encVel);
 
-  leftMotorSim.SetRawRotorPosition(motorPos);
-  leftMotorSim.SetRotorVelocity(motorVel);
+  leftMotorSim.SetRawRotorPosition(encPos *
+                                   consts::elevator::physical::GEARING);
+  leftMotorSim.SetRotorVelocity(encVel * consts::elevator::physical::GEARING);
 
-  rightMotorSim.SetRawRotorPosition(motorPos);
-  rightMotorSim.SetRotorVelocity(motorVel);
+  rightMotorSim.SetRawRotorPosition(encPos *
+                                    consts::elevator::physical::GEARING);
+  rightMotorSim.SetRotorVelocity(encVel * consts::elevator::physical::GEARING);
 }
 
 units::meter_t Elevator::GetHeight() {
@@ -96,11 +100,16 @@ units::meter_t Elevator::GetHeight() {
           rightPositionSig, rightVelocitySig);
 
   units::meter_t avgHeight =
-      ConvertRadiansToHeight((latencyCompLeft + latencyCompRight) / 2) *
-      consts::elevator::physical::NUM_OF_STAGES;
+      ConvertEncPosToHeight((latencyCompLeft + latencyCompRight) / 2.0);
 
   return avgHeight;
-};
+}
+
+units::meters_per_second_t Elevator::GetElevatorVel() {
+  units::meters_per_second_t avgVel = ConvertEncVelToHeightVel(
+      (leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) / 2.0);
+  return avgVel;
+}
 
 bool Elevator::IsAtGoalHeight() {
   return isAtGoalHeight;
@@ -114,9 +123,8 @@ frc2::CommandPtr Elevator::GoToHeightCmd(
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
   goalHeight = newHeight;
-  leftMotor.SetControl(elevatorHeightSetter.WithPosition(
-      ConvertHeightToRadians(newHeight) /
-      consts::elevator::physical::NUM_OF_STAGES));
+  leftMotor.SetControl(
+      elevatorHeightSetter.WithPosition(ConvertHeightToEncPos(newHeight)));
 }
 
 void Elevator::SetVoltage(units::volt_t volts) {
@@ -275,6 +283,7 @@ void Elevator::OptimizeBusSignals() {
 void Elevator::SetElevatorGains(str::gains::radial::RadialGainsHolder newGains,
                                 units::ampere_t kg) {
   currentGains = newGains;
+  currentKg = kg;
   ctre::phoenix6::configs::Slot0Configs slotConfig{};
   slotConfig.kV = currentGains.kV.value();
   slotConfig.kA = currentGains.kA.value();
@@ -312,6 +321,18 @@ void Elevator::SetElevatorGains(str::gains::radial::RadialGainsHolder newGains,
 }
 
 void Elevator::ConfigureMotors() {
+  ctre::phoenix6::configs::CANcoderConfiguration encCfg{};
+
+  encCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1_tr;
+  encCfg.MagnetSensor.SensorDirection =
+      ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
+  if (frc::RobotBase::IsSimulation()) {
+    encCfg.MagnetSensor.MagnetOffset = 0_tr;
+  } else {
+    encCfg.MagnetSensor.MagnetOffset = consts::elevator::physical::ENC_OFFSET;
+  }
+  outputEncoder.GetConfigurator().Apply(encCfg);
+
   ctre::phoenix6::configs::TalonFXConfiguration config{};
   ctre::phoenix6::configs::Slot0Configs gains{};
 
@@ -333,7 +354,6 @@ void Elevator::ConfigureMotors() {
 
   config.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
-  config.Feedback.SensorToMechanismRatio = consts::elevator::physical::GEARING;
   config.MotorOutput.Inverted =
       consts::elevator::physical::INVERT_LEFT
           ? ctre::phoenix6::signals::InvertedValue::Clockwise_Positive
@@ -353,6 +373,12 @@ void Elevator::ConfigureMotors() {
         ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
   }
 
+  config.Feedback.FeedbackRemoteSensorID = outputEncoder.GetDeviceID();
+  config.Feedback.FeedbackSensorSource =
+      ctre::phoenix6::signals::FeedbackSensorSourceValue::FusedCANcoder;
+  config.Feedback.SensorToMechanismRatio = 1.0;
+  config.Feedback.RotorToSensorRatio = consts::elevator::physical::GEARING;
+
   ctre::phoenix::StatusCode configLeftResult =
       leftMotor.GetConfigurator().Apply(config);
 
@@ -362,11 +388,14 @@ void Elevator::ConfigureMotors() {
 
   configureLeftAlert.Set(!configLeftResult.IsOK());
 
-  // Empty config because we only want to follow left and report output shaft
-  // pos
+  // Empty config because we only want to follow left
   ctre::phoenix6::configs::TalonFXConfiguration rightConfig{};
-  rightConfig.Feedback.SensorToMechanismRatio =
-      consts::elevator::physical::GEARING;
+
+  rightConfig.Feedback.FeedbackRemoteSensorID = outputEncoder.GetDeviceID();
+  rightConfig.Feedback.FeedbackSensorSource =
+      ctre::phoenix6::signals::FeedbackSensorSourceValue::FusedCANcoder;
+  rightConfig.Feedback.SensorToMechanismRatio = 1.0;
+  rightConfig.Feedback.RotorToSensorRatio = consts::elevator::physical::GEARING;
   ctre::phoenix::StatusCode configRightResult =
       rightMotor.GetConfigurator().Apply(rightConfig);
 
@@ -386,20 +415,32 @@ void Elevator::ConfigureControlSignals() {
   elevatorHeightSetter.OverrideCoastDurNeutral = true;
 }
 
-units::meter_t Elevator::ConvertRadiansToHeight(units::radian_t rots) {
-  return (rots / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2);
+units::meter_t Elevator::ConvertEncPosToHeight(units::turn_t turns) {
+  units::meter_t ret = (turns / 1_rad) *
+                       (consts::elevator::physical::PULLEY_DIAM / 2.0) *
+                       consts::elevator::physical::NUM_OF_STAGES;
+  return ret;
 }
 
-units::radian_t Elevator::ConvertHeightToRadians(units::meter_t height) {
-  return 1_rad * (height / (consts::elevator::physical::PULLEY_DIAM / 2));
+units::turn_t Elevator::ConvertHeightToEncPos(units::meter_t height) {
+  units::turn_t ret =
+      1_rad * (height / (consts::elevator::physical::PULLEY_DIAM / 2.0)) /
+      consts::elevator::physical::NUM_OF_STAGES;
+  return ret;
 }
 
-units::meters_per_second_t Elevator::ConvertRadianVelToHeightVel(
-    units::radians_per_second_t radialVel) {
-  return (radialVel / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2);
+units::meters_per_second_t Elevator::ConvertEncVelToHeightVel(
+    units::turns_per_second_t radialVel) {
+  units::meters_per_second_t ret =
+      (radialVel / 1_rad) * (consts::elevator::physical::PULLEY_DIAM / 2.0) *
+      consts::elevator::physical::NUM_OF_STAGES;
+  return ret;
 }
 
-units::radians_per_second_t Elevator::ConvertHeightVelToRadianVel(
+units::turns_per_second_t Elevator::ConvertHeightVelToEncVel(
     units::meters_per_second_t vel) {
-  return 1_rad * (vel / (consts::elevator::physical::PULLEY_DIAM / 2));
+  units::turns_per_second_t ret =
+      1_rad * (vel / (consts::elevator::physical::PULLEY_DIAM / 2.0)) /
+      consts::elevator::physical::NUM_OF_STAGES;
+  return ret;
 }

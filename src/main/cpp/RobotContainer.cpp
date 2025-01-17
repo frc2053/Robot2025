@@ -7,6 +7,7 @@
 #include <frc/MathUtil.h>
 #include <frc2/command/Commands.h>
 
+#include "constants/ElevatorConstants.h"
 #include "constants/SwerveConstants.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
 #include "str/DriverstationUtils.h"
@@ -41,8 +42,9 @@ void RobotContainer::ConfigureBindings() {
 
   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
       [this] {
-        elevatorSub.SetVoltage(
-            frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) * 12_V);
+        elevatorSub.SetTorqueCurrent(
+            frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) *
+            consts::elevator::current_limits::STATOR_LIMIT);
       },
       {&elevatorSub}));
 
@@ -201,9 +203,9 @@ Arm& RobotContainer::GetArm() {
   return armSub;
 }
 
-// str::vision::VisionSystem& RobotContainer::GetVision() {
-//   return vision;
-// }
+str::vision::VisionSystem& RobotContainer::GetVision() {
+  return vision;
+}
 
 str::SuperstructureDisplay& RobotContainer::GetSuperStructureDisplay() {
   return display;

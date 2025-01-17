@@ -6,6 +6,8 @@
 
 #include <frc2/command/SubsystemBase.h>
 
+#include <string>
+
 #include <ctre/phoenix6/TalonFX.hpp>
 
 #include "constants/ArmConstants.h"

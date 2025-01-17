@@ -14,9 +14,9 @@
 #include "Autos.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
+#include "subsystems/Arm.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
-#include "subsystems/Arm.h"
 
 class RobotContainer {
  public:
@@ -26,7 +26,7 @@ class RobotContainer {
   Drive& GetDrive();
   Elevator& GetElevator();
   Arm& GetArm();
-  // str::vision::VisionSystem& GetVision();
+  str::vision::VisionSystem& GetVision();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
  private:
@@ -51,7 +51,7 @@ class RobotContainer {
   Drive driveSub{};
   Elevator elevatorSub{display};
   Arm armSub{display};
-  // str::vision::VisionSystem vision;
+  str::vision::VisionSystem vision;
 
   Autos autos{driveSub};
 

@@ -21,6 +21,7 @@ inline constexpr units::hertz_t BUS_UPDATE_FREQ = 250_Hz;
 namespace can_ids {
 inline constexpr int LEFT_MOTOR = 15;
 inline constexpr int RIGHT_MOTOR = 16;
+inline constexpr int OUTPUT_ENC = 17;
 }  // namespace can_ids
 
 namespace current_limits {
@@ -40,6 +41,8 @@ inline constexpr units::scalar_t GEARING = 20;
 inline constexpr units::kilogram_t CARRIAGE_MASS = 201.54_lb;
 
 inline constexpr units::meter_t EXTENDED_HEIGHT = 26_in;
+
+inline constexpr units::turn_t ENC_OFFSET = .32_tr;
 }  // namespace physical
 
 namespace gains {
@@ -48,8 +51,8 @@ inline constexpr units::meter_t HEIGHT_TOLERANCE = .25_in;
 
 inline const str::gains::radial::RadialGainsHolder ELEVATOR_GAINS{
     (physical::MOTOR.freeSpeed / physical::GEARING),
-    str::gains::radial::turn_volt_ka_unit_t{0.017336},
-    str::gains::radial::turn_volt_kv_unit_t{2.2977},
+    str::gains::radial::turn_volt_ka_unit_t{0.018837},
+    str::gains::radial::turn_volt_kv_unit_t{2.3032},
     str::gains::radial::turn_amp_ka_unit_t{0},
     str::gains::radial::turn_amp_kv_unit_t{0},
     0_A,
