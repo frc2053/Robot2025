@@ -7,7 +7,6 @@
 #include <frc/MathUtil.h>
 #include <frc2/command/Commands.h>
 
-#include "constants/ElevatorConstants.h"
 #include "constants/SwerveConstants.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
 #include "str/DriverstationUtils.h"
@@ -42,9 +41,8 @@ void RobotContainer::ConfigureBindings() {
 
   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
       [this] {
-        elevatorSub.SetTorqueCurrent(
-            frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) *
-            consts::elevator::current_limits::STATOR_LIMIT);
+        elevatorSub.SetVoltage(
+            frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) * 12_V);
       },
       {&elevatorSub}));
 
@@ -65,7 +63,6 @@ void RobotContainer::ConfigureSysIdBinds() {
   tuningTable->PutBoolean("WheelRadius", false);
   tuningTable->PutBoolean("ElevatorPidTuning", false);
   tuningTable->PutBoolean("ElevatorSysIdVolts", false);
-  tuningTable->PutBoolean("ElevatorSysIdTorqueCurrent", false);
   tuningTable->PutBoolean("Quasistatic", true);
   tuningTable->PutBoolean("Forward", true);
 
@@ -92,10 +89,6 @@ void RobotContainer::ConfigureSysIdBinds() {
       [this] { return tuningTable->GetBoolean("Forward", true); }));
 
   elevatorSysIdVoltsBtn.WhileTrue(ElevatorVoltsSysIdCommands(
-      [this] { return tuningTable->GetBoolean("Forward", true); },
-      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
-
-  elevatorSysIdTorqueCurrentBtn.WhileTrue(ElevatorTorqueCurrentSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 }
@@ -143,22 +136,6 @@ frc2::CommandPtr RobotContainer::ElevatorVoltsSysIdCommands(
       frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
                             frc2::sysid::Direction::kReverse),
                         elevatorSub.SysIdElevatorDynamicVoltage(
-                            frc2::sysid::Direction::kReverse),
-                        quasistatic),
-      fwd);
-}
-
-frc2::CommandPtr RobotContainer::ElevatorTorqueCurrentSysIdCommands(
-    std::function<bool()> fwd, std::function<bool()> quasistatic) {
-  return frc2::cmd::Either(
-      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticTorqueCurrent(
-                            frc2::sysid::Direction::kForward),
-                        elevatorSub.SysIdElevatorDynamicTorqueCurrent(
-                            frc2::sysid::Direction::kForward),
-                        quasistatic),
-      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticTorqueCurrent(
-                            frc2::sysid::Direction::kReverse),
-                        elevatorSub.SysIdElevatorDynamicTorqueCurrent(
                             frc2::sysid::Direction::kReverse),
                         quasistatic),
       fwd);

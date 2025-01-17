@@ -52,7 +52,7 @@ class Arm : public frc2::SubsystemBase {
   ctre::phoenix6::controls::VoltageOut pivotVoltageSetter{0_V};
   ctre::phoenix6::controls::TorqueCurrentFOC pivotTorqueCurrentSetter{0_A};
 
-  str::gains::radial::RadialGainsHolder currentGains{
+  str::gains::radial::AmpRadialGainsHolder currentGains{
       consts::arm::gains::PIVOT_GAINS};
 
   frc::sim::SingleJointedArmSim armSim{consts::arm::physical::MOTOR,

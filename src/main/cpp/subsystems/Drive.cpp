@@ -166,7 +166,7 @@ frc2::CommandPtr Drive::TuneSteerPID(std::function<bool()> isDone) {
           {this}),
       frc2::cmd::Run(
           [this, tablePrefix] {
-            str::gains::radial::RadialGainsHolder newGains{
+            str::gains::radial::AmpRadialGainsHolder newGains{
                 units::turns_per_second_t{frc::SmartDashboard::GetNumber(
                     tablePrefix + "mmCruiseVel", 0)},
                 str::gains::radial::turn_volt_ka_unit_t{

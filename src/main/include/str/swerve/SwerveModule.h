@@ -30,7 +30,7 @@ class SwerveModule {
  public:
   explicit SwerveModule(const ModuleConstants& consts,
                         const ModulePhysicalCharacteristics& physical,
-                        str::gains::radial::RadialGainsHolder steer,
+                        str::gains::radial::AmpRadialGainsHolder steer,
                         DriveGains drive);
   void OptimizeBusSignals();
   frc::SwerveModuleState GoToState(frc::SwerveModuleState desired,
@@ -41,9 +41,9 @@ class SwerveModule {
   frc::SwerveModuleState GetState();
   units::radian_t GetOutputShaftTurns();
   frc::SwerveModuleState UpdateSimulatedModule(units::volt_t batteryVoltage);
-  void SetSteerGains(str::gains::radial::RadialGainsHolder newGains);
+  void SetSteerGains(str::gains::radial::AmpRadialGainsHolder newGains);
   void SetDriveGains(str::swerve::DriveGains newGains);
-  str::gains::radial::RadialGainsHolder GetSteerGains() const;
+  str::gains::radial::AmpRadialGainsHolder GetSteerGains() const;
   str::swerve::DriveGains GetDriveGains() const;
   units::ampere_t GetSimulatedCurrentDraw() const;
   void SetSteerToAmps(units::ampere_t ampsToSend);
@@ -85,7 +85,7 @@ class SwerveModule {
   frc::Alert optimizeDriveMotorAlert;
 
   ModulePhysicalCharacteristics physicalChar;
-  str::gains::radial::RadialGainsHolder steerGains;
+  str::gains::radial::AmpRadialGainsHolder steerGains;
   DriveGains driveGains;
 
   ctre::phoenix6::hardware::CANcoder steerEncoder;

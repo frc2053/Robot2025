@@ -17,12 +17,11 @@
 #include "ctre/phoenix6/controls/Follower.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoTorqueCurrentFOC.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
-#include "ctre/phoenix6/controls/MotionMagicTorqueCurrentFOC.hpp"
-#include "ctre/phoenix6/controls/PositionTorqueCurrentFOC.hpp"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
 #include "frc/simulation/ElevatorSim.h"
 #include "frc2/command/CommandPtr.h"
+#include "frc2/command/button/Trigger.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
 #include "networktables/BooleanTopic.h"
 #include "networktables/DoubleTopic.h"
@@ -45,16 +44,11 @@ class Elevator : public frc2::SubsystemBase {
   void SimulationPeriodic() override;
   units::meter_t GetHeight();
   void GoToHeight(units::meter_t newHeight);
-  bool IsAtGoalHeight();
+  frc2::Trigger IsAtGoalHeight();
   void SetVoltage(units::volt_t volts);
-  void SetTorqueCurrent(units::ampere_t amps);
   frc2::CommandPtr GoToHeightCmd(std::function<units::meter_t()> newHeight);
   frc2::CommandPtr SysIdElevatorQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdElevatorDynamicVoltage(frc2::sysid::Direction dir);
-  frc2::CommandPtr SysIdElevatorQuasistaticTorqueCurrent(
-      frc2::sysid::Direction dir);
-  frc2::CommandPtr SysIdElevatorDynamicTorqueCurrent(
-      frc2::sysid::Direction dir);
   frc2::CommandPtr TuneElevatorPID(std::function<bool()> isDone);
 
  private:
@@ -62,8 +56,8 @@ class Elevator : public frc2::SubsystemBase {
   void ConfigureControlSignals();
   void UpdateNTEntries();
   units::meters_per_second_t GetElevatorVel();
-  void SetElevatorGains(str::gains::radial::RadialGainsHolder newGains,
-                        units::ampere_t kg);
+  void SetElevatorGains(str::gains::radial::VoltRadialGainsHolder newGains,
+                        units::volt_t kg);
   units::meter_t ConvertEncPosToHeight(units::turn_t rots);
   units::turn_t ConvertHeightToEncPos(units::meter_t height);
   units::meters_per_second_t ConvertEncVelToHeightVel(
@@ -71,7 +65,6 @@ class Elevator : public frc2::SubsystemBase {
   units::turns_per_second_t ConvertHeightVelToEncVel(
       units::meters_per_second_t vel);
   void LogElevatorVolts(frc::sysid::SysIdRoutineLog* log);
-  void LogElevatorTorqueCurrent(frc::sysid::SysIdRoutineLog* log);
   ctre::phoenix6::hardware::TalonFX leftMotor{
       consts::elevator::can_ids::LEFT_MOTOR};
   ctre::phoenix6::hardware::TalonFX rightMotor{
@@ -94,8 +87,6 @@ class Elevator : public frc2::SubsystemBase {
       leftMotor.GetPosition();
   ctre::phoenix6::StatusSignal<units::turns_per_second_t> leftVelocitySig =
       leftMotor.GetVelocity();
-  ctre::phoenix6::StatusSignal<units::ampere_t> leftTorqueCurrentSig =
-      leftMotor.GetTorqueCurrent();
   ctre::phoenix6::StatusSignal<units::volt_t> leftVoltageSig =
       leftMotor.GetMotorVoltage();
 
@@ -103,21 +94,17 @@ class Elevator : public frc2::SubsystemBase {
       rightMotor.GetPosition();
   ctre::phoenix6::StatusSignal<units::turns_per_second_t> rightVelocitySig =
       rightMotor.GetVelocity();
-  ctre::phoenix6::StatusSignal<units::ampere_t> rightTorqueCurrentSig =
-      rightMotor.GetTorqueCurrent();
   ctre::phoenix6::StatusSignal<units::volt_t> rightVoltageSig =
       rightMotor.GetMotorVoltage();
 
-  ctre::phoenix6::controls::MotionMagicExpoTorqueCurrentFOC
-      elevatorHeightSetter{0_rad};
+  ctre::phoenix6::controls::MotionMagicExpoVoltage elevatorHeightSetter{0_rad};
   ctre::phoenix6::controls::VoltageOut elevatorVoltageSetter{0_V};
-  ctre::phoenix6::controls::TorqueCurrentFOC elevatorTorqueCurrentSetter{0_A};
   ctre::phoenix6::controls::Follower followerSetter{
       consts::elevator::can_ids::LEFT_MOTOR, true};
 
-  str::gains::radial::RadialGainsHolder currentGains{
+  str::gains::radial::VoltRadialGainsHolder currentGains{
       consts::elevator::gains::ELEVATOR_GAINS};
-  units::ampere_t currentKg{consts::elevator::gains::kG};
+  units::volt_t currentKg{consts::elevator::gains::kG};
 
   frc::sim::ElevatorSim elevatorSim{consts::elevator::physical::MOTOR,
                                     consts::elevator::physical::GEARING,
@@ -141,23 +128,6 @@ class Elevator : public frc2::SubsystemBase {
           [this](units::volt_t voltsToSend) { SetVoltage(voltsToSend); },
           [this](frc::sysid::SysIdRoutineLog* log) { LogElevatorVolts(log); },
           this, "elevator"}};
-
-  frc2::sysid::SysIdRoutine elevatorSysIdTorqueCurrent{
-      frc2::sysid::Config{
-          (10_V / 1_s), 500_V, std::nullopt,
-          [](frc::sysid::State state) {
-            ctre::phoenix6::SignalLogger().WriteString(
-                "SysIdElevator_State",
-                frc::sysid::SysIdRoutineLog::StateEnumToString(state));
-          }},
-      frc2::sysid::Mechanism{[this](units::volt_t ampsToSend) {
-                               SetTorqueCurrent(
-                                   units::ampere_t{ampsToSend.value()});
-                             },
-                             [this](frc::sysid::SysIdRoutineLog* log) {
-                               LogElevatorTorqueCurrent(log);
-                             },
-                             this, "elevator"}};
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Elevator")};

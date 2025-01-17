@@ -4,6 +4,8 @@
 
 #include "subsystems/Elevator.h"
 
+#include <string>
+
 #include "constants/ElevatorConstants.h"
 #include "ctre/phoenix/StatusCodes.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
@@ -13,13 +15,14 @@
 #include "frc/RobotController.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
+#include "frc2/command/button/Trigger.h"
+#include "str/GainTypes.h"
 #include "str/Units.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/length.h"
 #include "units/voltage.h"
-#include <string>
 
 Elevator::Elevator(str::SuperstructureDisplay& display) : display{display} {
   ConfigureMotors();
@@ -32,8 +35,7 @@ void Elevator::Periodic() {
   ctre::phoenix::StatusCode status =
       ctre::phoenix6::BaseStatusSignal::WaitForAll(
           2.0 / consts::elevator::BUS_UPDATE_FREQ, leftPositionSig,
-          leftVelocitySig, leftTorqueCurrentSig, leftVoltageSig,
-          rightPositionSig, rightVelocitySig, rightTorqueCurrentSig,
+          leftVelocitySig, leftVoltageSig, rightPositionSig, rightVelocitySig,
           rightVoltageSig);
 
   if (!status.IsOK()) {
@@ -113,29 +115,27 @@ units::meters_per_second_t Elevator::GetElevatorVel() {
   return avgVel;
 }
 
-bool Elevator::IsAtGoalHeight() {
-  return isAtGoalHeight;
+frc2::Trigger Elevator::IsAtGoalHeight() {
+  return frc2::Trigger{[this] { return isAtGoalHeight; }};
 }
 
 frc2::CommandPtr Elevator::GoToHeightCmd(
     std::function<units::meter_t()> newHeight) {
-  return frc2::cmd::Run([this, newHeight] { GoToHeight(newHeight()); }, {this})
-      .Until([this] { return IsAtGoalHeight(); });
+  return frc2::cmd::Run([this, newHeight] { GoToHeight(newHeight()); }, {this});
 }
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
   goalHeight = newHeight;
-  leftMotor.SetControl(elevatorHeightSetter.WithPosition(ConvertHeightToEncPos(
-      newHeight / consts::elevator::physical::NUM_OF_STAGES)));
+  leftMotor.SetControl(
+      elevatorHeightSetter
+          .WithPosition(ConvertHeightToEncPos(
+              newHeight / consts::elevator::physical::NUM_OF_STAGES))
+          .WithEnableFOC(true));
 }
 
 void Elevator::SetVoltage(units::volt_t volts) {
   leftMotor.SetControl(
       elevatorVoltageSetter.WithEnableFOC(true).WithOutput(volts));
-}
-
-void Elevator::SetTorqueCurrent(units::ampere_t amps) {
-  leftMotor.SetControl(elevatorTorqueCurrentSetter.WithOutput(amps));
 }
 
 frc2::CommandPtr Elevator::SysIdElevatorQuasistaticVoltage(
@@ -146,17 +146,6 @@ frc2::CommandPtr Elevator::SysIdElevatorQuasistaticVoltage(
 frc2::CommandPtr Elevator::SysIdElevatorDynamicVoltage(
     frc2::sysid::Direction dir) {
   return elevatorSysIdVoltage.Dynamic(dir).WithName("Elevator Dynamic Voltage");
-}
-
-frc2::CommandPtr Elevator::SysIdElevatorQuasistaticTorqueCurrent(
-    frc2::sysid::Direction dir) {
-  return elevatorSysIdTorqueCurrent.Quasistatic(dir).WithName(
-      "Elevator Quasistatic Torque Current");
-}
-frc2::CommandPtr Elevator::SysIdElevatorDynamicTorqueCurrent(
-    frc2::sysid::Direction dir) {
-  return elevatorSysIdTorqueCurrent.Dynamic(dir).WithName(
-      "Elevator Dynamic Torque Current");
 }
 
 frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
@@ -200,27 +189,27 @@ frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
           {this}),
       frc2::cmd::Run(
           [this, tablePrefix] {
-            str::gains::radial::RadialGainsHolder newGains{
+            str::gains::radial::VoltRadialGainsHolder newGains{
                 units::turns_per_second_t{frc::SmartDashboard::GetNumber(
                     tablePrefix + "mmCruiseVel", 0)},
                 str::gains::radial::turn_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
                 str::gains::radial::turn_volt_kv_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
-                str::gains::radial::turn_amp_ka_unit_t{
+                str::gains::radial::turn_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
-                str::gains::radial::turn_amp_kv_unit_t{
+                str::gains::radial::turn_volt_kv_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
-                units::ampere_t{
+                units::volt_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
-                str::gains::radial::turn_amp_kp_unit_t{
+                str::gains::radial::turn_volt_kp_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
-                str::gains::radial::turn_amp_ki_unit_t{
+                str::gains::radial::turn_volt_ki_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
-                str::gains::radial::turn_amp_kd_unit_t{
+                str::gains::radial::turn_volt_kd_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
 
-            units::ampere_t newKg = units::ampere_t{
+            units::volt_t newKg = units::volt_t{
                 frc::SmartDashboard::GetNumber(tablePrefix + "kG", 0)};
 
             if (newGains != currentGains ||
@@ -244,23 +233,11 @@ void Elevator::LogElevatorVolts(frc::sysid::SysIdRoutineLog* log) {
                 2.0);
 }
 
-void Elevator::LogElevatorTorqueCurrent(frc::sysid::SysIdRoutineLog* log) {
-  log->Motor("elevator")
-      .voltage(units::volt_t{(leftTorqueCurrentSig.GetValueAsDouble() +
-                              rightTorqueCurrentSig.GetValueAsDouble()) /
-                             2.0})
-      .position((leftPositionSig.GetValue() + rightPositionSig.GetValue()) /
-                2.0)
-      .velocity((leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) /
-                2.0);
-}
-
 void Elevator::OptimizeBusSignals() {
   ctre::phoenix::StatusCode freqSetterStatus =
       ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
           consts::elevator::BUS_UPDATE_FREQ, leftPositionSig, leftVelocitySig,
-          leftTorqueCurrentSig, leftVoltageSig, rightPositionSig,
-          rightVelocitySig, rightTorqueCurrentSig, rightVoltageSig);
+          leftVoltageSig, rightPositionSig, rightVelocitySig, rightVoltageSig);
 
   frc::DataLogManager::Log(
       fmt::format("Set bus signal frequenceies for elevator. Result was: {}",
@@ -282,8 +259,8 @@ void Elevator::OptimizeBusSignals() {
   optiRightAlert.Set(!optimizeRightResult.IsOK());
 }
 
-void Elevator::SetElevatorGains(str::gains::radial::RadialGainsHolder newGains,
-                                units::ampere_t kg) {
+void Elevator::SetElevatorGains(
+    str::gains::radial::VoltRadialGainsHolder newGains, units::volt_t kg) {
   currentGains = newGains;
   currentKg = kg;
   ctre::phoenix6::configs::Slot0Configs slotConfig{};
@@ -409,12 +386,9 @@ void Elevator::ConfigureMotors() {
 }
 
 void Elevator::ConfigureControlSignals() {
-  elevatorHeightSetter.UpdateFreqHz = 0_Hz;
-  elevatorVoltageSetter.UpdateFreqHz = 0_Hz;
-  elevatorTorqueCurrentSetter.UpdateFreqHz = 0_Hz;
-  followerSetter.UpdateFreqHz = 0_Hz;
-  elevatorTorqueCurrentSetter.OverrideCoastDurNeutral = true;
-  elevatorHeightSetter.OverrideCoastDurNeutral = true;
+  elevatorHeightSetter.UpdateFreqHz = 250_Hz;
+  elevatorVoltageSetter.UpdateFreqHz = 250_Hz;
+  followerSetter.UpdateFreqHz = 250_Hz;
 }
 
 units::meter_t Elevator::ConvertEncPosToHeight(units::turn_t turns) {

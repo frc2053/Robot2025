@@ -114,7 +114,7 @@ using turn_amp_kd_unit =
                          units::inverse<units::turns_per_second>>;
 using turn_amp_kd_unit_t = units::unit_t<turn_amp_kd_unit>;
 
-struct RadialGainsHolder {
+struct AmpRadialGainsHolder {
   units::turns_per_second_t motionMagicCruiseVel;
   turn_volt_ka_unit_t motionMagicExpoKa;
   turn_volt_kv_unit_t motionMagicExpoKv;
@@ -125,8 +125,8 @@ struct RadialGainsHolder {
   turn_amp_ki_unit_t kI;
   turn_amp_kd_unit_t kD;
 
-  RadialGainsHolder& operator=(const RadialGainsHolder& other) = default;
-  RadialGainsHolder(const RadialGainsHolder& other)
+  AmpRadialGainsHolder& operator=(const AmpRadialGainsHolder& other) = default;
+  AmpRadialGainsHolder(const AmpRadialGainsHolder& other)
       : motionMagicCruiseVel{other.motionMagicCruiseVel},
         motionMagicExpoKa{other.motionMagicExpoKa},
         motionMagicExpoKv{other.motionMagicExpoKv},
@@ -136,11 +136,11 @@ struct RadialGainsHolder {
         kP{other.kP},
         kI{other.kI},
         kD{other.kD} {}
-  RadialGainsHolder(units::turns_per_second_t mmCv, turn_volt_ka_unit_t mmKa,
-                    turn_volt_kv_unit_t mmKv, turn_amp_ka_unit_t ka,
-                    turn_amp_kv_unit_t kv, units::ampere_t ks,
-                    turn_amp_kp_unit_t kp, turn_amp_ki_unit_t ki,
-                    turn_amp_kd_unit_t kd)
+  AmpRadialGainsHolder(units::turns_per_second_t mmCv, turn_volt_ka_unit_t mmKa,
+                       turn_volt_kv_unit_t mmKv, turn_amp_ka_unit_t ka,
+                       turn_amp_kv_unit_t kv, units::ampere_t ks,
+                       turn_amp_kp_unit_t kp, turn_amp_ki_unit_t ki,
+                       turn_amp_kd_unit_t kd)
       : motionMagicCruiseVel{mmCv},
         motionMagicExpoKa{mmKa},
         motionMagicExpoKv{mmKv},
@@ -151,7 +151,7 @@ struct RadialGainsHolder {
         kI{ki},
         kD{kd} {}
 
-  bool operator==(const RadialGainsHolder& rhs) const {
+  bool operator==(const AmpRadialGainsHolder& rhs) const {
     return units::essentiallyEqual(motionMagicCruiseVel,
                                    rhs.motionMagicCruiseVel, 1e-6),
            units::essentiallyEqual(motionMagicExpoKa, rhs.motionMagicExpoKa,
@@ -165,7 +165,64 @@ struct RadialGainsHolder {
                units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
                units::essentiallyEqual(kD, rhs.kD, 1e-6);
   }
-  bool operator!=(const RadialGainsHolder& rhs) const {
+  bool operator!=(const AmpRadialGainsHolder& rhs) const {
+    return !operator==(rhs);
+  }
+};
+
+struct VoltRadialGainsHolder {
+  units::turns_per_second_t motionMagicCruiseVel;
+  turn_volt_ka_unit_t motionMagicExpoKa;
+  turn_volt_kv_unit_t motionMagicExpoKv;
+  turn_volt_ka_unit_t kA;
+  turn_volt_kv_unit_t kV;
+  units::volt_t kS;
+  turn_volt_kp_unit_t kP;
+  turn_volt_ki_unit_t kI;
+  turn_volt_kd_unit_t kD;
+
+  VoltRadialGainsHolder& operator=(const VoltRadialGainsHolder& other) =
+      default;
+  VoltRadialGainsHolder(const VoltRadialGainsHolder& other)
+      : motionMagicCruiseVel{other.motionMagicCruiseVel},
+        motionMagicExpoKa{other.motionMagicExpoKa},
+        motionMagicExpoKv{other.motionMagicExpoKv},
+        kA{other.kA},
+        kV{other.kV},
+        kS{other.kS},
+        kP{other.kP},
+        kI{other.kI},
+        kD{other.kD} {}
+  VoltRadialGainsHolder(units::turns_per_second_t mmCv,
+                        turn_volt_ka_unit_t mmKa, turn_volt_kv_unit_t mmKv,
+                        turn_volt_ka_unit_t ka, turn_volt_kv_unit_t kv,
+                        units::volt_t ks, turn_volt_kp_unit_t kp,
+                        turn_volt_ki_unit_t ki, turn_volt_kd_unit_t kd)
+      : motionMagicCruiseVel{mmCv},
+        motionMagicExpoKa{mmKa},
+        motionMagicExpoKv{mmKv},
+        kA{ka},
+        kV{kv},
+        kS{ks},
+        kP{kp},
+        kI{ki},
+        kD{kd} {}
+
+  bool operator==(const VoltRadialGainsHolder& rhs) const {
+    return units::essentiallyEqual(motionMagicCruiseVel,
+                                   rhs.motionMagicCruiseVel, 1e-6),
+           units::essentiallyEqual(motionMagicExpoKa, rhs.motionMagicExpoKa,
+                                   1e-6),
+           units::essentiallyEqual(motionMagicExpoKv, rhs.motionMagicExpoKv,
+                                   1e-6),
+           units::essentiallyEqual(kA, rhs.kA, 1e-6) &&
+               units::essentiallyEqual(kV, rhs.kV, 1e-6) &&
+               units::essentiallyEqual(kS, rhs.kS, 1e-6) &&
+               units::essentiallyEqual(kP, rhs.kP, 1e-6) &&
+               units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
+               units::essentiallyEqual(kD, rhs.kD, 1e-6);
+  }
+  bool operator!=(const VoltRadialGainsHolder& rhs) const {
     return !operator==(rhs);
   }
 };

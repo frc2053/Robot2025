@@ -44,7 +44,7 @@ inline constexpr units::radian_t MAX_ANGLE = 360_deg;
 }  // namespace physical
 
 namespace gains {
-inline const str::gains::radial::RadialGainsHolder PIVOT_GAINS{
+inline const str::gains::radial::AmpRadialGainsHolder PIVOT_GAINS{
     consts::arm::physical::MOTOR.freeSpeed / consts::arm::physical::GEARING,
     str::gains::radial::turn_volt_ka_unit_t{0},
     str::gains::radial::turn_volt_kv_unit_t{0},

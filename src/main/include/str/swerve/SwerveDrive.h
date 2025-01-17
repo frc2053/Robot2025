@@ -57,8 +57,8 @@ class SwerveDrive {
   units::radian_t GetYawFromImu() const;
   void ZeroYaw();
   void ResetPose(const frc::Pose2d& resetPose);
-  str::gains::radial::RadialGainsHolder GetSteerGains() const;
-  void SetSteerGains(str::gains::radial::RadialGainsHolder newGains);
+  str::gains::radial::AmpRadialGainsHolder GetSteerGains() const;
+  void SetSteerGains(str::gains::radial::AmpRadialGainsHolder newGains);
   str::swerve::DriveGains GetDriveGains() const;
   void SetDriveGains(str::swerve::DriveGains newGains);
 
