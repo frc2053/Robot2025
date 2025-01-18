@@ -60,8 +60,8 @@ class SuperstructureDisplay {
     elevatorCarriage->SetLength(newHeight / 1_m);
   }
   void SetPivotAngle(units::radian_t newAngle) {
-    pivotJoint->SetAngle(newAngle);
-    uShapeBack->SetAngle(newAngle + 116.16_deg);
+    pivotJoint->SetAngle(newAngle - 90_deg);
+    uShapeBack->SetAngle(newAngle - 90_deg + 116.16_deg);
   }
 
  private:

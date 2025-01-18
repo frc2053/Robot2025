@@ -15,6 +15,7 @@
 #include "ctre/phoenix6/CANcoder.hpp"
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
+#include "ctre/phoenix6/controls/MotionMagicVoltage.hpp"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
 #include "frc/simulation/SingleJointedArmSim.h"

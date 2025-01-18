@@ -39,6 +39,9 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.A().OnTrue(elevatorSub.GoToHeightCmd([] { return 5.5_ft; }));
   driverJoystick.B().OnTrue(elevatorSub.GoToHeightCmd([] { return 0_ft; }));
 
+  driverJoystick.X().OnTrue(pivotSub.GoToAngleCmd([] { return 135_deg; }));
+  driverJoystick.Y().OnTrue(pivotSub.GoToAngleCmd([] { return 0_deg; }));
+
   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
       [this] {
         elevatorSub.SetVoltage(
@@ -63,6 +66,8 @@ void RobotContainer::ConfigureSysIdBinds() {
   tuningTable->PutBoolean("WheelRadius", false);
   tuningTable->PutBoolean("ElevatorPidTuning", false);
   tuningTable->PutBoolean("ElevatorSysIdVolts", false);
+  tuningTable->PutBoolean("PivotPidTuning", false);
+  tuningTable->PutBoolean("PivotSysIdVolts", false);
   tuningTable->PutBoolean("Quasistatic", true);
   tuningTable->PutBoolean("Forward", true);
 
@@ -72,6 +77,8 @@ void RobotContainer::ConfigureSysIdBinds() {
       driveSub.TuneDrivePID([this] { return !driveTuneBtn.Get(); }));
   elevatorTuneBtn.OnTrue(
       elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get(); }));
+  pivotTuneBtn.OnTrue(
+      pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
 
   steerSysIdVoltsBtn.WhileTrue(SteerVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
@@ -89,6 +96,10 @@ void RobotContainer::ConfigureSysIdBinds() {
       [this] { return tuningTable->GetBoolean("Forward", true); }));
 
   elevatorSysIdVoltsBtn.WhileTrue(ElevatorVoltsSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+
+  pivotSysIdVoltsBtn.WhileTrue(PivotVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 }
@@ -138,6 +149,22 @@ frc2::CommandPtr RobotContainer::ElevatorVoltsSysIdCommands(
                         elevatorSub.SysIdElevatorDynamicVoltage(
                             frc2::sysid::Direction::kReverse),
                         quasistatic),
+      fwd);
+}
+
+frc2::CommandPtr RobotContainer::PivotVoltsSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(
+          pivotSub.SysIdPivotQuasistaticVoltage(
+              frc2::sysid::Direction::kForward),
+          pivotSub.SysIdPivotDynamicVoltage(frc2::sysid::Direction::kForward),
+          quasistatic),
+      frc2::cmd::Either(
+          pivotSub.SysIdPivotQuasistaticVoltage(
+              frc2::sysid::Direction::kReverse),
+          pivotSub.SysIdPivotDynamicVoltage(frc2::sysid::Direction::kReverse),
+          quasistatic),
       fwd);
 }
 
