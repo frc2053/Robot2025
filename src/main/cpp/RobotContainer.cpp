@@ -207,6 +207,10 @@ Pivot& RobotContainer::GetPivot() {
   return pivotSub;
 }
 
+Manipulator& RobotContainer::GetManipulator() {
+  return manipSub;
+}
+
 str::vision::VisionSystem& RobotContainer::GetVision() {
   return vision;
 }
