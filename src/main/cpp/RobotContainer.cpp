@@ -36,6 +36,9 @@ void RobotContainer::ConfigureBindings() {
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
 
+  driverJoystick.LeftBumper().OnTrue(manipSub.SuckUntilAlgae());
+  driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
+
   driverJoystick.A().OnTrue(elevatorSub.GoToHeightCmd([] { return 5.5_ft; }));
   driverJoystick.B().OnTrue(elevatorSub.GoToHeightCmd([] { return 0_ft; }));
 

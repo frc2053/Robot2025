@@ -5,7 +5,10 @@
 #include "subsystems/Manipulator.h"
 #include <frc/RobotBase.h>
 #include <frc/DataLogManager.h>
+#include "constants/ManipulatorConstants.h"
 #include "ctre/phoenix6/signals/SpnEnums.hpp"
+#include "frc/RobotController.h"
+#include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
 
 Manipulator::Manipulator() {
@@ -17,12 +20,34 @@ Manipulator::Manipulator() {
   nt->SetDefaultBoolean("SimBumpSwitch", false);
 }
 
+frc2::CommandPtr Manipulator::PoopPiece() {
+  return frc2::cmd::Run([this] { Poop(); });
+}
+
+// TODO: Might be able to detect wheel speed increase to get rid of time
+frc2::CommandPtr Manipulator::PoopPiece(
+    std::function<units::second_t()> timeToPoop) {
+  return frc2::cmd::Run([this] { Poop(); }).WithTimeout(timeToPoop());
+}
+
+frc2::CommandPtr Manipulator::SuckUntilAlgae() {
+  return frc2::cmd::Run([this] { Suck(); }).Until([this] {
+    return HasAlgae();
+  });
+}
+
+frc2::CommandPtr Manipulator::SuckUntilCoral() {
+  return frc2::cmd::Run([this] { Suck(); }).Until([this] {
+    return HasCoral();
+  });
+}
+
 // This method will be called once per scheduler run
 void Manipulator::Periodic() {
   ctre::phoenix::StatusCode status =
       ctre::phoenix6::BaseStatusSignal::RefreshAll(
-          fwdLimitPressedSig, revLimitPressedSig, torqueCurrentSig,
-          velocitySig);
+          fwdLimitPressedSig, revLimitPressedSig, torqueCurrentSig, velocitySig,
+          voltageSig);
 
   if (!status.IsOK()) {
     frc::DataLogManager::Log(fmt::format(
@@ -33,11 +58,30 @@ void Manipulator::Periodic() {
   hasAlgae = fwdLimitPressedSig.GetValue() ==
              ctre::phoenix6::signals::ForwardLimitValue::ClosedToGround;
 
+  currentVoltage = voltageSig.GetValue();
+  torqueCurrent = torqueCurrentSig.GetValue();
+  currentVelocity = velocitySig.GetValue();
+
   UpdateNTEntries();
+}
+
+void Manipulator::Poop() {
+  SetVoltage(consts::manip::gains::POOP_VOLTS);
+}
+
+void Manipulator::Suck() {
+  SetVoltage(-consts::manip::gains::SUCK_VOLTS);
 }
 
 void Manipulator::SimulationPeriodic() {
   rollerSim.SetForwardLimit(bumpSwitchSub.Get());
+  rollerSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+
+  coralWheelSim.SetInputVoltage(rollerSim.GetMotorVoltage());
+  coralWheelSim.Update(20_ms);
+
+  rollerSim.SetRotorVelocity(coralWheelSim.GetAngularVelocity() *
+                             consts::manip::physical::CORAL_REDUCTION);
 }
 
 frc2::Trigger Manipulator::GotAlgae() {
@@ -62,19 +106,24 @@ void Manipulator::UpdateNTEntries() {
   hasCoralPub.Set(hasCoral);
   gotAlgaePub.Set(GotAlgae().Get());
   gotCoralPub.Set(GotCoral().Get());
+  voltagePub.Set(currentVoltage.value());
+  velocityPub.Set(currentVelocity.value());
+  torqueCurrentPub.Set(torqueCurrent.value());
+  commandedVoltagePub.Set(commandedVoltage.value());
 }
 
 void Manipulator::SetVoltage(units::volt_t volts) {
-  rollerVoltageSetter.WithEnableFOC(true)
-      .WithIgnoreHardwareLimits(true)
-      .WithOutput(volts);
+  commandedVoltage = volts;
+  rollerMotor.SetControl(rollerVoltageSetter.WithEnableFOC(true)
+                             .WithIgnoreHardwareLimits(true)
+                             .WithOutput(volts));
 }
 
 void Manipulator::OptimizeBusSignals() {
   ctre::phoenix::StatusCode freqSetterStatus =
       ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
           consts::manip::BUS_UPDATE_FREQ, fwdLimitPressedSig,
-          revLimitPressedSig, torqueCurrentSig, velocitySig);
+          revLimitPressedSig, torqueCurrentSig, velocitySig, voltageSig);
 
   frc::DataLogManager::Log(
       fmt::format("Set bus signal frequenceies for manipulator. Result was: {}",

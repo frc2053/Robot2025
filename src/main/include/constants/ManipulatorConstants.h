@@ -10,6 +10,8 @@
 #include <units/mass.h>
 
 #include "frc/system/plant/DCMotor.h"
+#include "units/moment_of_inertia.h"
+#include "units/voltage.h"
 
 namespace consts::manip {
 
@@ -27,7 +29,13 @@ inline constexpr units::ampere_t STATOR_LIMIT = 40_A;
 namespace physical {
 inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr bool INVERT_ROLLER = false;
+inline constexpr units::dimensionless::scalar_t CORAL_REDUCTION = 36.0 / 30.0;
+inline constexpr units::moment_of_inertia::kilogram_square_meter_t MOI =
+    0.0001_kg_sq_m;
 }  // namespace physical
 
-namespace gains {}  // namespace gains
+namespace gains {
+inline constexpr units::volt_t POOP_VOLTS = 6_V;
+inline constexpr units::volt_t SUCK_VOLTS = 10_V;
+}  // namespace gains
 }  // namespace consts::manip
