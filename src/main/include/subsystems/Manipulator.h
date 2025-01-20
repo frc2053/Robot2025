@@ -37,6 +37,7 @@ class Manipulator : public frc2::SubsystemBase {
   void SimulationPeriodic() override;
   frc2::Trigger GotAlgae();
   frc2::Trigger GotCoral();
+  frc2::Trigger DroppedCoral();
   bool HasCoral();
   bool HasAlgae();
   void Poop();
@@ -60,7 +61,9 @@ class Manipulator : public frc2::SubsystemBase {
   bool hasCoral{false};
   bool previouslyHadAlgae{false};
   bool previouslyHadCoral{false};
-  bool fakeCoral{false};
+  bool fakeCoralDrop{false};
+  bool fakeCoralSuck{false};
+
   units::volt_t currentVoltage{0_V};
   units::volt_t commandedVoltage{0_V};
   units::ampere_t torqueCurrent{0_A};
@@ -98,6 +101,7 @@ class Manipulator : public frc2::SubsystemBase {
 
   frc2::Trigger gotCoral{GotCoral()};
   frc2::Trigger gotAlgae{GotAlgae()};
+  frc2::Trigger droppedCoral{DroppedCoral()};
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Manipulator")};
@@ -113,10 +117,14 @@ class Manipulator : public frc2::SubsystemBase {
       nt->GetBooleanTopic("SimBumpSwitch").Subscribe(false)};
   nt::BooleanSubscriber gotCorralSub{
       nt->GetBooleanTopic("SimGrabbingCoral").Subscribe(false)};
+  nt::BooleanSubscriber droppedCoralSub{
+      nt->GetBooleanTopic("SimDroppingCoral").Subscribe(false)};
   nt::BooleanPublisher hasAlgaePub{nt->GetBooleanTopic("HasAlgae").Publish()};
   nt::BooleanPublisher hasCoralPub{nt->GetBooleanTopic("HasCoral").Publish()};
   nt::BooleanPublisher gotAlgaePub{nt->GetBooleanTopic("GotAlgae").Publish()};
   nt::BooleanPublisher gotCoralPub{nt->GetBooleanTopic("GotCoral").Publish()};
+  nt::BooleanPublisher droppedCoralPub{
+      nt->GetBooleanTopic("DroppedCoral").Publish()};
 
   std::string manipAlertMsg{"Manipulator Motor Config"};
   frc::Alert configureManipAlert{manipAlertMsg, frc::Alert::AlertType::kError};

@@ -40,6 +40,7 @@ inline constexpr units::volt_t POOP_VOLTS = 6_V;
 inline constexpr units::volt_t SUCK_VOLTS = 10_V;
 
 inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = 20_A;
+inline constexpr units::ampere_t DROPPED_GAME_PIECE_CURRENT = -20_A;
 inline constexpr units::second_t CORAL_DEBOUNCE_TIME = .1_s;
 }  // namespace gains
 }  // namespace consts::manip

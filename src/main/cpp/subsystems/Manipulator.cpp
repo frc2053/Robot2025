@@ -21,6 +21,7 @@ Manipulator::Manipulator() {
 
   nt->SetDefaultBoolean("SimBumpSwitch", false);
   nt->SetDefaultBoolean("SimGrabbingCoral", false);
+  nt->SetDefaultBoolean("SimDroppingCoral", false);
 }
 
 frc2::CommandPtr Manipulator::PoopPiece() {
@@ -71,14 +72,17 @@ void Manipulator::Periodic() {
   currentVelocity = velocitySig.GetValue();
 
   if (frc::RobotBase::IsSimulation()) {
-    if (fakeCoral) {
+    if (fakeCoralSuck) {
       torqueCurrent = 400_A;
+    }
+    if (fakeCoralDrop) {
+      torqueCurrent = -400_A;
     }
   }
 
   filteredCurrent = currentFilter.Calculate(torqueCurrent);
 
-  hasCoral = gotCoral.Get() || previouslyHadCoral;
+  hasCoral = (gotCoral.Get() || previouslyHadCoral) && !droppedCoral.Get();
 
   UpdateNTEntries();
 }
@@ -96,7 +100,8 @@ void Manipulator::Stop() {
 }
 
 void Manipulator::SimulationPeriodic() {
-  fakeCoral = gotCorralSub.Get();
+  fakeCoralSuck = gotCorralSub.Get();
+  fakeCoralDrop = droppedCoralSub.Get();
   rollerSim.SetForwardLimit(bumpSwitchSub.Get());
   rollerSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
@@ -111,6 +116,15 @@ frc2::Trigger Manipulator::GotAlgae() {
   return frc2::Trigger{[this] {
     return (previouslyHadAlgae == false) && (previouslyHadAlgae != hasAlgae);
   }};
+}
+
+frc2::Trigger Manipulator::DroppedCoral() {
+  return frc2::Trigger{[this] {
+           return (filteredCurrent <
+                   consts::manip::gains::DROPPED_GAME_PIECE_CURRENT) &&
+                  (previouslyHadCoral == true);
+         }}
+      .Debounce(consts::manip::gains::CORAL_DEBOUNCE_TIME);
 }
 
 frc2::Trigger Manipulator::GotCoral() {
@@ -139,6 +153,7 @@ void Manipulator::UpdateNTEntries() {
   torqueCurrentPub.Set(torqueCurrent.value());
   commandedVoltagePub.Set(commandedVoltage.value());
   filteredCurrentPub.Set(filteredCurrent.value());
+  droppedCoralPub.Set(droppedCoral.Get());
 }
 
 void Manipulator::SetVoltage(units::volt_t volts) {
