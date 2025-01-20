@@ -33,7 +33,7 @@ namespace physical {
 inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr bool INVERT_PIVOT = false;
 
-inline constexpr units::scalar_t GEARING = 60;
+inline constexpr units::scalar_t GEARING = 21.333;
 
 inline constexpr units::kilogram_t MASS = 10_lb;
 inline constexpr units::kilogram_square_meter_t MOI = 0.12009477_kg_sq_m;
@@ -52,17 +52,17 @@ inline constexpr units::radian_t ANGLE_TOLERANCE = 1_deg;
 
 inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
-    str::gains::radial::turn_volt_ka_unit_t{0.17297},
-    str::gains::radial::turn_volt_kv_unit_t{6.7171},
-    str::gains::radial::turn_volt_ka_unit_t{0.17297},
-    str::gains::radial::turn_volt_kv_unit_t{6.7171},
+    str::gains::radial::turn_volt_ka_unit_t{0.073766},
+    str::gains::radial::turn_volt_kv_unit_t{2.8397},
+    str::gains::radial::turn_volt_ka_unit_t{0.073766},
+    str::gains::radial::turn_volt_kv_unit_t{2.8397},
     0.11888_V,
-    str::gains::radial::turn_volt_kp_unit_t{29.406},
+    str::gains::radial::turn_volt_kp_unit_t{22.604},
     str::gains::radial::turn_volt_ki_unit_t{0},
-    str::gains::radial::turn_volt_kd_unit_t{1.6836},
+    str::gains::radial::turn_volt_kd_unit_t{0.61875},
 };
 
-inline constexpr units::volt_t kG = 0.49244_V;
+inline constexpr units::volt_t kG = 1.9674_V;
 
 }  // namespace gains
 }  // namespace consts::pivot

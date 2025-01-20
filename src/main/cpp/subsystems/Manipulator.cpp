@@ -1,10 +1,12 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FRC 2053.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// the MIT License file in the root of this project
 
 #include "subsystems/Manipulator.h"
-#include <frc/RobotBase.h>
+
 #include <frc/DataLogManager.h>
+#include <frc/RobotBase.h>
+
 #include "constants/ManipulatorConstants.h"
 #include "ctre/phoenix6/signals/SpnEnums.hpp"
 #include "frc/RobotController.h"
@@ -18,6 +20,7 @@ Manipulator::Manipulator() {
   OptimizeBusSignals();
 
   nt->SetDefaultBoolean("SimBumpSwitch", false);
+  nt->SetDefaultBoolean("SimGrabbingCoral", false);
 }
 
 frc2::CommandPtr Manipulator::PoopPiece() {
@@ -31,15 +34,19 @@ frc2::CommandPtr Manipulator::PoopPiece(
 }
 
 frc2::CommandPtr Manipulator::SuckUntilAlgae() {
-  return frc2::cmd::Run([this] { Suck(); }).Until([this] {
-    return HasAlgae();
-  });
+  return frc2::cmd::Run([this] { Suck(); })
+      .Until([this] { return HasAlgae(); })
+      .AndThen(StopCmd());
 }
 
 frc2::CommandPtr Manipulator::SuckUntilCoral() {
-  return frc2::cmd::Run([this] { Suck(); }).Until([this] {
-    return HasCoral();
-  });
+  return frc2::cmd::Run([this] { Suck(); })
+      .Until([this] { return HasCoral(); })
+      .AndThen(StopCmd());
+}
+
+frc2::CommandPtr Manipulator::StopCmd() {
+  return frc2::cmd::RunOnce([this] { Stop(); });
 }
 
 // This method will be called once per scheduler run
@@ -54,6 +61,7 @@ void Manipulator::Periodic() {
         "Error updating manipulator signals! Error was: {}", status.GetName()));
   }
 
+  previouslyHadCoral = hasCoral;
   previouslyHadAlgae = hasAlgae;
   hasAlgae = fwdLimitPressedSig.GetValue() ==
              ctre::phoenix6::signals::ForwardLimitValue::ClosedToGround;
@@ -61,6 +69,16 @@ void Manipulator::Periodic() {
   currentVoltage = voltageSig.GetValue();
   torqueCurrent = torqueCurrentSig.GetValue();
   currentVelocity = velocitySig.GetValue();
+
+  if (frc::RobotBase::IsSimulation()) {
+    if (fakeCoral) {
+      torqueCurrent = 400_A;
+    }
+  }
+
+  filteredCurrent = currentFilter.Calculate(torqueCurrent);
+
+  hasCoral = gotCoral.Get() || previouslyHadCoral;
 
   UpdateNTEntries();
 }
@@ -73,7 +91,12 @@ void Manipulator::Suck() {
   SetVoltage(-consts::manip::gains::SUCK_VOLTS);
 }
 
+void Manipulator::Stop() {
+  SetVoltage(0_V);
+}
+
 void Manipulator::SimulationPeriodic() {
+  fakeCoral = gotCorralSub.Get();
   rollerSim.SetForwardLimit(bumpSwitchSub.Get());
   rollerSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
@@ -91,7 +114,12 @@ frc2::Trigger Manipulator::GotAlgae() {
 }
 
 frc2::Trigger Manipulator::GotCoral() {
-  return frc2::Trigger{[this] { return false; }};
+  return frc2::Trigger{[this] {
+           return (filteredCurrent >
+                   consts::manip::gains::GOT_GAME_PIECE_CURRENT) &&
+                  (previouslyHadCoral == false);
+         }}
+      .Debounce(consts::manip::gains::CORAL_DEBOUNCE_TIME);
 }
 
 bool Manipulator::HasCoral() {
@@ -104,12 +132,13 @@ bool Manipulator::HasAlgae() {
 void Manipulator::UpdateNTEntries() {
   hasAlgaePub.Set(hasAlgae);
   hasCoralPub.Set(hasCoral);
-  gotAlgaePub.Set(GotAlgae().Get());
-  gotCoralPub.Set(GotCoral().Get());
+  gotAlgaePub.Set(gotAlgae.Get());
+  gotCoralPub.Set(gotCoral.Get());
   voltagePub.Set(currentVoltage.value());
   velocityPub.Set(currentVelocity.value());
   torqueCurrentPub.Set(torqueCurrent.value());
   commandedVoltagePub.Set(commandedVoltage.value());
+  filteredCurrentPub.Set(filteredCurrent.value());
 }
 
 void Manipulator::SetVoltage(units::volt_t volts) {

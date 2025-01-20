@@ -39,11 +39,10 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.LeftBumper().OnTrue(manipSub.SuckUntilAlgae());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
 
-  driverJoystick.A().OnTrue(elevatorSub.GoToHeightCmd([] { return 5.5_ft; }));
-  driverJoystick.B().OnTrue(elevatorSub.GoToHeightCmd([] { return 0_ft; }));
-
-  driverJoystick.X().OnTrue(pivotSub.GoToAngleCmd([] { return 135_deg; }));
-  driverJoystick.Y().OnTrue(pivotSub.GoToAngleCmd([] { return 0_deg; }));
+  driverJoystick.A().OnTrue(coordinator.GoHome());
+  driverJoystick.B().OnTrue(coordinator.GoToL2());
+  driverJoystick.X().OnTrue(coordinator.GoToL3());
+  driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
       [this] {

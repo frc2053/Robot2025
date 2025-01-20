@@ -14,10 +14,11 @@
 #include "Autos.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
-#include "subsystems/Manipulator.h"
-#include "subsystems/Pivot.h"
+#include "subsystems/Coordinator.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
+#include "subsystems/Manipulator.h"
+#include "subsystems/Pivot.h"
 
 class RobotContainer {
  public:
@@ -28,6 +29,7 @@ class RobotContainer {
   Elevator& GetElevator();
   Pivot& GetPivot();
   Manipulator& GetManipulator();
+  Coordinator& GetCoordinator();
   str::vision::VisionSystem& GetVision();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
@@ -54,6 +56,7 @@ class RobotContainer {
   Elevator elevatorSub{display};
   Pivot pivotSub{display};
   Manipulator manipSub{};
+  Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
   str::vision::VisionSystem vision;
 

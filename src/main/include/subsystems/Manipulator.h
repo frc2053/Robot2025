@@ -1,15 +1,21 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FRC 2053.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// the MIT License file in the root of this project
 
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
+
+#include <memory>
+#include <string>
+
+#include "constants/ManipulatorConstants.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/TalonFX.hpp"
 #include "ctre/phoenix6/signals/SpnEnums.hpp"
 #include "ctre/phoenix6/sim/TalonFXSimState.hpp"
 #include "frc/Alert.h"
+#include "frc/simulation/FlywheelSim.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc2/command/Command.h"
 #include "frc2/command/button/Trigger.h"
@@ -17,11 +23,10 @@
 #include "networktables/DoubleTopic.h"
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
-#include "frc/simulation/FlywheelSim.h"
-#include "constants/ManipulatorConstants.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/time.h"
+#include "frc/filter/LinearFilter.h"
 
 class Manipulator : public frc2::SubsystemBase {
  public:
@@ -36,12 +41,14 @@ class Manipulator : public frc2::SubsystemBase {
   bool HasAlgae();
   void Poop();
   void Suck();
+  void Stop();
 
   frc2::CommandPtr PoopPiece();
   // TODO: Might be able to detect wheel speed increase to get rid of time
   frc2::CommandPtr PoopPiece(std::function<units::second_t()> timeToPoop);
   frc2::CommandPtr SuckUntilAlgae();
   frc2::CommandPtr SuckUntilCoral();
+  frc2::CommandPtr StopCmd();
 
  private:
   void ConfigureMotors();
@@ -52,10 +59,13 @@ class Manipulator : public frc2::SubsystemBase {
   bool hasAlgae{false};
   bool hasCoral{false};
   bool previouslyHadAlgae{false};
+  bool previouslyHadCoral{false};
+  bool fakeCoral{false};
   units::volt_t currentVoltage{0_V};
   units::volt_t commandedVoltage{0_V};
   units::ampere_t torqueCurrent{0_A};
   units::revolutions_per_minute_t currentVelocity{0_rpm};
+  units::ampere_t filteredCurrent{0_A};
 
   ctre::phoenix6::hardware::TalonFX rollerMotor{
       consts::manip::can_ids::ROLLER_MOTOR};
@@ -83,6 +93,12 @@ class Manipulator : public frc2::SubsystemBase {
   frc::sim::FlywheelSim coralWheelSim{coralWheelPlant,
                                       consts::manip::physical::MOTOR};
 
+  frc::LinearFilter<units::ampere_t> currentFilter =
+      frc::LinearFilter<units::ampere_t>::MovingAverage(5);
+
+  frc2::Trigger gotCoral{GotCoral()};
+  frc2::Trigger gotAlgae{GotAlgae()};
+
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Manipulator")};
   nt::DoublePublisher voltagePub{nt->GetDoubleTopic("Voltage").Publish()};
@@ -91,8 +107,12 @@ class Manipulator : public frc2::SubsystemBase {
   nt::DoublePublisher velocityPub{nt->GetDoubleTopic("Velocity").Publish()};
   nt::DoublePublisher torqueCurrentPub{
       nt->GetDoubleTopic("TorqueCurrent").Publish()};
+  nt::DoublePublisher filteredCurrentPub{
+      nt->GetDoubleTopic("Filtered Current").Publish()};
   nt::BooleanSubscriber bumpSwitchSub{
       nt->GetBooleanTopic("SimBumpSwitch").Subscribe(false)};
+  nt::BooleanSubscriber gotCorralSub{
+      nt->GetBooleanTopic("SimGrabbingCoral").Subscribe(false)};
   nt::BooleanPublisher hasAlgaePub{nt->GetBooleanTopic("HasAlgae").Publish()};
   nt::BooleanPublisher hasCoralPub{nt->GetBooleanTopic("HasCoral").Publish()};
   nt::BooleanPublisher gotAlgaePub{nt->GetBooleanTopic("GotAlgae").Publish()};

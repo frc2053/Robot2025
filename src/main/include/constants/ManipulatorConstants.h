@@ -11,6 +11,7 @@
 
 #include "frc/system/plant/DCMotor.h"
 #include "units/moment_of_inertia.h"
+#include "units/time.h"
 #include "units/voltage.h"
 
 namespace consts::manip {
@@ -37,5 +38,8 @@ inline constexpr units::moment_of_inertia::kilogram_square_meter_t MOI =
 namespace gains {
 inline constexpr units::volt_t POOP_VOLTS = 6_V;
 inline constexpr units::volt_t SUCK_VOLTS = 10_V;
+
+inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = 20_A;
+inline constexpr units::second_t CORAL_DEBOUNCE_TIME = .1_s;
 }  // namespace gains
 }  // namespace consts::manip
