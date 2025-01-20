@@ -23,8 +23,10 @@ inline constexpr units::radian_t algaeNet = 100_deg;
 
 namespace elev {
 namespace algae {
+inline constexpr units::meter_t processor = 5_in;
 inline constexpr units::meter_t l2 = 12_in;
 inline constexpr units::meter_t l3 = 24_in;
+inline constexpr units::meter_t net = 80_in;
 }  // namespace algae
 
 namespace coral {
