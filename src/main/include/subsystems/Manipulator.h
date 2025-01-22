@@ -15,6 +15,7 @@
 #include "ctre/phoenix6/signals/SpnEnums.hpp"
 #include "ctre/phoenix6/sim/TalonFXSimState.hpp"
 #include "frc/Alert.h"
+#include "frc/filter/LinearFilter.h"
 #include "frc/simulation/FlywheelSim.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc2/command/Command.h"
@@ -26,7 +27,6 @@
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/time.h"
-#include "frc/filter/LinearFilter.h"
 
 class Manipulator : public frc2::SubsystemBase {
  public:

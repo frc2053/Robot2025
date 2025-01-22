@@ -41,6 +41,7 @@ class Pivot : public frc2::SubsystemBase {
   units::radian_t GetAngle();
   void GoToAngle(units::radian_t newAngle);
   frc2::Trigger IsAtGoalAngle();
+  frc2::Trigger IsClearOfFunnel();
   void SetVoltage(units::volt_t volts);
   frc2::CommandPtr GoToAngleCmd(std::function<units::radian_t()> newAngle);
   frc2::CommandPtr SysIdPivotQuasistaticVoltage(frc2::sysid::Direction dir);

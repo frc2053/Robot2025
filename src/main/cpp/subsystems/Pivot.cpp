@@ -84,6 +84,12 @@ units::radians_per_second_t Pivot::GetPivotVel() {
   return velocitySig.GetValue();
 }
 
+frc2::Trigger Pivot::IsClearOfFunnel() {
+  return frc2::Trigger{[this] {
+    return currentAngle >= consts::pivot::physical::CLEAR_OF_FUNNEL_ANGLE;
+  }};
+}
+
 frc2::Trigger Pivot::IsAtGoalAngle() {
   return frc2::Trigger{[this] { return isAtGoalAngle; }};
 }

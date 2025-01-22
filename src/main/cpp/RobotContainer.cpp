@@ -39,7 +39,9 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.LeftBumper().OnTrue(manipSub.SuckUntilAlgae());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
 
-  driverJoystick.A().OnTrue(coordinator.GoHome());
+  driverJoystick.Start().OnTrue(coordinator.GoToLoading());
+
+  driverJoystick.A().OnTrue(coordinator.GoToL1());
   driverJoystick.B().OnTrue(coordinator.GoToL2());
   driverJoystick.X().OnTrue(coordinator.GoToL3());
   driverJoystick.Y().OnTrue(coordinator.GoToL4());
