@@ -47,7 +47,8 @@ namespace gains {
 inline constexpr units::meter_t HEIGHT_TOLERANCE = .25_in;
 
 inline const str::gains::radial::VoltRadialGainsHolder ELEVATOR_GAINS{
-    720_deg_per_s,
+    consts::elevator::physical::MOTOR.freeSpeed /
+        consts::elevator::physical::GEARING,
     str::gains::radial::turn_volt_ka_unit_t{0.024803},
     str::gains::radial::turn_volt_kv_unit_t{2.3032},
     str::gains::radial::turn_volt_ka_unit_t{0.024803},

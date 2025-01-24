@@ -77,9 +77,9 @@ class SuperstructureDisplay {
     superstructurePoses[3] =
         frc::Pose3d{frc::Translation3d{0.1016508_m, -0.117274594_m, 0.263525_m},
                     frc::Rotation3d{0_deg, 0_deg, -90_deg}}
-            .TransformBy(
-                frc::Transform3d{superstructurePoses[2].Translation(),
-                                 frc::Rotation3d{newAngle, 0_rad, 0_rad}});
+            .TransformBy(frc::Transform3d{
+                superstructurePoses[2].Translation(),
+                frc::Rotation3d{-(newAngle - 90_deg), 0_rad, 0_rad}});
   }
 
  private:

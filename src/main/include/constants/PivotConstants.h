@@ -53,7 +53,7 @@ namespace gains {
 inline constexpr units::radian_t ANGLE_TOLERANCE = 1_deg;
 
 inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
-    180_deg_per_s,
+    consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
     str::gains::radial::turn_volt_ka_unit_t{0.073766},
     str::gains::radial::turn_volt_kv_unit_t{2.8397},
     str::gains::radial::turn_volt_ka_unit_t{0.073766},
