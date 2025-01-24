@@ -7,12 +7,17 @@
 #include <units/length.h>
 
 #include "constants/SwerveConstants.h"
+#include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation3d.h"
 #include "frc/smartdashboard/Mechanism2d.h"
 #include "frc/smartdashboard/MechanismLigament2d.h"
 #include "frc/smartdashboard/MechanismObject2d.h"
 #include "frc/smartdashboard/MechanismRoot2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "frc/util/Color.h"
+#include "networktables/StructArrayTopic.h"
 #include "units/angle.h"
 
 namespace str {
@@ -58,13 +63,33 @@ class SuperstructureDisplay {
   }
   void SetElevatorHeight(units::meter_t newHeight) {
     elevatorCarriage->SetLength(newHeight / 1_m);
+    superstructurePoses[0] =
+        frc::Pose3d{0_m, 0_m, newHeight / 3.0, frc::Rotation3d{}};
+    superstructurePoses[1] =
+        frc::Pose3d{0_m, 0_m, (newHeight / 3.0) * 2, frc::Rotation3d{}};
+    superstructurePoses[2] =
+        frc::Pose3d{0_m, 0_m, newHeight, frc::Rotation3d{}};
+    aScopeDisplay.Set(superstructurePoses);
   }
   void SetPivotAngle(units::radian_t newAngle) {
     pivotJoint->SetAngle(newAngle - 90_deg);
     uShapeBack->SetAngle(newAngle - 90_deg + 116.16_deg);
+    superstructurePoses[3] =
+        frc::Pose3d{frc::Translation3d{0.1016508_m, -0.117274594_m, 0.263525_m},
+                    frc::Rotation3d{0_deg, 0_deg, -90_deg}}
+            .TransformBy(
+                frc::Transform3d{superstructurePoses[2].Translation(),
+                                 frc::Rotation3d{newAngle, 0_rad, 0_rad}});
   }
 
  private:
+  std::shared_ptr<nt::NetworkTable> nt{
+      nt::NetworkTableInstance::GetDefault().GetTable("3DDisplay")};
+  nt::StructArrayPublisher<frc::Pose3d> aScopeDisplay{
+      nt->GetStructArrayTopic<frc::Pose3d>("Superstructure").Publish()};
+  std::array<frc::Pose3d, 4> superstructurePoses{frc::Pose3d{}, frc::Pose3d{},
+                                                 frc::Pose3d{}, frc::Pose3d{}};
+
   inline static constexpr units::meter_t TOTAL_SCREEN_WIDTH = 60_in;
   inline static constexpr units::meter_t TOTAL_SCREEN_HEIGHT = 120_in;
   inline static constexpr units::meter_t PIPE_THICKNESS = 1.66_in;
