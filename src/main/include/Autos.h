@@ -10,11 +10,14 @@
 #include <pathplanner/lib/auto/NamedCommands.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 
+#include "subsystems/Coordinator.h"
 #include "subsystems/Drive.h"
+#include "subsystems/Manipulator.h"
 
 class Autos {
  public:
-  explicit Autos(Drive& driveSub) : m_driveSub{driveSub} {
+  explicit Autos(Drive& driveSub, Coordinator& coordinator, Manipulator& manip)
+      : m_driveSub{driveSub}, m_coordinator{coordinator}, m_manipSub{manip} {
     BindCommandsAndTriggers();
 
     selectCommand = frc2::cmd::Select<AutoSelector>(
@@ -34,8 +37,16 @@ class Autos {
 
  private:
   void BindCommandsAndTriggers() {
+    pathplanner::NamedCommands::registerCommand("PrimeToScore",
+                                                m_coordinator.GoToL2());
+    pathplanner::NamedCommands::registerCommand("L4Coral",
+                                                m_coordinator.GoToL4());
+    pathplanner::NamedCommands::registerCommand("Loading",
+                                                m_coordinator.GoToLoading());
+    pathplanner::NamedCommands::registerCommand("WaitForCoral",
+                                                m_manipSub.SuckUntilCoral());
     pathplanner::NamedCommands::registerCommand(
-        "Test", frc2::cmd::Print("Test named command"));
+        "Score", m_manipSub.PoopPiece([] { return 1_s; }));
   }
 
   enum AutoSelector { NOTHING, TEST, TESTPP };
@@ -43,6 +54,8 @@ class Autos {
   frc::SendableChooser<AutoSelector> autoChooser;
 
   Drive& m_driveSub;
+  Coordinator& m_coordinator;
+  Manipulator& m_manipSub;
 
   frc2::CommandPtr selectCommand{frc2::cmd::None()};
 };

@@ -117,7 +117,8 @@ frc2::Trigger Elevator::IsAtGoalHeight() {
 
 frc2::CommandPtr Elevator::GoToHeightCmd(
     std::function<units::meter_t()> newHeight) {
-  return frc2::cmd::Run([this, newHeight] { GoToHeight(newHeight()); }, {this});
+  return frc2::cmd::Run([this, newHeight] { GoToHeight(newHeight()); }, {this})
+      .Until([this] { return isAtGoalHeight; });
 }
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
@@ -364,9 +365,9 @@ void Elevator::ConfigureMotors() {
 }
 
 void Elevator::ConfigureControlSignals() {
-  elevatorHeightSetter.UpdateFreqHz = 0_Hz;
-  elevatorVoltageSetter.UpdateFreqHz = 0_Hz;
-  followerSetter.UpdateFreqHz = 0_Hz;
+  elevatorHeightSetter.UpdateFreqHz = 250_Hz;
+  elevatorVoltageSetter.UpdateFreqHz = 250_Hz;
+  followerSetter.UpdateFreqHz = 250_Hz;
 }
 
 units::meter_t Elevator::ConvertEncPosToHeight(units::turn_t turns) {

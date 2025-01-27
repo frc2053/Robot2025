@@ -85,6 +85,8 @@ inline constexpr units::meter_t TOTAL_WIDTH =
 inline constexpr units::meter_t TOTAL_LENGTH =
     DRIVEBASE_LENGTH + (2 * BUMPER_THICKNESS);
 
+inline constexpr units::meter_t MANIP_CENTER_OFFSET = 4.5_in;
+
 inline constexpr units::degree_t IMU_MOUNT_ROLL = 0_deg;
 inline constexpr units::degree_t IMU_MOUNT_PITCH = 0_deg;
 inline constexpr units::degree_t IMU_MOUNT_YAW = 0_deg;

@@ -96,7 +96,8 @@ frc2::Trigger Pivot::IsAtGoalAngle() {
 
 frc2::CommandPtr Pivot::GoToAngleCmd(
     std::function<units::radian_t()> newAngle) {
-  return frc2::cmd::Run([this, newAngle] { GoToAngle(newAngle()); }, {this});
+  return frc2::cmd::Run([this, newAngle] { GoToAngle(newAngle()); }, {this})
+      .Until([this] { return isAtGoalAngle; });
 }
 
 void Pivot::GoToAngle(units::radian_t newAngle) {
@@ -339,6 +340,6 @@ void Pivot::ConfigureMotors() {
 }
 
 void Pivot::ConfigureControlSignals() {
-  pivotAngleSetter.UpdateFreqHz = 0_Hz;
-  pivotVoltageSetter.UpdateFreqHz = 0_Hz;
+  pivotAngleSetter.UpdateFreqHz = 100_Hz;
+  pivotVoltageSetter.UpdateFreqHz = 100_Hz;
 }

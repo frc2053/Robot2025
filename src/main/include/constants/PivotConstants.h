@@ -59,12 +59,12 @@ inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     str::gains::radial::turn_volt_ka_unit_t{0.073766},
     str::gains::radial::turn_volt_kv_unit_t{2.8397},
     0.11888_V,
-    str::gains::radial::turn_volt_kp_unit_t{40.604},
+    str::gains::radial::turn_volt_kp_unit_t{22.604},
     str::gains::radial::turn_volt_ki_unit_t{0},
     str::gains::radial::turn_volt_kd_unit_t{0.61875},
 };
 
-inline constexpr units::volt_t kG = 1.9674_V;
+inline constexpr units::volt_t kG = 1.5_V;
 
 }  // namespace gains
 }  // namespace consts::pivot

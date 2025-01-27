@@ -5,9 +5,97 @@
     "data": {
       "commands": [
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New Path.0"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrimeToScore"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New Path.1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4Coral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New Path.2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Loading"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "New Path.3"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New Path.4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4Coral"
+                }
+              }
+            ]
           }
         }
       ]

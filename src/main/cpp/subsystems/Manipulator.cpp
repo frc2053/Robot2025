@@ -24,6 +24,10 @@ Manipulator::Manipulator() {
   nt->SetDefaultBoolean("SimDroppingCoral", false);
 }
 
+void Manipulator::OverrideHasCoral(bool overrideCoral) {
+  hasCoral = overrideCoral;
+}
+
 frc2::CommandPtr Manipulator::PoopPiece() {
   return frc2::cmd::Run([this] { Poop(); });
 }
@@ -31,7 +35,7 @@ frc2::CommandPtr Manipulator::PoopPiece() {
 // TODO: Might be able to detect wheel speed increase to get rid of time
 frc2::CommandPtr Manipulator::PoopPiece(
     std::function<units::second_t()> timeToPoop) {
-  return frc2::cmd::Run([this] { Poop(); }).WithTimeout(timeToPoop());
+  return PoopPiece().WithTimeout(timeToPoop());
 }
 
 frc2::CommandPtr Manipulator::SuckUntilAlgae() {

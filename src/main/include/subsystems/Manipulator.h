@@ -32,6 +32,7 @@ class Manipulator : public frc2::SubsystemBase {
  public:
   Manipulator();
   void OptimizeBusSignals();
+  void OverrideHasCoral(bool hasCoral);
 
   void Periodic() override;
   void SimulationPeriodic() override;

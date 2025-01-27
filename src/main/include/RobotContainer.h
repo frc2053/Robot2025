@@ -60,7 +60,7 @@ class RobotContainer {
 
   str::vision::VisionSystem vision;
 
-  Autos autos{driveSub};
+  Autos autos{driveSub, coordinator, manipSub};
 
   std::shared_ptr<nt::NetworkTable> tuningTable{
       nt::NetworkTableInstance::GetDefault().GetTable("Tuning")};
