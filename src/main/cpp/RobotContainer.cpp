@@ -13,8 +13,10 @@
 #include "str/vision/VisionSystem.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
+#include "util/choreovariables.h"
 
 RobotContainer::RobotContainer() {
+  importantPoses = strchoreo::LoadPoses();
   ConfigureBindings();
   ConfigureSysIdBinds();
 }
@@ -45,6 +47,9 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.B().OnTrue(coordinator.GoToL2());
   driverJoystick.X().OnTrue(coordinator.GoToL3());
   driverJoystick.Y().OnTrue(coordinator.GoToL4());
+
+  driverJoystick.LeftTrigger().WhileTrue(
+      driveSub.DriveToPose([this] { return importantPoses["A"]; }));
 
   //   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {

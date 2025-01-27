@@ -50,6 +50,7 @@ class SwerveDrive {
                           units::meters_per_second_t yVel,
                           units::radians_per_second_t omega, bool openLoop);
   frc::ChassisSpeeds GetRobotRelativeSpeeds();
+  frc::ChassisSpeeds GetFieldRelativeSpeeds();
   void Drive(frc::ChassisSpeeds speeds, bool openLoop);
   void Drive(units::meters_per_second_t xVel, units::meters_per_second_t yVel,
              units::radians_per_second_t omega, bool openLoop);

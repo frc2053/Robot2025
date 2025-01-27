@@ -11,8 +11,10 @@
 #include <functional>
 #include <memory>
 
+#include "constants/SwerveConstants.h"
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "frc/geometry/Pose2d.h"
+#include "frc2/command/CommandPtr.h"
 #include "str/swerve/SwerveDrive.h"
 #include "str/swerve/SwerveModuleHelpers.h"
 #include "units/angular_velocity.h"
@@ -43,6 +45,8 @@ class Drive : public frc2::SubsystemBase {
       std::function<units::meters_per_second_t()> yVel,
       std::function<units::radians_per_second_t()> omega);
 
+  frc2::CommandPtr DriveToPose(std::function<frc::Pose2d()> goalPose);
+
   frc2::CommandPtr SysIdSteerQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdSteerDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdSteerQuasistaticTorqueCurrent(
@@ -58,6 +62,36 @@ class Drive : public frc2::SubsystemBase {
  private:
   str::swerve::SwerveDrive swerveDrive{};
   std::shared_ptr<pathplanner::PPHolonomicDriveController> ppControllers;
+
+  frc::TrapezoidProfile<units::meters>::Constraints translationConstraints{
+      consts::swerve::physical::DRIVE_MAX_SPEED,
+      consts::swerve::physical::MAX_ACCEL,
+  };
+
+  frc::TrapezoidProfile<units::radians>::Constraints rotationConstraints{
+      consts::swerve::physical::MAX_ROT_SPEED,
+      consts::swerve::physical::MAX_ROT_ACCEL,
+  };
+
+  frc::ProfiledPIDController<units::meters> xPoseController{
+      consts::swerve::pathplanning::POSE_P,
+      consts::swerve::pathplanning::POSE_I,
+      consts::swerve::pathplanning::POSE_D, translationConstraints};
+
+  frc::ProfiledPIDController<units::meters> yPoseController{
+      consts::swerve::pathplanning::POSE_P,
+      consts::swerve::pathplanning::POSE_I,
+      consts::swerve::pathplanning::POSE_D, translationConstraints};
+
+  frc::ProfiledPIDController<units::radians> thetaController{
+      consts::swerve::pathplanning::ROTATION_P,
+      consts::swerve::pathplanning::ROTATION_I,
+      consts::swerve::pathplanning::ROTATION_D, rotationConstraints};
+
+  std::shared_ptr<nt::NetworkTable> nt{
+      nt::NetworkTableInstance::GetDefault().GetTable("Swerve")};
+  nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{
+      nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
 
   str::swerve::WheelRadiusCharData wheelRadiusData{};
 

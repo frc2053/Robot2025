@@ -10,8 +10,11 @@
 
 #include <functional>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include "Autos.h"
+#include "frc/geometry/Pose2d.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
 #include "subsystems/Coordinator.h"
@@ -51,6 +54,8 @@ class RobotContainer {
   frc2::CommandXboxController driverJoystick{0};
 
   str::SuperstructureDisplay display{};
+
+  std::unordered_map<std::string, frc::Pose2d> importantPoses{};
 
   Drive driveSub{};
   Elevator elevatorSub{display};

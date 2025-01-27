@@ -43,6 +43,11 @@ frc::ChassisSpeeds SwerveDrive::GetRobotRelativeSpeeds() {
   return consts::swerve::physical::KINEMATICS.ToChassisSpeeds(moduleStates);
 }
 
+frc::ChassisSpeeds SwerveDrive::GetFieldRelativeSpeeds() {
+  return frc::ChassisSpeeds::FromRobotRelativeSpeeds(GetRobotRelativeSpeeds(),
+                                                     GetPose().Rotation());
+}
+
 frc::Pose2d SwerveDrive::GetPose() const {
   return poseEstimator.GetEstimatedPosition();
 }

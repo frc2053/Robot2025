@@ -75,6 +75,71 @@ frc2::CommandPtr Drive::DriveRobotRel(
       .WithName("DriveRobotRel");
 }
 
+frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose) {
+  return frc2::cmd::Sequence(
+             frc2::cmd::RunOnce(
+                 [this, goalPose] {
+                   frc::Pose2d currentPose = GetRobotPose();
+                   frc::ChassisSpeeds currentSpeeds =
+                       swerveDrive.GetFieldRelativeSpeeds();
+                   xPoseController.Reset(currentPose.Translation().X(),
+                                         currentSpeeds.vx);
+                   yPoseController.Reset(currentPose.Translation().Y(),
+                                         currentSpeeds.vy);
+                   thetaController.Reset(currentPose.Rotation().Radians(),
+                                         currentSpeeds.omega);
+                   thetaController.EnableContinuousInput(
+                       units::radian_t{-std::numbers::pi},
+                       units::radian_t{std::numbers::pi});
+                   xPoseController.SetGoal(goalPose().X());
+                   yPoseController.SetGoal(goalPose().Y());
+                   thetaController.SetGoal(goalPose().Rotation().Radians());
+                   xPoseController.SetTolerance(
+                       consts::swerve::pathplanning::translationalPIDTolerance,
+                       consts::swerve::pathplanning::
+                           translationalVelPIDTolerance);
+                   yPoseController.SetTolerance(
+                       consts::swerve::pathplanning::translationalPIDTolerance,
+                       consts::swerve::pathplanning::
+                           translationalVelPIDTolerance);
+                   thetaController.SetTolerance(
+                       consts::swerve::pathplanning::rotationalPIDTolerance,
+                       consts::swerve::pathplanning::rotationalVelPIDTolerance);
+                   pidPoseSetpointPub.Set(goalPose());
+                 },
+                 {this})
+                 .WithName("PIDToPose Init"),
+             frc2::cmd::Run(
+                 [this, goalPose] {
+                   frc::Pose2d currentPose = GetRobotPose();
+
+                   xPoseController.SetGoal(goalPose().X());
+                   yPoseController.SetGoal(goalPose().Y());
+                   thetaController.SetGoal(goalPose().Rotation().Radians());
+                   pidPoseSetpointPub.Set(goalPose());
+
+                   units::meters_per_second_t xSpeed{xPoseController.Calculate(
+                       currentPose.Translation().X())};
+                   units::meters_per_second_t ySpeed{yPoseController.Calculate(
+                       currentPose.Translation().Y())};
+                   units::radians_per_second_t thetaSpeed{
+                       thetaController.Calculate(
+                           currentPose.Rotation().Radians())};
+
+                   swerveDrive.Drive(xSpeed, ySpeed, thetaSpeed, true);
+                 },
+                 {this})
+                 .Until([this] {
+                   return xPoseController.AtGoal() &&
+                          yPoseController.AtGoal() && thetaController.AtGoal();
+                 })
+                 .WithName("PIDToPose Run"),
+             frc2::cmd::Run([this] {
+               swerveDrive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+             }).WithName("PIDToPose Stop"))
+      .WithName("PIDToPose");
+}
+
 void Drive::SetupPathplanner() {
   ppControllers = std::make_shared<pathplanner::PPHolonomicDriveController>(
       pathplanner::PIDConstants{consts::swerve::pathplanning::POSE_P,
