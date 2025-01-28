@@ -46,6 +46,11 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.X().OnTrue(coordinator.GoToL3());
   driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
+  driverJoystick.A().OnFalse(coordinator.GoToLoading());
+  driverJoystick.B().OnFalse(coordinator.GoToLoading());
+  driverJoystick.X().OnFalse(coordinator.GoToLoading());
+  driverJoystick.Y().OnFalse(coordinator.GoToLoading());
+
   driverJoystick.LeftTrigger().WhileTrue(
       driveSub.AlignToReef([] { return true; }));
   driverJoystick.RightTrigger().WhileTrue(
