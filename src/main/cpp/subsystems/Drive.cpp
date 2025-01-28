@@ -10,23 +10,30 @@
 #include <pathplanner/lib/util/PathPlannerLogging.h>
 
 #include <memory>
+#include <numbers>
 #include <string>
 
 #include "constants/SwerveConstants.h"
 #include "frc/MathUtil.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "pathplanner/lib/util/DriveFeedforwards.h"
+#include "pathplanner/lib/util/FlippingUtil.h"
 #include "str/DriverstationUtils.h"
 #include "str/swerve/SwerveModuleHelpers.h"
+#include "units/angle.h"
+#include "util/choreovariables.h"
 
 Drive::Drive() {
+  importantPoses = strchoreo::LoadPoses();
   SetupPathplanner();
 }
 
 void Drive::Periodic() {
   swerveDrive.UpdateNTEntries();
+  WhatReefZoneAmIIn();
 }
 
 void Drive::SimulationPeriodic() {
@@ -126,7 +133,8 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose) {
                        thetaController.Calculate(
                            currentPose.Rotation().Radians())};
 
-                   swerveDrive.Drive(xSpeed, ySpeed, thetaSpeed, true);
+                   swerveDrive.DriveFieldRelative(xSpeed, ySpeed, thetaSpeed,
+                                                  true);
                  },
                  {this})
                  .Until([this] {
@@ -138,6 +146,67 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose) {
                swerveDrive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
              }).WithName("PIDToPose Stop"))
       .WithName("PIDToPose");
+}
+
+frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
+  return DriveToPose([this, leftSide] {
+    if (str::IsOnRed()) {
+      return pathplanner::FlippingUtil::flipFieldPose(
+          importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(), leftSide())]);
+
+    } else {
+      return importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(), leftSide())];
+    }
+  });
+}
+
+std::string Drive::WhatPoleToGoTo(int zone, bool leftOrRight) {
+  if (zone == 0) {
+    return leftOrRight ? "H" : "G";
+  }
+  if (zone == 1) {
+    return leftOrRight ? "J" : "I";
+  }
+  if (zone == 2) {
+    return leftOrRight ? "K" : "L";
+  }
+  if (zone == 3) {
+    return leftOrRight ? "A" : "B";
+  }
+  if (zone == 4) {
+    return leftOrRight ? "C" : "D";
+  }
+  if (zone == 5) {
+    return leftOrRight ? "F" : "E";
+  }
+}
+
+// 0 is the side closer to the middle of the field, CCW+ when viewed from the
+// top
+int Drive::WhatReefZoneAmIIn() {
+  frc::Translation2d reefCenter{4.482401371002197_m, 4.037817478179932_m};
+  units::radian_t rotationAmount = 0_deg;
+  if (str::IsOnRed()) {
+    reefCenter = pathplanner::FlippingUtil::flipFieldPosition(reefCenter);
+    rotationAmount = 180_deg;
+  }
+
+  units::radian_t angle = units::math::atan2(
+      GetRobotPose().Y() - reefCenter.Y(), GetRobotPose().X() - reefCenter.X());
+
+  units::radian_t normalizedAngle =
+      units::math::fmod(angle + units::radian_t{2 * std::numbers::pi},
+                        units::radian_t{2 * std::numbers::pi});
+
+  units::radian_t rotatedAngle = units::math::fmod(
+      normalizedAngle + units::radian_t{std::numbers::pi / 6} + rotationAmount,
+      units::radian_t{2 * std::numbers::pi});
+
+  units::radian_t sliceWidth = units::radian_t{2 * std::numbers::pi} / 6.0;
+
+  int sliceIndex = static_cast<int>(rotatedAngle / sliceWidth);
+
+  return sliceIndex;
 }
 
 void Drive::SetupPathplanner() {

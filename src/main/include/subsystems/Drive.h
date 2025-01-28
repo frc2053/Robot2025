@@ -45,6 +45,7 @@ class Drive : public frc2::SubsystemBase {
       std::function<units::meters_per_second_t()> yVel,
       std::function<units::radians_per_second_t()> omega);
 
+  frc2::CommandPtr AlignToReef(std::function<bool()> leftSide);
   frc2::CommandPtr DriveToPose(std::function<frc::Pose2d()> goalPose);
 
   frc2::CommandPtr SysIdSteerQuasistaticVoltage(frc2::sysid::Direction dir);
@@ -94,6 +95,10 @@ class Drive : public frc2::SubsystemBase {
       nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
 
   str::swerve::WheelRadiusCharData wheelRadiusData{};
+
+  std::unordered_map<std::string, frc::Pose2d> importantPoses{};
+  int WhatReefZoneAmIIn();
+  std::string WhatPoleToGoTo(int zone, bool leftOrRight);
 
   frc2::sysid::SysIdRoutine steerSysIdVoltage{
       frc2::sysid::Config{

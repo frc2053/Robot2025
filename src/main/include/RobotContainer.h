@@ -55,8 +55,6 @@ class RobotContainer {
 
   str::SuperstructureDisplay display{};
 
-  std::unordered_map<std::string, frc::Pose2d> importantPoses{};
-
   Drive driveSub{};
   Elevator elevatorSub{display};
   Pivot pivotSub{display};
