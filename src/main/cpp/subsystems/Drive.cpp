@@ -179,6 +179,7 @@ std::string Drive::WhatPoleToGoTo(int zone, bool leftOrRight) {
   if (zone == 5) {
     return leftOrRight ? "F" : "E";
   }
+  return "A";
 }
 
 // 0 is the side closer to the middle of the field, CCW+ when viewed from the
