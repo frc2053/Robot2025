@@ -36,7 +36,7 @@ void RobotContainer::ConfigureBindings() {
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
 
-  driverJoystick.LeftBumper().OnTrue(manipSub.SuckUntilAlgae());
+  driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
 
   driverJoystick.Start().OnTrue(coordinator.GoToLoading());

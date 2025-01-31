@@ -36,7 +36,7 @@ frc2::CommandPtr Manipulator::PoopPiece() {
 // TODO: Might be able to detect wheel speed increase to get rid of time
 frc2::CommandPtr Manipulator::PoopPiece(
     std::function<units::second_t()> timeToPoop) {
-  return PoopPiece().WithTimeout(timeToPoop());
+  return PoopPiece().WithTimeout(timeToPoop()).FinallyDo([this] { Stop(); });
 }
 
 frc2::CommandPtr Manipulator::SuckUntilAlgae() {
