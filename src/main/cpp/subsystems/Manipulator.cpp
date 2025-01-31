@@ -13,7 +13,8 @@
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
 
-Manipulator::Manipulator() {
+Manipulator::Manipulator(str::SuperstructureDisplay& display)
+    : display{display} {
   ConfigureMotors();
   ConfigureControlSignals();
 
@@ -158,6 +159,7 @@ void Manipulator::UpdateNTEntries() {
   commandedVoltagePub.Set(commandedVoltage.value());
   filteredCurrentPub.Set(filteredCurrent.value());
   droppedCoralPub.Set(droppedCoral.Get());
+  display.GamePieceSet(hasCoral, hasAlgae);
 }
 
 void Manipulator::SetVoltage(units::volt_t volts) {

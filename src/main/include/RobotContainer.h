@@ -58,7 +58,7 @@ class RobotContainer {
   Drive driveSub{};
   Elevator elevatorSub{display};
   Pivot pivotSub{display};
-  Manipulator manipSub{};
+  Manipulator manipSub{display};
   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
   str::vision::VisionSystem vision;

@@ -1,18 +1,18 @@
 {
     "fileName": "PathplannerLib-2025.2.1.json",
     "name": "PathplannerLib",
-    "version": "2025.2.1",
+    "version": "0.0.0",
     "uuid": "1b42324f-17c6-4875-8e77-1c312bc8c786",
     "frcYear": "2025",
     "mavenUrls": [
-        "https://3015rangerrobotics.github.io/pathplannerlib/repo"
+        "C:\\Users\\willi\\.m2\\repository"
     ],
     "jsonUrl": "https://3015rangerrobotics.github.io/pathplannerlib/PathplannerLib.json",
     "javaDependencies": [
         {
             "groupId": "com.pathplanner.lib",
             "artifactId": "PathplannerLib-java",
-            "version": "2025.2.1"
+            "version": "0.0.0"
         }
     ],
     "jniDependencies": [],
@@ -20,7 +20,7 @@
         {
             "groupId": "com.pathplanner.lib",
             "artifactId": "PathplannerLib-cpp",
-            "version": "2025.2.1",
+            "version": "0.0.0",
             "libName": "PathplannerLib",
             "headerClassifier": "headers",
             "sharedLibrary": false,

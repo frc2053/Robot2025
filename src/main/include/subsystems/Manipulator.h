@@ -24,13 +24,14 @@
 #include "networktables/DoubleTopic.h"
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
+#include "str/SuperstructureDisplay.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/time.h"
 
 class Manipulator : public frc2::SubsystemBase {
  public:
-  Manipulator();
+  explicit Manipulator(str::SuperstructureDisplay& display);
   void OptimizeBusSignals();
   void OverrideHasCoral(bool hasCoral);
 
@@ -104,6 +105,7 @@ class Manipulator : public frc2::SubsystemBase {
   frc2::Trigger gotAlgae{GotAlgae()};
   frc2::Trigger droppedCoral{DroppedCoral()};
 
+  str::SuperstructureDisplay& display;
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Manipulator")};
   nt::DoublePublisher voltagePub{nt->GetDoubleTopic("Voltage").Publish()};

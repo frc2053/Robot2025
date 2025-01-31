@@ -10,6 +10,8 @@
 
 #include <functional>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include "constants/SwerveConstants.h"
 #include "ctre/phoenix6/SignalLogger.hpp"

@@ -1,10 +1,15 @@
-// Copyright (c) Choreo contributors
+// Copyright (c) FRC 2053.
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License file in the root of this project
+
 #pragma once
+#include <wpi/json_fwd.h>
+
 #include <cmath>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <wpi/json_fwd.h>
+
 namespace choreo {
 /**
  * A representation of an expression. An equation and its value.

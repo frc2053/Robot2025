@@ -6,7 +6,10 @@
 
 #include <units/length.h>
 
+#include <memory>
+
 #include "constants/SwerveConstants.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
@@ -24,6 +27,7 @@ namespace str {
 class SuperstructureDisplay {
  public:
   SuperstructureDisplay() = default;
+
   void Draw() {
     frc::SmartDashboard::PutData("Superstructure Display",
                                  &superstructureDisplay);
@@ -61,6 +65,7 @@ class SuperstructureDisplay {
     uShapeBack->SetColor(frc::Color::kOrange);
     uShapeAround->SetColor(frc::Color::kOrange);
   }
+  void SetRobotPose(frc::Pose2d robotPose) { currentPose = robotPose; }
   void SetElevatorHeight(units::meter_t newHeight) {
     elevatorCarriage->SetLength(newHeight / 1_m);
     superstructurePoses[0] =
@@ -74,12 +79,37 @@ class SuperstructureDisplay {
   void SetPivotAngle(units::radian_t newAngle) {
     pivotJoint->SetAngle(newAngle - 90_deg);
     uShapeBack->SetAngle(newAngle - 90_deg + 116.16_deg);
-    superstructurePoses[3] =
-        frc::Pose3d{frc::Translation3d{0.1016508_m, -0.117274594_m, 0.263525_m},
-                    frc::Rotation3d{0_deg, 0_deg, -90_deg}}
-            .TransformBy(frc::Transform3d{
-                superstructurePoses[2].Translation(),
-                frc::Rotation3d{-(newAngle - 90_deg), 0_rad, 0_rad}});
+    currentAngle = -(newAngle - 90_deg);
+
+    superstructurePoses[3] = iHonestlyForgetWhatThisRepresents.TransformBy(
+        frc::Transform3d{superstructurePoses[2].Translation(),
+                         frc::Rotation3d{currentAngle, 0_rad, 0_rad}});
+  }
+
+  void GamePieceSet(bool hasCoral, bool hasAlgae) {
+    if (hasAlgae) {
+      algae[0] = iHonestlyForgetWhatThisRepresents.TransformBy(
+          frc::Transform3d{currentPose.X(), currentPose.Y(), 0_m,
+                           frc::Rotation3d{currentPose.Rotation()}});
+    } else {
+      algae[0] = frc::Pose3d{};
+    }
+    if (hasCoral) {
+      coral[0] =
+          frc::Pose3d{frc::Translation3d{currentPose.Translation()},
+                      frc::Rotation3d{currentPose.Rotation()}}
+              .TransformBy(frc::Transform3d{
+                  frc::Translation3d{superstructurePoses[3].X(),
+                                     superstructurePoses[3].Y(),
+                                     superstructurePoses[3].Z()},
+                  superstructurePoses[3].Rotation()})
+              .TransformBy(frc::Transform3d{
+                  0_in, 0_in, 11_in, frc::Rotation3d{0_deg, 100_deg, 90_deg}});
+    } else {
+      coral[0] = frc::Pose3d{};
+    }
+    aScopeCoral.Set(coral);
+    aScopeAlgae.Set(algae);
   }
 
  private:
@@ -87,8 +117,21 @@ class SuperstructureDisplay {
       nt::NetworkTableInstance::GetDefault().GetTable("3DDisplay")};
   nt::StructArrayPublisher<frc::Pose3d> aScopeDisplay{
       nt->GetStructArrayTopic<frc::Pose3d>("Superstructure").Publish()};
+  nt::StructArrayPublisher<frc::Pose3d> aScopeCoral{
+      nt->GetStructArrayTopic<frc::Pose3d>("Coral").Publish()};
+  nt::StructArrayPublisher<frc::Pose3d> aScopeAlgae{
+      nt->GetStructArrayTopic<frc::Pose3d>("Algae").Publish()};
   std::array<frc::Pose3d, 4> superstructurePoses{frc::Pose3d{}, frc::Pose3d{},
                                                  frc::Pose3d{}, frc::Pose3d{}};
+  std::array<frc::Pose3d, 1> coral{frc::Pose3d{}};
+  std::array<frc::Pose3d, 1> algae{frc::Pose3d{}};
+
+  frc::Pose2d currentPose{};
+  units::radian_t currentAngle{};
+
+  frc::Pose3d iHonestlyForgetWhatThisRepresents =
+      frc::Pose3d{frc::Translation3d{0.1016508_m, -0.117274594_m, 0.263525_m},
+                  frc::Rotation3d{0_deg, 0_deg, -90_deg}};
 
   inline static constexpr units::meter_t TOTAL_SCREEN_WIDTH = 60_in;
   inline static constexpr units::meter_t TOTAL_SCREEN_HEIGHT = 120_in;

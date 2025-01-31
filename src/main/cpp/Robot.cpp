@@ -41,7 +41,8 @@ void Robot::RobotPeriodic() {
   matchTimePub.Set(frc::DriverStation::GetMatchTime().value());
   battVoltagePub.Set(frc::RobotController::GetBatteryVoltage().value());
 
-  // elevatorArm.Periodic();
+  m_container.GetSuperStructureDisplay().SetRobotPose(
+      m_container.GetDrive().GetRobotPose());
 }
 
 void Robot::SimulationPeriodic() {

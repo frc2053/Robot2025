@@ -23,11 +23,16 @@ class Autos {
     selectCommand = frc2::cmd::Select<AutoSelector>(
         [this] { return autoChooser.GetSelected(); },
         std::pair{NOTHING, frc2::cmd::None()},
-        std::pair{TEST, pathplanner::PathPlannerAuto("Test").ToPtr()},
-        std::pair{TESTPP, pathplanner::PathPlannerAuto("TestPP").ToPtr()});
+        std::pair{TEST_NON_MIRROR,
+                  pathplanner::PathPlannerAuto("Test", false).ToPtr()},
+        std::pair{TEST_MIRROR,
+                  pathplanner::PathPlannerAuto("Test", true).ToPtr()},
+        std::pair{TESTPP,
+                  pathplanner::PathPlannerAuto("TestPP", true).ToPtr()});
 
-    autoChooser.SetDefaultOption("Do Nothing", AutoSelector::TEST);
-    autoChooser.AddOption("Test", AutoSelector::TEST);
+    autoChooser.SetDefaultOption("Do Nothing", AutoSelector::TEST_NON_MIRROR);
+    autoChooser.AddOption("Test Non-Mirror", AutoSelector::TEST_NON_MIRROR);
+    autoChooser.AddOption("Test Mirror", AutoSelector::TEST_MIRROR);
     autoChooser.AddOption("TestPP", AutoSelector::TESTPP);
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
@@ -49,7 +54,7 @@ class Autos {
         "Score", m_manipSub.PoopPiece([] { return 1_s; }));
   }
 
-  enum AutoSelector { NOTHING, TEST, TESTPP };
+  enum AutoSelector { NOTHING, TEST_MIRROR, TESTPP, TEST_NON_MIRROR };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 

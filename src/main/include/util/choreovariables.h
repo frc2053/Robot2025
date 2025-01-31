@@ -1,12 +1,20 @@
+// Copyright (c) FRC 2053.
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License file in the root of this project
+
 #pragma once
+
+#include <wpi/MemoryBuffer.h>
+#include <wpi/json.h>
+
+#include <string>
+#include <unordered_map>
 
 #include "ProjectFile.h"
 #include "frc/Errors.h"
-#include "frc/geometry/Pose3d.h"
 #include "frc/Filesystem.h"
+#include "frc/geometry/Pose3d.h"
 #include "units/angle.h"
-#include <wpi/MemoryBuffer.h>
-#include <wpi/json.h>
 
 namespace strchoreo {
 
