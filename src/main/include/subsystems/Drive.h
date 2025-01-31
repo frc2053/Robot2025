@@ -48,6 +48,7 @@ class Drive : public frc2::SubsystemBase {
       std::function<units::radians_per_second_t()> omega);
 
   frc2::CommandPtr AlignToReef(std::function<bool()> leftSide);
+  frc2::CommandPtr AlignToAlgae();
   frc2::CommandPtr AlignToProcessor();
   frc2::CommandPtr DriveToPose(std::function<frc::Pose2d()> goalPose);
 
@@ -102,6 +103,7 @@ class Drive : public frc2::SubsystemBase {
   std::unordered_map<std::string, frc::Pose2d> importantPoses{};
   int WhatReefZoneAmIIn();
   std::string WhatPoleToGoTo(int zone, bool leftOrRight);
+  std::string WhatAlgaeToGoTo(int zone);
 
   frc2::sysid::SysIdRoutine steerSysIdVoltage{
       frc2::sysid::Config{

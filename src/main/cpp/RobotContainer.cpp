@@ -59,8 +59,9 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
                         [this] { return manipSub.HasAlgae(); }));
 
-  driverJoystick.LeftTrigger().WhileTrue(
-      driveSub.AlignToReef([] { return true; }));
+  driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
+      driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
+      [this] { return !manipSub.HasCoral(); }));
   driverJoystick.RightTrigger().WhileTrue(frc2::cmd::Either(
       driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false; }),
       [this] { return manipSub.HasAlgae(); }));

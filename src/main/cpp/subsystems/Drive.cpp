@@ -148,6 +148,18 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose) {
       .WithName("PIDToPose");
 }
 
+frc2::CommandPtr Drive::AlignToAlgae() {
+  return DriveToPose([this] {
+    if (str::IsOnRed()) {
+      return pathplanner::FlippingUtil::flipFieldPose(
+          importantPoses[WhatAlgaeToGoTo(WhatReefZoneAmIIn())]);
+
+    } else {
+      return importantPoses[WhatAlgaeToGoTo(WhatReefZoneAmIIn())];
+    }
+  });
+}
+
 frc2::CommandPtr Drive::AlignToProcessor() {
   return DriveToPose([this] {
     if (str::IsOnRed()) {
@@ -190,6 +202,28 @@ std::string Drive::WhatPoleToGoTo(int zone, bool leftOrRight) {
   }
   if (zone == 5) {
     return leftOrRight ? "F" : "E";
+  }
+  return "A";
+}
+
+std::string Drive::WhatAlgaeToGoTo(int zone) {
+  if (zone == 0) {
+    return "GHAlgae";
+  }
+  if (zone == 1) {
+    return "IJAlgae";
+  }
+  if (zone == 2) {
+    return "KLAlgae";
+  }
+  if (zone == 3) {
+    return "ABAlgae";
+  }
+  if (zone == 4) {
+    return "CDAlgae";
+  }
+  if (zone == 5) {
+    return "EFAlgae";
   }
   return "A";
 }
