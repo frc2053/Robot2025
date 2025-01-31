@@ -46,15 +46,24 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.X().OnTrue(coordinator.GoToL3());
   driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
-  driverJoystick.A().OnFalse(coordinator.GoToLoading());
-  driverJoystick.B().OnFalse(coordinator.GoToLoading());
-  driverJoystick.X().OnFalse(coordinator.GoToLoading());
-  driverJoystick.Y().OnFalse(coordinator.GoToLoading());
+  driverJoystick.A().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.B().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.X().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.Y().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
 
   driverJoystick.LeftTrigger().WhileTrue(
       driveSub.AlignToReef([] { return true; }));
-  driverJoystick.RightTrigger().WhileTrue(
-      driveSub.AlignToReef([] { return false; }));
+  driverJoystick.RightTrigger().WhileTrue(frc2::cmd::Either(
+      driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false; }),
+      [this] { return manipSub.HasAlgae(); }));
 
   //   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {

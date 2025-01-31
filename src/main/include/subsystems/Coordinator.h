@@ -17,6 +17,7 @@ class Coordinator {
   frc2::CommandPtr GoToL2();
   frc2::CommandPtr GoToL3();
   frc2::CommandPtr GoToL4();
+  frc2::CommandPtr GoToAlgaeHold();
   frc2::CommandPtr GoToLoading();
 
  private:

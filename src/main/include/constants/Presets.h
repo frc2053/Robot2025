@@ -17,6 +17,7 @@ inline constexpr units::radian_t l3 = 200_deg;
 inline constexpr units::radian_t l4 = 205_deg;
 }  // namespace coral
 
+inline constexpr units::radian_t algaeHold = 150_deg;
 inline constexpr units::radian_t algaeProcess = 150_deg;
 inline constexpr units::radian_t algaeGrab = 100_deg;
 inline constexpr units::radian_t algaeNet = 100_deg;
@@ -24,7 +25,8 @@ inline constexpr units::radian_t algaeNet = 100_deg;
 
 namespace elev {
 namespace algae {
-inline constexpr units::meter_t processor = 20_in;
+inline constexpr units::meter_t hold = 12_in;
+inline constexpr units::meter_t processor = 12_in;
 inline constexpr units::meter_t l2 = 12_in;
 inline constexpr units::meter_t l3 = 24_in;
 inline constexpr units::meter_t net = 80_in;

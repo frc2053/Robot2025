@@ -48,6 +48,7 @@ class Drive : public frc2::SubsystemBase {
       std::function<units::radians_per_second_t()> omega);
 
   frc2::CommandPtr AlignToReef(std::function<bool()> leftSide);
+  frc2::CommandPtr AlignToProcessor();
   frc2::CommandPtr DriveToPose(std::function<frc::Pose2d()> goalPose);
 
   frc2::CommandPtr SysIdSteerQuasistaticVoltage(frc2::sysid::Direction dir);

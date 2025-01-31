@@ -88,9 +88,15 @@ class SuperstructureDisplay {
 
   void GamePieceSet(bool hasCoral, bool hasAlgae) {
     if (hasAlgae) {
-      algae[0] = iHonestlyForgetWhatThisRepresents.TransformBy(
-          frc::Transform3d{currentPose.X(), currentPose.Y(), 0_m,
-                           frc::Rotation3d{currentPose.Rotation()}});
+      algae[0] = frc::Pose3d{frc::Translation3d{currentPose.Translation()},
+                             frc::Rotation3d{currentPose.Rotation()}}
+                     .TransformBy(frc::Transform3d{
+                         frc::Translation3d{superstructurePoses[3].X(),
+                                            superstructurePoses[3].Y(),
+                                            superstructurePoses[3].Z()},
+                         superstructurePoses[3].Rotation()})
+                     .TransformBy(
+                         frc::Transform3d{0_in, 8_in, 6_in, frc::Rotation3d{}});
     } else {
       algae[0] = frc::Pose3d{};
     }

@@ -148,6 +148,18 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose) {
       .WithName("PIDToPose");
 }
 
+frc2::CommandPtr Drive::AlignToProcessor() {
+  return DriveToPose([this] {
+    if (str::IsOnRed()) {
+      return pathplanner::FlippingUtil::flipFieldPose(
+          importantPoses["Process"]);
+
+    } else {
+      return importantPoses["Process"];
+    }
+  });
+}
+
 frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
   return DriveToPose([this, leftSide] {
     if (str::IsOnRed()) {
