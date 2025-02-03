@@ -32,6 +32,12 @@ frc2::CommandPtr Coordinator::GoToL4() {
                            [this] { return manip.HasCoral(); });
 }
 
+frc2::CommandPtr Coordinator::GetOutOfStartingConfig() {
+  return frc2::cmd::Sequence(
+      piv.GoToAngleCmd([] { return presets::wrist::outofstarting; }),
+      elev.GoToHeightCmd([] { return presets::elev::outofstarting; }));
+}
+
 frc2::CommandPtr Coordinator::GoToAlgaeHold() {
   return frc2::cmd::Parallel(
       elev.GoToHeightCmd([] { return presets::elev::algae::hold; }),

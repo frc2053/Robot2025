@@ -42,6 +42,8 @@ class Autos {
 
  private:
   void BindCommandsAndTriggers() {
+    pathplanner::NamedCommands::registerCommand(
+        "GetOutOfStarting", m_coordinator.GetOutOfStartingConfig());
     pathplanner::NamedCommands::registerCommand("PrimeToScore",
                                                 m_coordinator.GoToL2());
     pathplanner::NamedCommands::registerCommand("L4Coral",

@@ -70,9 +70,14 @@ void Robot::UpdateVision() {
   }
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledInit() {
+  m_container.GetPivot().SetToStartingPosition();
+  m_container.GetElevator().SetToZeroHeight();
+}
 
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledPeriodic() {
+  m_container.GetPivot().SetToStartingPosition();
+}
 
 void Robot::DisabledExit() {}
 
@@ -93,8 +98,6 @@ void Robot::TeleopInit() {
   if (m_autonomousCommand) {
     m_autonomousCommand->Cancel();
   }
-
-  // elevatorArm.CalculateTraj();
 }
 
 void Robot::TeleopPeriodic() {}

@@ -8,11 +8,14 @@
 #include <frc2/command/Commands.h>
 
 #include "constants/SwerveConstants.h"
+#include "frc/RobotBase.h"
+#include "frc2/command/button/Trigger.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
 #include "str/DriverstationUtils.h"
 #include "str/vision/VisionSystem.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
+#include <frc2/command/button/RobotModeTriggers.h>
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -35,6 +38,9 @@ void RobotContainer::ConfigureBindings() {
         return frc::ApplyDeadband<double>(-driverJoystick.GetRightX(), .1) *
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
+
+  frc2::RobotModeTriggers::Teleop().OnTrue(
+      coordinator.GetOutOfStartingConfig());
 
   driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());

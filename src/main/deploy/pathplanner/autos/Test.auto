@@ -11,13 +11,20 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "New Path.0"
+                  "pathName": "EdgeTwoCoral.0"
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "PrimeToScore"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "GetOutOfStarting"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -30,7 +37,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "New Path.1"
+                  "pathName": "EdgeTwoCoral.1"
                 }
               },
               {
@@ -55,7 +62,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "New Path.2"
+                  "pathName": "EdgeTwoCoral.2"
                 }
               },
               {
@@ -76,7 +83,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path.3"
+            "pathName": "EdgeTwoCoral.3"
           }
         },
         {
@@ -86,7 +93,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "New Path.4"
+                  "pathName": "EdgeTwoCoral.4"
                 }
               },
               {

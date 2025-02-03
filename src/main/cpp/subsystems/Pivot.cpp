@@ -49,6 +49,17 @@ void Pivot::Periodic() {
   UpdateNTEntries();
 }
 
+void Pivot::SetToStartingPosition() {
+  pivotSim.SetInputVoltage(0_V);
+  encoderSim.SetRawPosition(35_deg);
+  encoderSim.SetVelocity(0_deg_per_s);
+
+  pivotMotorSim.SetRawRotorPosition(35_deg * consts::pivot::physical::GEARING);
+
+  pivotSim.SetState(35_deg, 0_deg_per_s);
+  GoToAngle(35_deg);
+}
+
 void Pivot::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
   angleSetpointPub.Set(goalAngle.convert<units::degrees>().value());

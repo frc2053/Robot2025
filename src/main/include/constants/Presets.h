@@ -21,6 +21,7 @@ inline constexpr units::radian_t algaeHold = 150_deg;
 inline constexpr units::radian_t algaeProcess = 150_deg;
 inline constexpr units::radian_t algaeGrab = 100_deg;
 inline constexpr units::radian_t algaeNet = 100_deg;
+inline constexpr units::radian_t outofstarting = 90_deg;
 }  // namespace wrist
 
 namespace elev {
@@ -40,5 +41,6 @@ inline constexpr units::meter_t l3 = 44_in;
 inline constexpr units::meter_t l4 = 75_in;
 }  // namespace coral
 
+inline constexpr units::meter_t outofstarting = 12_in;
 }  // namespace elev
 }  // namespace presets

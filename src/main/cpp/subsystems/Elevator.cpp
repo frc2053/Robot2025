@@ -122,6 +122,7 @@ frc2::CommandPtr Elevator::GoToHeightCmd(
 }
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
+  fmt::print("Elev Height Set: {}\n", newHeight);
   goalHeight = newHeight;
   leftMotor.SetControl(
       elevatorHeightSetter
@@ -362,6 +363,18 @@ void Elevator::ConfigureMotors() {
                   configRightResult.GetName()));
 
   configureRightAlert.Set(!configRightResult.IsOK());
+}
+
+void Elevator::SetToZeroHeight() {
+  elevatorSim.SetInputVoltage(0_V);
+  leftMotorSim.SetRawRotorPosition(0_tr);
+  leftMotorSim.SetRotorVelocity(0_deg_per_s);
+
+  rightMotorSim.SetRawRotorPosition(0_tr);
+  rightMotorSim.SetRotorVelocity(0_deg_per_s);
+
+  elevatorSim.SetState(0_m, 0_mps);
+  GoToHeight(0_m);
 }
 
 void Elevator::ConfigureControlSignals() {

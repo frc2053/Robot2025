@@ -50,6 +50,7 @@ class Elevator : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdElevatorQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdElevatorDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr TuneElevatorPID(std::function<bool()> isDone);
+  void SetToZeroHeight();
 
  private:
   void ConfigureMotors();

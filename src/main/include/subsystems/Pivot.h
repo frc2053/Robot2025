@@ -47,6 +47,7 @@ class Pivot : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdPivotQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdPivotDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr TunePivotPID(std::function<bool()> isDone);
+  void SetToStartingPosition();
 
  private:
   void ConfigureMotors();
