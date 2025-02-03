@@ -46,48 +46,48 @@ void Robot::RobotPeriodic() {
 }
 
 void Robot::SimulationPeriodic() {
-  m_container.GetVision().SimulationPeriodic(
-      m_container.GetDrive().GetOdomPose());
+  // m_container.GetVision().SimulationPeriodic(
+  //     m_container.GetDrive().GetOdomPose());
 }
 
 void Robot::UpdateVision() {
-  auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses(
-      frc::Pose3d{m_container.GetDrive().GetRobotPose()});
-  auto stdDevs = m_container.GetVision().GetPoseStdDevs(visionEstimates);
+  // auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses(
+  //     frc::Pose3d{m_container.GetDrive().GetRobotPose()});
+  // auto stdDevs = m_container.GetVision().GetPoseStdDevs(visionEstimates);
 
-  frc::Pose3d pose = frc::Pose3d{m_container.GetDrive().GetRobotPose()};
+  // frc::Pose3d pose = frc::Pose3d{m_container.GetDrive().GetRobotPose()};
 
-  m_container.GetVision().UpdateCameraPositionVis(pose);
+  // m_container.GetVision().UpdateCameraPositionVis(pose);
 
-  int i = 0;
-  for (const auto& est : visionEstimates) {
-    if (est.has_value()) {
-      m_container.GetDrive().AddVisionMeasurement(
-          est.value().estimatedPose.ToPose2d(), est.value().timestamp,
-          stdDevs[i].value());
-    }
-    i++;
-  }
+  // int i = 0;
+  // for (const auto& est : visionEstimates) {
+  //   if (est.has_value()) {
+  //     m_container.GetDrive().AddVisionMeasurement(
+  //         est.value().estimatedPose.ToPose2d(), est.value().timestamp,
+  //         stdDevs[i].value());
+  //   }
+  //   i++;
+  // }
 }
 
 void Robot::DisabledInit() {
-  m_container.GetPivot().SetToStartingPosition();
-  m_container.GetElevator().SetToZeroHeight();
+  // m_container.GetPivot().SetToStartingPosition();
+  // m_container.GetElevator().SetToZeroHeight();
 }
 
 void Robot::DisabledPeriodic() {
-  m_container.GetPivot().SetToStartingPosition();
+  // m_container.GetPivot().SetToStartingPosition();
 }
 
 void Robot::DisabledExit() {}
 
 void Robot::AutonomousInit() {
-  m_container.GetManipulator().OverrideHasCoral(true);
-  m_autonomousCommand = m_container.GetAutonomousCommand();
+  // m_container.GetManipulator().OverrideHasCoral(true);
+  // m_autonomousCommand = m_container.GetAutonomousCommand();
 
-  if (m_autonomousCommand != nullptr) {
-    m_autonomousCommand->Schedule();
-  }
+  // if (m_autonomousCommand != nullptr) {
+  //   m_autonomousCommand->Schedule();
+  // }
 }
 
 void Robot::AutonomousPeriodic() {}

@@ -29,11 +29,11 @@ class RobotContainer {
 
   frc2::Command* GetAutonomousCommand();
   Drive& GetDrive();
-  Elevator& GetElevator();
-  Pivot& GetPivot();
-  Manipulator& GetManipulator();
-  Coordinator& GetCoordinator();
-  str::vision::VisionSystem& GetVision();
+  //   Elevator& GetElevator();
+  //   Pivot& GetPivot();
+  //   Manipulator& GetManipulator();
+  //   Coordinator& GetCoordinator();
+  //   str::vision::VisionSystem& GetVision();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
  private:
@@ -46,24 +46,25 @@ class RobotContainer {
   frc2::CommandPtr DriveSysIdCommands(std::function<bool()> fwd,
                                       std::function<bool()> quasistatic);
   frc2::CommandPtr WheelRadiusSysIdCommands(std::function<bool()> fwd);
-  frc2::CommandPtr ElevatorVoltsSysIdCommands(
-      std::function<bool()> fwd, std::function<bool()> quasistatic);
-  frc2::CommandPtr PivotVoltsSysIdCommands(std::function<bool()> fwd,
-                                           std::function<bool()> quasistatic);
+  //   frc2::CommandPtr ElevatorVoltsSysIdCommands(
+  //       std::function<bool()> fwd, std::function<bool()> quasistatic);
+  //   frc2::CommandPtr PivotVoltsSysIdCommands(std::function<bool()> fwd,
+  //                                            std::function<bool()>
+  //                                            quasistatic);
 
   frc2::CommandXboxController driverJoystick{0};
 
   str::SuperstructureDisplay display{};
 
   Drive driveSub{};
-  Elevator elevatorSub{display};
-  Pivot pivotSub{display};
-  Manipulator manipSub{display};
-  Coordinator coordinator{elevatorSub, pivotSub, manipSub};
+  //   Elevator elevatorSub{display};
+  //   Pivot pivotSub{display};
+  //   Manipulator manipSub{display};
+  //   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
-  str::vision::VisionSystem vision;
+  //   str::vision::VisionSystem vision;
 
-  Autos autos{driveSub, coordinator, manipSub};
+  //   Autos autos{driveSub, coordinator, manipSub};
 
   std::shared_ptr<nt::NetworkTable> tuningTable{
       nt::NetworkTableInstance::GetDefault().GetTable("Tuning")};
@@ -74,8 +75,9 @@ class RobotContainer {
                                                  "SteerSysIdTorqueCurrent"};
   frc2::NetworkButton driveSysIdBtn{tuningTable, "DriveSysId"};
   frc2::NetworkButton wheelRadiusBtn{tuningTable, "WheelRadius"};
-  frc2::NetworkButton elevatorTuneBtn{tuningTable, "ElevatorPidTuning"};
-  frc2::NetworkButton elevatorSysIdVoltsBtn{tuningTable, "ElevatorSysIdVolts"};
-  frc2::NetworkButton pivotTuneBtn{tuningTable, "PivotPidTuning"};
-  frc2::NetworkButton pivotSysIdVoltsBtn{tuningTable, "PivotSysIdVolts"};
+  //   frc2::NetworkButton elevatorTuneBtn{tuningTable, "ElevatorPidTuning"};
+  //   frc2::NetworkButton elevatorSysIdVoltsBtn{tuningTable,
+  //   "ElevatorSysIdVolts"}; frc2::NetworkButton pivotTuneBtn{tuningTable,
+  //   "PivotPidTuning"}; frc2::NetworkButton pivotSysIdVoltsBtn{tuningTable,
+  //   "PivotSysIdVolts"};
 };
