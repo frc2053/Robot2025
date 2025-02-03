@@ -24,13 +24,11 @@ class Autos {
         [this] { return autoChooser.GetSelected(); },
         std::pair{NOTHING, frc2::cmd::None()},
         std::pair{TEST_NON_MIRROR,
-                  pathplanner::PathPlannerAuto("Test", false).ToPtr()},
-        std::pair{TEST_MIRROR,
-                  pathplanner::PathPlannerAuto("Test", true).ToPtr()},
-        std::pair{TESTPP,
-                  pathplanner::PathPlannerAuto("TestPP", true).ToPtr()});
+                  pathplanner::PathPlannerAuto("Test").ToPtr()},
+        std::pair{TEST_MIRROR, pathplanner::PathPlannerAuto("Test").ToPtr()},
+        std::pair{TESTPP, pathplanner::PathPlannerAuto("TestPP").ToPtr()});
 
-    autoChooser.SetDefaultOption("Do Nothing", AutoSelector::TEST_NON_MIRROR);
+    autoChooser.SetDefaultOption("Do Nothing", AutoSelector::NOTHING);
     autoChooser.AddOption("Test Non-Mirror", AutoSelector::TEST_NON_MIRROR);
     autoChooser.AddOption("Test Mirror", AutoSelector::TEST_MIRROR);
     autoChooser.AddOption("TestPP", AutoSelector::TESTPP);
