@@ -122,7 +122,6 @@ frc2::CommandPtr Elevator::GoToHeightCmd(
 }
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
-  fmt::print("Elev Height Set: {}\n", newHeight);
   goalHeight = newHeight;
   leftMotor.SetControl(
       elevatorHeightSetter
