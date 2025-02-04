@@ -16,11 +16,24 @@
 
 #include "constants/Constants.h"
 #include "constants/VisionConstants.h"
+#include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Rotation3d.h"
+#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation2d.h"
+#include "frc/geometry/Translation3d.h"
+#include "frc/smartdashboard/SmartDashboard.h"
+#include "opencv2/core/types.hpp"
+#include "photon/PhotonPoseEstimator.h"
 #include "photon/estimation/TargetModel.h"
 #include "photon/simulation/VisionTargetSim.h"
+#include "photon/targeting/PhotonTrackedTarget.h"
+#include "photon/targeting/TargetCorner.h"
+#include "photon/PhotonUtils.h"
 #include "units/angle.h"
+#include "units/length.h"
 
 using namespace str::vision;
 
@@ -28,6 +41,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
                Eigen::Matrix<double, 3, 1> singleTagStdDev,
                Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate)
     : simulate(simulate),
+      robotToCam(robotToCamera),
       singleTagDevs(singleTagStdDev),
       multiTagDevs(multiTagDevs),
       posePub(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation")
@@ -79,6 +93,7 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose(
 
   for (const auto& result : allUnread) {
     visionEst = photonEstimator->Update(result);
+    singleTagPose = ImuTagOnRio(result);
 
     if (visionEst.has_value()) {
       posePub.Set(visionEst.value().estimatedPose.ToPose2d());
@@ -104,8 +119,78 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose(
     targetPosesPub.Set(targetPoses);
     cornersPub.Set(cornerPxs);
   }
-
   return visionEst;
+}
+
+std::optional<photon::EstimatedRobotPose> Camera::ImuTagOnRio(
+    photon::PhotonPipelineResult result) {
+  if (result.HasTargets() && result.GetTargets().size() == 1 &&
+      camera->GetCameraMatrix().has_value()) {
+    photon::PhotonTrackedTarget target = result.GetBestTarget();
+    int tagId = target.GetFiducialId();
+    std::optional<frc::Pose3d> tagPose =
+        consts::yearspecific::TAG_LAYOUT.GetTagPose(tagId);
+    if (!tagPose.has_value()) {
+      return {};
+    }
+
+    std::vector<photon::TargetCorner> targetCorners =
+        target.GetDetectedCorners();
+    double sumX = 0.0;
+    double sumY = 0.0;
+    for (const auto& t : targetCorners) {
+      sumX = sumX + t.x;
+      sumY = sumY + t.y;
+    }
+
+    cv::Point2d tagCenter{sumX / 4.0, sumY / 4.0};
+    frc::Rotation3d tagAngle =
+        GetCorrectedPixelRot(tagCenter, camera->GetCameraMatrix().value());
+
+    frc::Transform3d best = target.GetBestCameraToTarget();
+
+    units::meter_t distance = best.Translation().Norm();
+
+    units::meter_t distance2d =
+        distance * units::math::cos(-robotToCam.Rotation().Y() - tagAngle.Y());
+
+    std::optional<units::radian_t> headingState =
+        yawBuffer.Sample(result.GetTimestamp());
+    if (!headingState.has_value()) {
+      return {};
+    }
+
+    frc::Rotation2d robotHeading{headingState.value()};
+
+    frc::Rotation2d camToTagRotation =
+        (robotHeading + robotToCam.Rotation().ToRotation2d()) +
+        frc::Rotation2d{tagAngle.Z()};
+
+    frc::Pose2d fieldToCameraPose =
+        frc::Pose2d{tagPose->ToPose2d().Translation(),
+                    camToTagRotation +
+                        frc::Rotation2d{units::radian_t{std::numbers::pi}}}
+            .TransformBy(frc::Transform2d{distance2d, 0_m, frc::Rotation2d{}});
+
+    frc::Translation2d fieldToCameraTranslation =
+        fieldToCameraPose.Translation();
+
+    frc::Pose2d robotPose =
+        frc::Pose2d{fieldToCameraTranslation,
+                    robotHeading + robotToCam.Rotation().ToRotation2d()}
+            .TransformBy(frc::Transform2d{
+                frc::Pose2d{robotToCam.X(), robotToCam.Y(),
+                            robotToCam.Rotation().ToRotation2d()},
+                frc::Pose2d{}});
+
+    robotPose = frc::Pose2d{robotPose.Translation(), robotHeading};
+
+    return photon::EstimatedRobotPose{
+        frc::Pose3d{robotPose}, result.GetTimestamp(), result.GetTargets(),
+        photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT};
+  } else {
+    return {};
+  }
 }
 
 Eigen::Matrix<double, 3, 1> Camera::GetEstimationStdDevs(

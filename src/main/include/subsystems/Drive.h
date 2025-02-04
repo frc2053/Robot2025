@@ -19,6 +19,7 @@
 #include "frc2/command/CommandPtr.h"
 #include "str/swerve/SwerveDrive.h"
 #include "str/swerve/SwerveModuleHelpers.h"
+#include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/time.h"
@@ -32,6 +33,7 @@ class Drive : public frc2::SubsystemBase {
   void UpdateOdom();
   frc::Pose2d GetRobotPose() const;
   frc::Pose2d GetOdomPose() const;
+  units::radian_t GetGyroYaw() const { return swerveDrive.GetYawFromImu(); }
   void SetupPathplanner();
   void AddVisionMeasurement(const frc::Pose2d& measurement,
                             units::second_t timestamp,

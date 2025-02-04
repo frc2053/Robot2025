@@ -10,6 +10,7 @@
 #include "constants/VisionConstants.h"
 #include "frc/geometry/Pose2d.h"
 #include "str/vision/Camera.h"
+#include "units/angle.h"
 
 namespace str::vision {
 class VisionSystem {
@@ -17,6 +18,11 @@ class VisionSystem {
   VisionSystem() = default;
   void UpdateCameraPositionVis(frc::Pose3d robotPose);
   void SimulationPeriodic(frc::Pose2d simRobotPose);
+  void UpdateYaws(units::radian_t yaw, units::second_t time) {
+    for (auto& cam : cameras) {
+      cam.AddYaw(yaw, time);
+    }
+  }
   std::vector<std::optional<photon::EstimatedRobotPose>>
   GetCameraEstimatedPoses(frc::Pose3d robotPose);
   std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> GetPoseStdDevs(

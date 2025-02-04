@@ -16,11 +16,17 @@
 #include <photon/targeting/PhotonPipelineResult.h>
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
+#include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
+#include "units/angle.h"
 #include "units/length.h"
+#include "units/time.h"
 
 namespace str::vision {
 class Camera {
@@ -32,6 +38,14 @@ class Camera {
   std::optional<photon::EstimatedRobotPose> GetEstimatedGlobalPose(
       frc::Pose3d robotPose);
   Eigen::Matrix<double, 3, 1> GetEstimationStdDevs(frc::Pose2d estimatedPose);
+  std::optional<photon::EstimatedRobotPose> ImuTagOnRio(
+      photon::PhotonPipelineResult result);
+  void AddYaw(units::radian_t yaw, units::second_t time) {
+    yawBuffer.AddSample(time, yaw);
+  };
+  std::optional<photon::EstimatedRobotPose> LatestSingleTagPose() {
+    return singleTagPose;
+  }
 
  private:
   bool simulate;
@@ -40,9 +54,28 @@ class Camera {
   std::unique_ptr<photon::VisionSystemSim> visionSim;
   std::unique_ptr<photon::SimCameraProperties> cameraProps;
   std::shared_ptr<photon::PhotonCameraSim> cameraSim;
+  std::optional<photon::EstimatedRobotPose> singleTagPose;
+  frc::Transform3d robotToCam{};
+  frc::TimeInterpolatableBuffer<units::radian_t> yawBuffer{1.0_s};
 
   photon::PhotonPipelineResult latestResult;
   std::vector<photon::PhotonTrackedTarget> targetsCopy;
+
+  frc::Rotation3d GetCorrectedPixelRot(
+      const cv::Point2d& point,
+      const Eigen::Matrix<double, 3, 3>& camIntrinsics) const {
+    double fx = camIntrinsics(0, 0);
+    double cx = camIntrinsics(0, 2);
+    double xOffset = cx - point.x;
+
+    double fy = camIntrinsics(1, 1);
+    double cy = camIntrinsics(1, 2);
+    double yOffset = cy - point.y;
+
+    frc::Rotation2d yaw{fx, xOffset};
+    frc::Rotation2d pitch{fy / std::cos(std::atan(xOffset / fx)), -yOffset};
+    return frc::Rotation3d{0_rad, pitch.Radians(), yaw.Radians()};
+  };
 
   Eigen::Matrix<double, 3, 1> singleTagDevs;
   Eigen::Matrix<double, 3, 1> multiTagDevs;

@@ -42,6 +42,7 @@ VisionSystem::GetCameraEstimatedPoses(frc::Pose3d robotPose) {
   std::vector<std::optional<photon::EstimatedRobotPose>> allPoses;
   for (auto& cam : cameras) {
     allPoses.push_back(cam.GetEstimatedGlobalPose(robotPose));
+    allPoses.push_back(cam.LatestSingleTagPose());
   }
   return allPoses;
 }

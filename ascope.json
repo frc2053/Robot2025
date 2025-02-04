@@ -1,20 +1,26 @@
 {
   "hubs": [
     {
-      "x": -8,
-      "y": -8,
-      "width": 1936,
-      "height": 1048,
+      "x": -2568,
+      "y": -191,
+      "width": 2576,
+      "height": 1408,
       "state": {
         "sidebar": {
           "width": 300,
           "expanded": [
-            "/Pivot",
-            "/Manipulator"
+            "/3DDisplay",
+            "/SmartDashboard",
+            "/Swerve/Single Tag Pose",
+            "/Swerve/Single Tag Pose/rotation",
+            "/Swerve/Single Tag Pose/translation",
+            "/SmartDashboard/VisionSystemSim-str_fl_cam/Sim Field",
+            "/photonvision",
+            "/photonvision/str_fl_cam"
           ]
         },
         "tabs": {
-          "selected": 5,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -141,11 +147,21 @@
                     }
                   },
                   {
-                    "type": "mechanism",
-                    "logKey": "NT:/SmartDashboard/Superstructure Display",
-                    "logType": "Mechanism2d",
+                    "type": "component",
+                    "logKey": "NT:/3DDisplay/Superstructure",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {}
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:/Vision/str_fl_camRobotTrans",
+                    "logType": "Translation2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
                   },
                   {
                     "type": "trajectory",
@@ -161,7 +177,7 @@
                     "type": "ghost",
                     "logKey": "NT:/PathPlanner/targetPose",
                     "logType": "Pose2d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "model": "20532025",
                       "color": "#00ffff"
@@ -213,6 +229,51 @@
                       "model": "20532025",
                       "color": "#ff8c00"
                     }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/3DDisplay/Algae",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Algae"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/3DDisplay/Coral",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Swerve/Single Tag Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "20532025",
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "NT:/Vision/str_fl_camTagPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "cone",
+                    "logKey": "NT:/Vision/str_fl_camTransPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "position": "center"
+                    }
                   }
                 ],
                 "game": "2025 Field",
@@ -220,20 +281,100 @@
               },
               "controllerUUID": "987bqt8uyy95kylzdnynkpma8u744yj1",
               "renderer": {
-                "cameraIndex": -2,
+                "cameraIndex": -1,
                 "orbitFov": 75,
                 "cameraPosition": [
-                  0.9757742929844002,
-                  1.8651937025403793,
-                  -4.01379634434857
+                  7.477547898013231,
+                  2.8636441181133763,
+                  -0.8847339393179329
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  5.574325568296608,
+                  -2.8294573057771006,
+                  0.2845160587667911
                 ]
               },
               "controlsHeight": 370
+            },
+            {
+              "type": 1,
+              "title": "Line Graph",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/FlatDistance",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Distance2d",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Distance3d",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "6bibvebgcpb4durymogn2dfm2stvs13v",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 11,
+              "title": "Points",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "plus",
+                    "logKey": "NT:/Vision/str_fl_camtargetCorners",
+                    "logType": "Translation2d[]",
+                    "visible": true,
+                    "options": {
+                      "size": "medium",
+                      "groupSize": "0"
+                    }
+                  }
+                ],
+                "width": 1280,
+                "height": 960,
+                "orientation": "xr,yd",
+                "origin": "ul"
+              },
+              "controllerUUID": "fhbirf8xuxtelqdm259dq7t79y9g89yq",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
               "type": 1,
@@ -428,6 +569,61 @@
               "controlsHeight": 258
             },
             {
+              "type": 1,
+              "title": "Algae Intake",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Algae/AlgaePivotAngleSetpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Algae/CurrentAlgaePivotAngle",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Algae/IsAtRequestedPivotAngle",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "fcbl5utjcx34gfv9pwfx46mp7nxog31a",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
               "type": 10,
               "title": "Mechanism",
               "controller": [
@@ -449,5 +645,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.1"
+  "version": "4.1.2"
 }

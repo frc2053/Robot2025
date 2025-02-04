@@ -39,46 +39,42 @@ void RobotContainer::ConfigureBindings() {
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
 
-  //   frc2::RobotModeTriggers::Teleop().OnTrue(
-  //       coordinator.GetOutOfStartingConfig());
+  frc2::RobotModeTriggers::Teleop().OnTrue(
+      coordinator.GetOutOfStartingConfig());
 
-  //   driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
-  //   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
+  driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
+  driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
 
-  //   driverJoystick.Start().OnTrue(coordinator.GoToLoading());
+  driverJoystick.Start().OnTrue(coordinator.GoToLoading());
 
-  //   driverJoystick.A().OnTrue(coordinator.GoToL1());
-  //   driverJoystick.B().OnTrue(coordinator.GoToL2());
-  //   driverJoystick.X().OnTrue(coordinator.GoToL3());
-  //   driverJoystick.Y().OnTrue(coordinator.GoToL4());
+  driverJoystick.A().OnTrue(coordinator.GoToL1());
+  driverJoystick.B().OnTrue(coordinator.GoToL2());
+  driverJoystick.X().OnTrue(coordinator.GoToL3());
+  driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
   driverJoystick.Start().OnTrue(algaeintakeSub.Intake());
 
   driverJoystick.Back().OnTrue(algaeintakeSub.Stow());
 
-  //   driverJoystick.A().OnFalse(
-  //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
-  //       coordinator.GoToLoading(),
-  //                         [this] { return manipSub.HasAlgae(); }));
-  //   driverJoystick.B().OnFalse(
-  //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
-  //       coordinator.GoToLoading(),
-  //                         [this] { return manipSub.HasAlgae(); }));
-  //   driverJoystick.X().OnFalse(
-  //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
-  //       coordinator.GoToLoading(),
-  //                         [this] { return manipSub.HasAlgae(); }));
-  //   driverJoystick.Y().OnFalse(
-  //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
-  //       coordinator.GoToLoading(),
-  //                         [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.A().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.B().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.X().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.Y().OnFalse(
+      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+                        [this] { return manipSub.HasAlgae(); }));
 
-  //   driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
-  //       driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
-  //       [this] { return !manipSub.HasCoral(); }));
-  //   driverJoystick.RightTrigger().WhileTrue(frc2::cmd::Either(
-  //       driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false;
-  //       }), [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
+      driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
+      [this] { return !manipSub.HasCoral(); }));
+  driverJoystick.RightTrigger().WhileTrue(frc2::cmd::Either(
+      driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false; }),
+      [this] { return manipSub.HasAlgae(); }));
 
   //   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {
@@ -104,10 +100,10 @@ void RobotContainer::ConfigureSysIdBinds() {
   tuningTable->PutBoolean("SteerSysIdTorqueCurrent", false);
   tuningTable->PutBoolean("DriveSysId", false);
   tuningTable->PutBoolean("WheelRadius", false);
-  //   tuningTable->PutBoolean("ElevatorPidTuning", false);
-  //   tuningTable->PutBoolean("ElevatorSysIdVolts", false);
-  //   tuningTable->PutBoolean("PivotPidTuning", false);
-  //   tuningTable->PutBoolean("PivotSysIdVolts", false);
+  tuningTable->PutBoolean("ElevatorPidTuning", false);
+  tuningTable->PutBoolean("ElevatorSysIdVolts", false);
+  tuningTable->PutBoolean("PivotPidTuning", false);
+  tuningTable->PutBoolean("PivotSysIdVolts", false);
   tuningTable->PutBoolean("AlgaePivotSysIdVolts", false);
   tuningTable->PutBoolean("AlgaePivotPidTuning", false);
   tuningTable->PutBoolean("Quasistatic", true);
@@ -117,11 +113,10 @@ void RobotContainer::ConfigureSysIdBinds() {
       driveSub.TuneSteerPID([this] { return !steerTuneBtn.Get(); }));
   driveTuneBtn.OnTrue(
       driveSub.TuneDrivePID([this] { return !driveTuneBtn.Get(); }));
-  //   elevatorTuneBtn.OnTrue(
-  //       elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get();
-  //       }));
-  //   pivotTuneBtn.OnTrue(
-  //       pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
+  elevatorTuneBtn.OnTrue(
+      elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get(); }));
+  pivotTuneBtn.OnTrue(
+      pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
   algaePivotTuneBtn.OnTrue(algaeintakeSub.TuneAlgaePivotPID(
       [this] { return !algaePivotTuneBtn.Get(); }));
 
@@ -140,13 +135,13 @@ void RobotContainer::ConfigureSysIdBinds() {
   wheelRadiusBtn.WhileTrue(WheelRadiusSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); }));
 
-  //   elevatorSysIdVoltsBtn.WhileTrue(ElevatorVoltsSysIdCommands(
-  //       [this] { return tuningTable->GetBoolean("Forward", true); },
-  //       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+  elevatorSysIdVoltsBtn.WhileTrue(ElevatorVoltsSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 
-  //   pivotSysIdVoltsBtn.WhileTrue(PivotVoltsSysIdCommands(
-  //       [this] { return tuningTable->GetBoolean("Forward", true); },
-  //       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+  pivotSysIdVoltsBtn.WhileTrue(PivotVoltsSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 
   algaePivotSysIdVoltsBtn.WhileTrue(AlgaeIntakePivotVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
@@ -185,37 +180,37 @@ frc2::CommandPtr RobotContainer::SteerTorqueCurrentSysIdCommands(
       fwd);
 }
 
-// frc2::CommandPtr RobotContainer::ElevatorVoltsSysIdCommands(
-//     std::function<bool()> fwd, std::function<bool()> quasistatic) {
-//   return frc2::cmd::Either(
-//       frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
-//                             frc2::sysid::Direction::kForward),
-//                         elevatorSub.SysIdElevatorDynamicVoltage(
-//                             frc2::sysid::Direction::kForward),
-//                         quasistatic),
-//       frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
-//                             frc2::sysid::Direction::kReverse),
-//                         elevatorSub.SysIdElevatorDynamicVoltage(
-//                             frc2::sysid::Direction::kReverse),
-//                         quasistatic),
-//       fwd);
-// }
+frc2::CommandPtr RobotContainer::ElevatorVoltsSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
+                            frc2::sysid::Direction::kForward),
+                        elevatorSub.SysIdElevatorDynamicVoltage(
+                            frc2::sysid::Direction::kForward),
+                        quasistatic),
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        elevatorSub.SysIdElevatorDynamicVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        quasistatic),
+      fwd);
+}
 
-// frc2::CommandPtr RobotContainer::PivotVoltsSysIdCommands(
-//     std::function<bool()> fwd, std::function<bool()> quasistatic) {
-//   return frc2::cmd::Either(
-//       frc2::cmd::Either(
-//           pivotSub.SysIdPivotQuasistaticVoltage(
-//               frc2::sysid::Direction::kForward),
-//           pivotSub.SysIdPivotDynamicVoltage(frc2::sysid::Direction::kForward),
-//           quasistatic),
-//       frc2::cmd::Either(
-//           pivotSub.SysIdPivotQuasistaticVoltage(
-//               frc2::sysid::Direction::kReverse),
-//           pivotSub.SysIdPivotDynamicVoltage(frc2::sysid::Direction::kReverse),
-//           quasistatic),
-//       fwd);
-// }
+frc2::CommandPtr RobotContainer::PivotVoltsSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(
+          pivotSub.SysIdPivotQuasistaticVoltage(
+              frc2::sysid::Direction::kForward),
+          pivotSub.SysIdPivotDynamicVoltage(frc2::sysid::Direction::kForward),
+          quasistatic),
+      frc2::cmd::Either(
+          pivotSub.SysIdPivotQuasistaticVoltage(
+              frc2::sysid::Direction::kReverse),
+          pivotSub.SysIdPivotDynamicVoltage(frc2::sysid::Direction::kReverse),
+          quasistatic),
+      fwd);
+}
 
 frc2::CommandPtr RobotContainer::AlgaeIntakePivotVoltsSysIdCommands(
     std::function<bool()> fwd, std::function<bool()> quasistatic) {
@@ -256,33 +251,33 @@ frc2::CommandPtr RobotContainer::WheelRadiusSysIdCommands(
       driveSub.WheelRadius(frc2::sysid::Direction::kReverse), fwd);
 }
 
-// frc2::Command* RobotContainer::GetAutonomousCommand() {
-//   return autos.GetSelectedCommand();
-// }
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+  return autos.GetSelectedCommand();
+}
 
 Drive& RobotContainer::GetDrive() {
   return driveSub;
 }
 
-// Elevator& RobotContainer::GetElevator() {
-//   return elevatorSub;
-// }
+Elevator& RobotContainer::GetElevator() {
+  return elevatorSub;
+}
 
-// Pivot& RobotContainer::GetPivot() {
-//   return pivotSub;
-// }
+Pivot& RobotContainer::GetPivot() {
+  return pivotSub;
+}
 
-// Manipulator& RobotContainer::GetManipulator() {
-//   return manipSub;
-// }
+Manipulator& RobotContainer::GetManipulator() {
+  return manipSub;
+}
 
 AlgaeIntake& RobotContainer::GetAlgaeIntake() {
   return algaeintakeSub;
 }
 
-// str::vision::VisionSystem& RobotContainer::GetVision() {
-//   return vision;
-// }
+str::vision::VisionSystem& RobotContainer::GetVision() {
+  return vision;
+}
 
 str::SuperstructureDisplay& RobotContainer::GetSuperStructureDisplay() {
   return display;
