@@ -86,6 +86,21 @@ frc2::Trigger AlgaeIntake::IsAtGoalAngle() {
   return frc2::Trigger{[this] { return isAtGoalAngle; }};
 }
 
+frc2::CommandPtr AlgaeIntake::Stow() {
+  return frc2::cmd::Sequence(
+      GoToAngleCmd([] { return consts::algae::physical::ALGAE_STOW_ANGLE; }));
+}
+
+frc2::CommandPtr AlgaeIntake::Hold() {
+  return frc2::cmd::Sequence(
+      GoToAngleCmd([] { return consts::algae::physical::ALGAE_HOLD_ANGLE; }));
+}
+
+frc2::CommandPtr AlgaeIntake::Intake() {
+  return frc2::cmd::Sequence(
+      GoToAngleCmd([] { return consts::algae::physical::ALGAE_INTAKE_ANGLE; }));
+}
+
 frc2::CommandPtr AlgaeIntake::GoToAngleCmd(
     std::function<units::radian_t()> newAngle) {
   return frc2::cmd::Run([this, newAngle] { GoToAngle(newAngle()); }, {this})

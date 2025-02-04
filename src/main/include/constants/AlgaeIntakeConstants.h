@@ -45,6 +45,10 @@ inline constexpr units::meter_t ARM_LENGTH = 13.219105_in;
 
 inline constexpr units::radian_t MIN_ANGLE = -100_deg;
 inline constexpr units::radian_t MAX_ANGLE = 100_deg;
+
+inline constexpr units::radian_t ALGAE_INTAKE_ANGLE = -10_deg;
+inline constexpr units::radian_t ALGAE_STOW_ANGLE = -90_deg;
+inline constexpr units::radian_t ALGAE_HOLD_ANGLE = -25_deg;
 }  // namespace physical
 
 namespace gains {

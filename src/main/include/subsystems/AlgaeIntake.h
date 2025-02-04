@@ -39,6 +39,10 @@ class AlgaeIntake : public frc2::SubsystemBase {
   void GoToAngle(units::radian_t newAngle);
   frc2::Trigger IsAtGoalAngle();
   void SetPivotVoltage(units::volt_t volts);
+  frc2::CommandPtr Stow();
+  frc2::CommandPtr Hold();
+  frc2::CommandPtr Intake();
+
   frc2::CommandPtr GoToAngleCmd(std::function<units::radian_t()> newAngle);
   frc2::CommandPtr SysIdAlgaePivotQuasistaticVoltage(
       frc2::sysid::Direction dir);

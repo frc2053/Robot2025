@@ -52,11 +52,9 @@ void RobotContainer::ConfigureBindings() {
   //   driverJoystick.X().OnTrue(coordinator.GoToL3());
   //   driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
-  driverJoystick.Start().OnTrue(
-      algaeintakeSub.GoToAngleCmd([this] { return -10_deg; }));
+  driverJoystick.Start().OnTrue(algaeintakeSub.Intake());
 
-  driverJoystick.Back().OnTrue(
-      algaeintakeSub.GoToAngleCmd([this] { return -90_deg; }));
+  driverJoystick.Back().OnTrue(algaeintakeSub.Stow());
 
   //   driverJoystick.A().OnFalse(
   //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
