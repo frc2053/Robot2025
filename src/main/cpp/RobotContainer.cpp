@@ -104,6 +104,7 @@ void RobotContainer::ConfigureSysIdBinds() {
   //   tuningTable->PutBoolean("ElevatorSysIdVolts", false);
   //   tuningTable->PutBoolean("PivotPidTuning", false);
   //   tuningTable->PutBoolean("PivotSysIdVolts", false);
+  tuningTable->PutBoolean("AlgaePivotSysIdVolts", false);
   tuningTable->PutBoolean("Quasistatic", true);
   tuningTable->PutBoolean("Forward", true);
 
@@ -116,6 +117,8 @@ void RobotContainer::ConfigureSysIdBinds() {
   //       }));
   //   pivotTuneBtn.OnTrue(
   //       pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
+  algaePivotTuneBtn.OnTrue(algaeintakeSub.TuneAlgaePivotPID(
+      [this] { return !algaePivotTuneBtn.Get(); }));
 
   steerSysIdVoltsBtn.WhileTrue(SteerVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
@@ -139,6 +142,10 @@ void RobotContainer::ConfigureSysIdBinds() {
   //   pivotSysIdVoltsBtn.WhileTrue(PivotVoltsSysIdCommands(
   //       [this] { return tuningTable->GetBoolean("Forward", true); },
   //       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+
+  algaePivotSysIdVoltsBtn.WhileTrue(AlgaeIntakePivotVoltsSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 }
 
 frc2::CommandPtr RobotContainer::SteerVoltsSysIdCommands(
@@ -205,6 +212,22 @@ frc2::CommandPtr RobotContainer::SteerTorqueCurrentSysIdCommands(
 //       fwd);
 // }
 
+frc2::CommandPtr RobotContainer::AlgaeIntakePivotVoltsSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(algaeintakeSub.SysIdAlgaePivotQuasistaticVoltage(
+                            frc2::sysid::Direction::kForward),
+                        algaeintakeSub.SysIdAlgaePivotDynamicVoltage(
+                            frc2::sysid::Direction::kForward),
+                        quasistatic),
+      frc2::cmd::Either(algaeintakeSub.SysIdAlgaePivotQuasistaticVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        algaeintakeSub.SysIdAlgaePivotDynamicVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        quasistatic),
+      fwd);
+}
+
 frc2::CommandPtr RobotContainer::DriveSysIdCommands(
     std::function<bool()> fwd, std::function<bool()> quasistatic) {
   return frc2::cmd::Either(
@@ -247,6 +270,10 @@ Drive& RobotContainer::GetDrive() {
 // Manipulator& RobotContainer::GetManipulator() {
 //   return manipSub;
 // }
+
+AlgaeIntake& RobotContainer::GetAlgaeIntake() {
+  return algaeintakeSub;
+}
 
 // str::vision::VisionSystem& RobotContainer::GetVision() {
 //   return vision;

@@ -22,6 +22,7 @@
 #include "subsystems/Elevator.h"
 #include "subsystems/Manipulator.h"
 #include "subsystems/Pivot.h"
+#include "subsystems/AlgaeIntake.h"
 
 class RobotContainer {
  public:
@@ -34,6 +35,7 @@ class RobotContainer {
   //   Manipulator& GetManipulator();
   //   Coordinator& GetCoordinator();
   //   str::vision::VisionSystem& GetVision();
+  AlgaeIntake& GetAlgaeIntake();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
  private:
@@ -51,6 +53,8 @@ class RobotContainer {
   //   frc2::CommandPtr PivotVoltsSysIdCommands(std::function<bool()> fwd,
   //                                            std::function<bool()>
   //                                            quasistatic);
+  frc2::CommandPtr AlgaeIntakePivotVoltsSysIdCommands(
+      std::function<bool()> fwd, std::function<bool()> quasistatic);
 
   frc2::CommandXboxController driverJoystick{0};
 
@@ -60,6 +64,7 @@ class RobotContainer {
   //   Elevator elevatorSub{display};
   //   Pivot pivotSub{display};
   //   Manipulator manipSub{display};
+  AlgaeIntake algaeintakeSub{display};
   //   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
   //   str::vision::VisionSystem vision;
@@ -80,4 +85,7 @@ class RobotContainer {
   //   "ElevatorSysIdVolts"}; frc2::NetworkButton pivotTuneBtn{tuningTable,
   //   "PivotPidTuning"}; frc2::NetworkButton pivotSysIdVoltsBtn{tuningTable,
   //   "PivotSysIdVolts"};
+  frc2::NetworkButton algaePivotTuneBtn{tuningTable, "AlgaePivotPidTuning"};
+  frc2::NetworkButton algaePivotSysIdVoltsBtn{tuningTable,
+                                              "AlgaePivotSysIdVolts"};
 };
