@@ -52,6 +52,12 @@ void RobotContainer::ConfigureBindings() {
   //   driverJoystick.X().OnTrue(coordinator.GoToL3());
   //   driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
+  driverJoystick.Start().OnTrue(
+      algaeintakeSub.GoToAngleCmd([this] { return -10_deg; }));
+
+  driverJoystick.Back().OnTrue(
+      algaeintakeSub.GoToAngleCmd([this] { return -90_deg; }));
+
   //   driverJoystick.A().OnFalse(
   //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
   //       coordinator.GoToLoading(),
@@ -105,6 +111,7 @@ void RobotContainer::ConfigureSysIdBinds() {
   //   tuningTable->PutBoolean("PivotPidTuning", false);
   //   tuningTable->PutBoolean("PivotSysIdVolts", false);
   tuningTable->PutBoolean("AlgaePivotSysIdVolts", false);
+  tuningTable->PutBoolean("AlgaePivotPidTuning", false);
   tuningTable->PutBoolean("Quasistatic", true);
   tuningTable->PutBoolean("Forward", true);
 

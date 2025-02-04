@@ -11,12 +11,9 @@
 
 #include <ctre/phoenix6/TalonFX.hpp>
 
-#include "constants/AlgaeConstants.h"
-#include "ctre/phoenix6/CANcoder.hpp"
+#include "constants/AlgaeIntakeConstants.h"
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
-#include "ctre/phoenix6/controls/MotionMagicVoltage.hpp"
-#include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
 #include "frc/simulation/SingleJointedArmSim.h"
 #include "frc2/command/CommandPtr.h"

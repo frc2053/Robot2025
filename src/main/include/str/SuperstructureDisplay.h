@@ -64,6 +64,10 @@ class SuperstructureDisplay {
     pivotJoint->SetColor(frc::Color::kBlue);
     uShapeBack->SetColor(frc::Color::kOrange);
     uShapeAround->SetColor(frc::Color::kOrange);
+
+    algaeIntakeUpright->SetColor(frc::Color::kDarkGreen);
+    algaeIntakeArmFirstPart->SetColor(frc::Color::kGreen);
+    algaeIntakeArmSecondPart->SetColor(frc::Color::kGreen);
   }
   void SetRobotPose(frc::Pose2d robotPose) { currentPose = robotPose; }
   void SetElevatorHeight(units::meter_t newHeight) {
@@ -84,6 +88,15 @@ class SuperstructureDisplay {
     superstructurePoses[3] = iHonestlyForgetWhatThisRepresents.TransformBy(
         frc::Transform3d{superstructurePoses[2].Translation(),
                          frc::Rotation3d{currentAngle, 0_rad, 0_rad}});
+  }
+
+  void SetAlgaeIntakeAngle(units::radian_t newAngle) {
+    algaeIntakeArmFirstPart->SetAngle(newAngle - 90_deg);
+    currentAlgaeIntakeAngle = -(newAngle - 90_deg);
+
+    // superstructurePoses[3] = iHonestlyForgetWhatThisRepresents.TransformBy(
+    //     frc::Transform3d{superstructurePoses[2].Translation(),
+    //                      frc::Rotation3d{currentAngle, 0_rad, 0_rad}});
   }
 
   void GamePieceSet(bool hasCoral, bool hasAlgae) {
@@ -134,6 +147,7 @@ class SuperstructureDisplay {
 
   frc::Pose2d currentPose{};
   units::radian_t currentAngle{};
+  units::radian_t currentAlgaeIntakeAngle{};
 
   frc::Pose3d iHonestlyForgetWhatThisRepresents =
       frc::Pose3d{frc::Translation3d{0.1016508_m, -0.117274594_m, 0.263525_m},
@@ -148,6 +162,12 @@ class SuperstructureDisplay {
   inline static constexpr units::meter_t MIDDLE_OF_CARRIAGE =
       MIDDLE_OF_SWERVE - 4_in;
   inline static constexpr units::meter_t LOWEST_CARRIAGE_HEIGHT = 9.875000_in;
+
+  inline static constexpr units::meter_t ALGAE_INTAKE =
+      MIDDLE_OF_SWERVE + 12_in;
+  inline static constexpr units::meter_t ALGAE_INTAKE_UPRIGHT = 14.812851_in;
+  inline static constexpr units::meter_t ALGAE_ARM_FIRST_PART = 7.193467_in;
+  inline static constexpr units::meter_t ALGAE_ARM_SECOND_PART = 6.534639_in;
 
   frc::Mechanism2d superstructureDisplay{TOTAL_SCREEN_WIDTH.value(),
                                          TOTAL_SCREEN_HEIGHT.value()};
@@ -206,6 +226,19 @@ class SuperstructureDisplay {
   frc::MechanismLigament2d* drivebaseRight{
       drivebaseBottomRight->Append<frc::MechanismLigament2d>(
           "DTRight", TOP_OF_SWERVE.value(), -90_deg)};
+
+  // ALGAE INTAKE
+  frc::MechanismRoot2d* algaeIntakeRoot{superstructureDisplay.GetRoot(
+      "AlgaeIntakeRoot", ALGAE_INTAKE.value(), TOP_OF_SWERVE.value())};
+  frc::MechanismLigament2d* algaeIntakeUpright{
+      algaeIntakeRoot->Append<frc::MechanismLigament2d>(
+          "AlgaeIntakeUpright", ALGAE_INTAKE_UPRIGHT.value(), 90_deg)};
+  frc::MechanismLigament2d* algaeIntakeArmFirstPart{
+      algaeIntakeUpright->Append<frc::MechanismLigament2d>(
+          "AlgaeIntakeArmFirst", ALGAE_ARM_FIRST_PART.value(), -109.5_deg)};
+  frc::MechanismLigament2d* algaeIntakeArmSecondPart{
+      algaeIntakeArmFirstPart->Append<frc::MechanismLigament2d>(
+          "AlgaeIntakeArmSecond", ALGAE_ARM_SECOND_PART.value(), -10.5_deg)};
 
   // Elevator
   frc::MechanismRoot2d* elevatorRoot{

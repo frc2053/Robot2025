@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "constants/AlgaeConstants.h"
+#include "constants/AlgaeIntakeConstants.h"
 #include "ctre/phoenix/StatusCodes.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/signals/SpnEnums.hpp"
@@ -47,6 +47,7 @@ void AlgaeIntake::Periodic() {
   isAtGoalAngle = units::math::abs(goalAngle - currentAngle) <
                   consts::algae::gains::ANGLE_TOLERANCE;
 
+  display.SetAlgaeIntakeAngle(currentAngle);
   UpdateNTEntries();
 }
 
