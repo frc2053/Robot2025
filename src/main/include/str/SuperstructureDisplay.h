@@ -13,6 +13,7 @@
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/smartdashboard/Mechanism2d.h"
 #include "frc/smartdashboard/MechanismLigament2d.h"
@@ -94,9 +95,10 @@ class SuperstructureDisplay {
     algaeIntakeArmFirstPart->SetAngle(newAngle - 90_deg);
     currentAlgaeIntakeAngle = -(newAngle - 90_deg);
 
-    // superstructurePoses[3] = iHonestlyForgetWhatThisRepresents.TransformBy(
-    //     frc::Transform3d{superstructurePoses[2].Translation(),
-    //                      frc::Rotation3d{currentAngle, 0_rad, 0_rad}});
+    superstructurePoses[4] =
+        frc::Pose3d{-0.3048_m, 0.11_m, 0.530225_m, frc::Rotation3d{}}
+            .TransformBy(frc::Transform3d{
+                frc::Translation3d{}, frc::Rotation3d{0_rad, newAngle, 0_rad}});
   }
 
   void GamePieceSet(bool hasCoral, bool hasAlgae) {
@@ -140,8 +142,9 @@ class SuperstructureDisplay {
       nt->GetStructArrayTopic<frc::Pose3d>("Coral").Publish()};
   nt::StructArrayPublisher<frc::Pose3d> aScopeAlgae{
       nt->GetStructArrayTopic<frc::Pose3d>("Algae").Publish()};
-  std::array<frc::Pose3d, 4> superstructurePoses{frc::Pose3d{}, frc::Pose3d{},
-                                                 frc::Pose3d{}, frc::Pose3d{}};
+  std::array<frc::Pose3d, 5> superstructurePoses{frc::Pose3d{}, frc::Pose3d{},
+                                                 frc::Pose3d{}, frc::Pose3d{},
+                                                 frc::Pose3d{}};
   std::array<frc::Pose3d, 1> coral{frc::Pose3d{}};
   std::array<frc::Pose3d, 1> algae{frc::Pose3d{}};
 
