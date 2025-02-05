@@ -112,7 +112,10 @@ frc2::CommandPtr Pivot::GoToAngleCmd(
 }
 
 void Pivot::GoToAngle(units::radian_t newAngle) {
-  goalAngle = newAngle;
+  if (!units::essentiallyEqual(goalAngle, newAngle, 1e-6)) {
+    isAtGoalAngle = false;
+    goalAngle = newAngle;
+  }
   pivotMotor.SetControl(
       pivotAngleSetter.WithPosition(newAngle).WithEnableFOC(true));
 }

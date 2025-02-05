@@ -45,7 +45,7 @@ inline constexpr units::radian_t MAX_ANGLE = 360_deg;
 
 inline constexpr units::turn_t ENCODER_OFFSET = .32_tr;
 
-inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 85_deg;
+inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 70_deg;
 }  // namespace physical
 
 namespace gains {

@@ -122,7 +122,10 @@ frc2::CommandPtr Elevator::GoToHeightCmd(
 }
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
-  goalHeight = newHeight;
+  if (!units::essentiallyEqual(goalHeight, newHeight, 1e-6)) {
+    isAtGoalHeight = false;
+    goalHeight = newHeight;
+  }
   leftMotor.SetControl(
       elevatorHeightSetter
           .WithPosition(ConvertHeightToEncPos(
