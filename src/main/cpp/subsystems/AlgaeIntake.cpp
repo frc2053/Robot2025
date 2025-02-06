@@ -76,6 +76,7 @@ void AlgaeIntake::UpdateNTEntries() {
   rollerTorquePub.Set(currentTorque.value());
   filteredCurrentPub.Set(filteredCurrent.value());
   hasAlgaePub.Set(hasAlgae);
+  display.AlgaeIntakeGamePiece(hasAlgae);
 }
 
 void AlgaeIntake::SimulationPeriodic() {

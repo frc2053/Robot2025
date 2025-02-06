@@ -47,6 +47,7 @@ class AlgaeIntake : public frc2::SubsystemBase {
   frc2::CommandPtr Intake();
   frc2::CommandPtr Roller();
   frc2::CommandPtr Poop();
+  bool HasAlgae() { return hasAlgae; }
 
   frc2::CommandPtr GoToAngleCmd(std::function<units::radian_t()> newAngle);
   frc2::CommandPtr SysIdAlgaePivotQuasistaticVoltage(
@@ -129,7 +130,7 @@ class AlgaeIntake : public frc2::SubsystemBase {
       consts::algae::physical::MIN_ANGLE,
       consts::algae::physical::MAX_ANGLE,
       true,
-      0_rad};
+      -90_deg};
 
   frc2::sysid::SysIdRoutine algaePivotSysIdVoltage{
       frc2::sysid::Config{

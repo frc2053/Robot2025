@@ -101,6 +101,18 @@ class SuperstructureDisplay {
                 frc::Translation3d{}, frc::Rotation3d{0_rad, newAngle, 0_rad}});
   }
 
+  void AlgaeIntakeGamePiece(bool hasAlgae) {
+    if (hasAlgae) {
+      algae[1] = frc::Pose3d{frc::Translation3d{currentPose.Translation()},
+                             frc::Rotation3d{currentPose.Rotation()}}
+                     .TransformBy(frc::Transform3d{-20_in, 0_in, 12_in,
+                                                   frc::Rotation3d{}});
+    } else {
+      algae[1] = frc::Pose3d{};
+    }
+    aScopeAlgae.Set(algae);
+  }
+
   void GamePieceSet(bool hasCoral, bool hasAlgae) {
     if (hasAlgae) {
       algae[0] = frc::Pose3d{frc::Translation3d{currentPose.Translation()},
@@ -146,7 +158,7 @@ class SuperstructureDisplay {
                                                  frc::Pose3d{}, frc::Pose3d{},
                                                  frc::Pose3d{}};
   std::array<frc::Pose3d, 1> coral{frc::Pose3d{}};
-  std::array<frc::Pose3d, 1> algae{frc::Pose3d{}};
+  std::array<frc::Pose3d, 2> algae{frc::Pose3d{}, frc::Pose3d{}};
 
   frc::Pose2d currentPose{};
   units::radian_t currentAngle{};

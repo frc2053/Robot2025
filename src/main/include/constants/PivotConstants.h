@@ -33,9 +33,9 @@ namespace physical {
 inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr bool INVERT_PIVOT = false;
 
-inline constexpr units::scalar_t GEARING = 21.333;
+inline constexpr units::scalar_t GEARING = (64.0 / 12.0) * (48.0 / 12.0);
 
-inline constexpr units::kilogram_t MASS = 10_lb;
+inline constexpr units::kilogram_t MASS = 7.602434_lb;
 inline constexpr units::kilogram_square_meter_t MOI = 0.12009477_kg_sq_m;
 
 inline constexpr units::meter_t ARM_LENGTH = 4.37480954214_in;
