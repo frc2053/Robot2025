@@ -42,6 +42,7 @@ class AlgaeIntake : public frc2::SubsystemBase {
   frc2::CommandPtr Stow();
   frc2::CommandPtr Hold();
   frc2::CommandPtr Intake();
+  frc2::CommandPtr Roller();
 
   frc2::CommandPtr GoToAngleCmd(std::function<units::radian_t()> newAngle);
   frc2::CommandPtr SysIdAlgaePivotQuasistaticVoltage(
@@ -61,12 +62,14 @@ class AlgaeIntake : public frc2::SubsystemBase {
 
   ctre::phoenix6::hardware::TalonFX algaePivotMotor{
       consts::algae::can_ids::ALGAE_PIVOT_MOTOR};
+
   ctre::phoenix6::hardware::TalonFX algaeRollerMotor{
       consts::algae::can_ids::ALGAE_ROLLER_MOTOR};
 
   units::radian_t goalAngle = 0_rad;
   units::radian_t currentAngle = 0_rad;
   bool isAtGoalAngle = false;
+  units::ampere_t currentTorque = 0_A;
 
   ctre::phoenix6::sim::TalonFXSimState& algaeMotorSim =
       algaePivotMotor.GetSimState();
@@ -77,6 +80,18 @@ class AlgaeIntake : public frc2::SubsystemBase {
       algaePivotMotor.GetVelocity();
   ctre::phoenix6::StatusSignal<units::volt_t> voltageSig =
       algaePivotMotor.GetMotorVoltage();
+  // The Roller Motor
+  ctre::phoenix6::sim::TalonFXSimState& algaeRollerMotorSim =
+      algaeRollerMotor.GetSimState();
+
+  ctre::phoenix6::StatusSignal<units::turn_t> positionRollerSig =
+      algaeRollerMotor.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> velocityRollerSig =
+      algaeRollerMotor.GetVelocity();
+  ctre::phoenix6::StatusSignal<units::volt_t> voltageRollerSig =
+      algaeRollerMotor.GetMotorVoltage();
+  ctre::phoenix6::StatusSignal<units::ampere_t> torqueCurrentRollerSig =
+      algaeRollerMotor.GetTorqueCurrent();
 
   ctre::phoenix6::controls::MotionMagicExpoVoltage algaePivotAngleSetter{0_rad};
   ctre::phoenix6::controls::VoltageOut algaePivotVoltageSetter{0_V};

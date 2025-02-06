@@ -33,8 +33,9 @@ AlgaeIntake::AlgaeIntake(str::SuperstructureDisplay& display)
 
 void AlgaeIntake::Periodic() {
   ctre::phoenix::StatusCode status =
-      ctre::phoenix6::BaseStatusSignal::RefreshAll(positionSig, velocitySig,
-                                                   voltageSig);
+      ctre::phoenix6::BaseStatusSignal::RefreshAll(
+          positionSig, velocitySig, voltageSig, positionRollerSig,
+          velocityRollerSig, voltageRollerSig, torqueCurrentRollerSig);
 
   if (!status.IsOK()) {
     frc::DataLogManager::Log(
@@ -43,6 +44,7 @@ void AlgaeIntake::Periodic() {
   }
 
   currentAngle = GetAlgaePivotAngle();
+  currentTorque = torqueCurrentRollerSig.GetValue();
 
   isAtGoalAngle = units::math::abs(goalAngle - currentAngle) <
                   consts::algae::gains::ANGLE_TOLERANCE;
@@ -99,6 +101,13 @@ frc2::CommandPtr AlgaeIntake::Hold() {
 frc2::CommandPtr AlgaeIntake::Intake() {
   return frc2::cmd::Sequence(
       GoToAngleCmd([] { return consts::algae::physical::ALGAE_INTAKE_ANGLE; }));
+}
+
+frc2::CommandPtr AlgaeIntake::Roller() {
+  return frc2::cmd::Sequence(
+             frc2::cmd::Run([this] { algaeRollerMotor.Set(1.0); }, {this}))
+      .Until([this] { return currentTorque > CURRENT_TORQUE_LIMIT });
+    );
 }
 
 frc2::CommandPtr AlgaeIntake::GoToAngleCmd(
