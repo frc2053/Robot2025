@@ -29,6 +29,8 @@ AlgaeIntake::AlgaeIntake(str::SuperstructureDisplay& display)
   ConfigureControlSignals();
 
   OptimizeBusSignals();
+
+  nt->SetDefaultBoolean("SimGrabbingAlgae", false);
 }
 
 void AlgaeIntake::Periodic() {
@@ -49,6 +51,20 @@ void AlgaeIntake::Periodic() {
   isAtGoalAngle = units::math::abs(goalAngle - currentAngle) <
                   consts::algae::gains::ANGLE_TOLERANCE;
 
+  previouslyHadAlgae = hasAlgae;
+
+  if (frc::RobotBase::IsSimulation()) {
+    if (fakeAlgaeSuck) {
+      currentTorque = 400_A;
+    }
+  }
+
+  filteredCurrent = currentFilter.Calculate(currentTorque);
+  bool intakeSpike = intakeSpikeDebouncer.Calculate(
+      filteredCurrent > consts::algae::current_limits::GRABBED_ALGAE);
+
+  hasAlgae = intakeSpike || previouslyHadAlgae;
+
   display.SetAlgaeIntakeAngle(currentAngle);
   UpdateNTEntries();
 }
@@ -57,20 +73,31 @@ void AlgaeIntake::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
   angleSetpointPub.Set(goalAngle.convert<units::degrees>().value());
   isAtSetpointPub.Set(isAtGoalAngle);
+  rollerTorquePub.Set(currentTorque.value());
+  filteredCurrentPub.Set(filteredCurrent.value());
+  hasAlgaePub.Set(hasAlgae);
 }
 
 void AlgaeIntake::SimulationPeriodic() {
-  algaeMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  fakeAlgaeSuck = gotAlgaeSub.Get();
 
+  algaeMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
   algaePivotSim.SetInputVoltage(algaeMotorSim.GetMotorVoltage());
+  rollerSim.SetInputVoltage(algaeRollerMotorSim.GetMotorVoltage());
 
   algaePivotSim.Update(20_ms);
+  rollerSim.Update(20_ms);
 
   units::turn_t encPos = algaePivotSim.GetAngle();
   units::turns_per_second_t encVel = algaePivotSim.GetVelocity();
 
-  algaeMotorSim.SetRawRotorPosition(encPos * consts::algae::physical::GEARING);
-  algaeMotorSim.SetRotorVelocity(encVel * consts::algae::physical::GEARING);
+  algaeMotorSim.SetRawRotorPosition(encPos *
+                                    consts::algae::physical::PIVOT_GEARING);
+  algaeMotorSim.SetRotorVelocity(encVel *
+                                 consts::algae::physical::PIVOT_GEARING);
+
+  algaeRollerMotorSim.SetRotorVelocity(rollerSim.GetAngularVelocity() *
+                                       consts::algae::physical::ROLLER_GEARING);
 }
 
 units::radian_t AlgaeIntake::GetAlgaePivotAngle() {
@@ -89,8 +116,23 @@ frc2::Trigger AlgaeIntake::IsAtGoalAngle() {
 }
 
 frc2::CommandPtr AlgaeIntake::Stow() {
-  return frc2::cmd::Sequence(
-      GoToAngleCmd([] { return consts::algae::physical::ALGAE_STOW_ANGLE; }));
+  return frc2::cmd::Parallel(
+      GoToAngleCmd([] { return consts::algae::physical::ALGAE_STOW_ANGLE; }),
+      frc2::cmd::RunOnce([this] { algaeRollerMotor.Set(0); }));
+}
+
+frc2::CommandPtr AlgaeIntake::Poop() {
+  return frc2::cmd::Parallel(
+             GoToAngleCmd([] {
+               return consts::algae::physical::ALGAE_INTAKE_ANGLE;
+             }).Repeatedly(),
+             frc2::cmd::RunOnce([this] {
+               hasAlgae = false;
+               previouslyHadAlgae = false;
+               algaeRollerMotor.Set(-1);
+             }))
+      .FinallyDo(
+          [this] { frc2::CommandScheduler::GetInstance().Schedule(Stow()); });
 }
 
 frc2::CommandPtr AlgaeIntake::Hold() {
@@ -99,15 +141,22 @@ frc2::CommandPtr AlgaeIntake::Hold() {
 }
 
 frc2::CommandPtr AlgaeIntake::Intake() {
-  return frc2::cmd::Sequence(
-      GoToAngleCmd([] { return consts::algae::physical::ALGAE_INTAKE_ANGLE; }));
+  return Roller().FinallyDo([this] {
+    frc2::CommandScheduler::GetInstance().Schedule(
+        frc2::cmd::Either(Hold(), Stow(), [this] { return hasAlgae; }));
+  });
 }
 
 frc2::CommandPtr AlgaeIntake::Roller() {
   return frc2::cmd::Sequence(
-             frc2::cmd::Run([this] { algaeRollerMotor.Set(1.0); }, {this}))
-      .Until([this] { return currentTorque > CURRENT_TORQUE_LIMIT });
-    );
+      frc2::cmd::RunOnce(
+          [this] {
+            GoToAngle(consts::algae::physical::ALGAE_INTAKE_ANGLE);
+            algaeRollerMotor.Set(1.0);
+          },
+          {this}),
+      frc2::cmd::WaitUntil([this] { return hasAlgae; }),
+      frc2::cmd::RunOnce([this] { algaeRollerMotor.Set(0); }, {this}));
 }
 
 frc2::CommandPtr AlgaeIntake::GoToAngleCmd(
@@ -117,7 +166,10 @@ frc2::CommandPtr AlgaeIntake::GoToAngleCmd(
 }
 
 void AlgaeIntake::GoToAngle(units::radian_t newAngle) {
-  goalAngle = newAngle;
+  if (!units::essentiallyEqual(goalAngle, newAngle, 1e-6)) {
+    isAtGoalAngle = false;
+    goalAngle = newAngle;
+  }
   algaePivotMotor.SetControl(
       algaePivotAngleSetter.WithPosition(newAngle).WithEnableFOC(true));
 }
@@ -224,7 +276,9 @@ void AlgaeIntake::LogAlgaePivotVolts(frc::sysid::SysIdRoutineLog* log) {
 void AlgaeIntake::OptimizeBusSignals() {
   ctre::phoenix::StatusCode freqSetterStatus =
       ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
-          consts::algae::BUS_UPDATE_FREQ, positionSig, velocitySig, voltageSig);
+          consts::algae::BUS_UPDATE_FREQ, positionSig, velocitySig, voltageSig,
+          positionRollerSig, velocityRollerSig, voltageRollerSig,
+          torqueCurrentRollerSig);
 
   frc::DataLogManager::Log(fmt::format(
       "Set bus signal frequenceies for algae intake. Result was: {}",
@@ -319,7 +373,8 @@ void AlgaeIntake::ConfigureMotors() {
     config.MotorOutput.Inverted =
         ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
   }
-  config.Feedback.SensorToMechanismRatio = consts::algae::physical::GEARING;
+  config.Feedback.SensorToMechanismRatio =
+      consts::algae::physical::PIVOT_GEARING;
 
   ctre::phoenix::StatusCode configAlgaePivotResult =
       algaePivotMotor.GetConfigurator().Apply(config);
@@ -329,6 +384,39 @@ void AlgaeIntake::ConfigureMotors() {
                   configAlgaePivotResult.GetName()));
 
   configureAlgaePivotAlert.Set(!configAlgaePivotResult.IsOK());
+
+  ctre::phoenix6::configs::TalonFXConfiguration rollerConfig{};
+
+  rollerConfig.MotorOutput.NeutralMode =
+      ctre::phoenix6::signals::NeutralModeValue::Brake;
+  rollerConfig.MotorOutput.Inverted =
+      consts::algae::physical::INVERT_ROLLER
+          ? ctre::phoenix6::signals::InvertedValue::Clockwise_Positive
+          : ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
+
+  rollerConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+      consts::algae::current_limits::STATOR_LIMIT;
+  rollerConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+      -consts::algae::current_limits::STATOR_LIMIT;
+
+  rollerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+  rollerConfig.CurrentLimits.SupplyCurrentLimit =
+      consts::algae::current_limits::SUPPLY_LIMIT;
+
+  if (frc::RobotBase::IsSimulation()) {
+    rollerConfig.MotorOutput.Inverted =
+        ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
+  }
+
+  ctre::phoenix::StatusCode configAlgaeRollerResult =
+      algaeRollerMotor.GetConfigurator().Apply(rollerConfig);
+
+  frc::DataLogManager::Log(
+      fmt::format("Configured algae roller motor. Result was: {}",
+                  configAlgaeRollerResult.GetName()));
+
+  configureAlgaePivotAlert.Set(!configAlgaePivotResult.IsOK());
+  configureAlgaeRollerAlert.Set(!configAlgaeRollerResult.IsOK());
 }
 
 void AlgaeIntake::ConfigureControlSignals() {

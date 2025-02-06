@@ -15,6 +15,8 @@
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
 #include "frc/Alert.h"
+#include "frc/filter/LinearFilter.h"
+#include "frc/simulation/FlywheelSim.h"
 #include "frc/simulation/SingleJointedArmSim.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
@@ -27,6 +29,7 @@
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/voltage.h"
+#include "frc/system/plant/LinearSystemId.h"
 
 class AlgaeIntake : public frc2::SubsystemBase {
  public:
@@ -43,6 +46,7 @@ class AlgaeIntake : public frc2::SubsystemBase {
   frc2::CommandPtr Hold();
   frc2::CommandPtr Intake();
   frc2::CommandPtr Roller();
+  frc2::CommandPtr Poop();
 
   frc2::CommandPtr GoToAngleCmd(std::function<units::radian_t()> newAngle);
   frc2::CommandPtr SysIdAlgaePivotQuasistaticVoltage(
@@ -70,9 +74,16 @@ class AlgaeIntake : public frc2::SubsystemBase {
   units::radian_t currentAngle = 0_rad;
   bool isAtGoalAngle = false;
   units::ampere_t currentTorque = 0_A;
+  units::ampere_t filteredCurrent{0_A};
+  bool hasAlgae = false;
+  bool previouslyHadAlgae = false;
+  bool fakeAlgaeSuck{false};
 
   ctre::phoenix6::sim::TalonFXSimState& algaeMotorSim =
       algaePivotMotor.GetSimState();
+  // The Roller Motor
+  ctre::phoenix6::sim::TalonFXSimState& algaeRollerMotorSim =
+      algaeRollerMotor.GetSimState();
 
   ctre::phoenix6::StatusSignal<units::turn_t> positionSig =
       algaePivotMotor.GetPosition();
@@ -80,9 +91,6 @@ class AlgaeIntake : public frc2::SubsystemBase {
       algaePivotMotor.GetVelocity();
   ctre::phoenix6::StatusSignal<units::volt_t> voltageSig =
       algaePivotMotor.GetMotorVoltage();
-  // The Roller Motor
-  ctre::phoenix6::sim::TalonFXSimState& algaeRollerMotorSim =
-      algaeRollerMotor.GetSimState();
 
   ctre::phoenix6::StatusSignal<units::turn_t> positionRollerSig =
       algaeRollerMotor.GetPosition();
@@ -100,9 +108,22 @@ class AlgaeIntake : public frc2::SubsystemBase {
       consts::algae::gains::ALGAE_PIVOT_GAINS};
   units::volt_t currentKg{consts::algae::gains::kG};
 
+  frc::LinearFilter<units::ampere_t> currentFilter =
+      frc::LinearFilter<units::ampere_t>::MovingAverage(5);
+
+  frc::Debouncer intakeSpikeDebouncer{.25_s, frc::Debouncer::kRising};
+
+  frc::LinearSystem<1, 1, 1> rollerPlant{frc::LinearSystemId::FlywheelSystem(
+      consts::algae::physical::ROLLER_MOTOR,
+      consts::algae::physical::ROLLER_MOI,
+      consts::algae::physical::ROLLER_GEARING)};
+
+  frc::sim::FlywheelSim rollerSim{rollerPlant,
+                                  consts::algae::physical::ROLLER_MOTOR};
+
   frc::sim::SingleJointedArmSim algaePivotSim{
       consts::algae::physical::PIVOT_MOTOR,
-      consts::algae::physical::GEARING,
+      consts::algae::physical::PIVOT_GEARING,
       consts::algae::physical::MOI,
       consts::algae::physical::ARM_LENGTH,
       consts::algae::physical::MIN_ANGLE,
@@ -115,7 +136,7 @@ class AlgaeIntake : public frc2::SubsystemBase {
           std::nullopt, 10_V, std::nullopt,
           [](frc::sysid::State state) {
             ctre::phoenix6::SignalLogger().WriteString(
-                "SysIdAlgae_State",  // Questionable
+                "SysIdAlgae_State",
                 frc::sysid::SysIdRoutineLog::StateEnumToString(state));
           }},
       frc2::sysid::Mechanism{
@@ -131,6 +152,13 @@ class AlgaeIntake : public frc2::SubsystemBase {
       nt->GetDoubleTopic("AlgaePivotAngleSetpoint").Publish()};
   nt::BooleanPublisher isAtSetpointPub{
       nt->GetBooleanTopic("IsAtRequestedPivotAngle").Publish()};
+  nt::BooleanPublisher hasAlgaePub{nt->GetBooleanTopic("HasAlgae").Publish()};
+  nt::DoublePublisher rollerTorquePub{
+      nt->GetDoubleTopic("RollerTorqueCurrent").Publish()};
+  nt::DoublePublisher filteredCurrentPub{
+      nt->GetDoubleTopic("Filtered Current").Publish()};
+  nt::BooleanSubscriber gotAlgaeSub{
+      nt->GetBooleanTopic("SimGrabbingAlgae").Subscribe(false)};
   str::SuperstructureDisplay& display;
   std::string algaePivotAlertMsg{"Algae Pivot Motor Config"};
   frc::Alert configureAlgaePivotAlert{algaePivotAlertMsg,

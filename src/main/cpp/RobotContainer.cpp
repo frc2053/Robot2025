@@ -52,9 +52,8 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.X().OnTrue(coordinator.GoToL3());
   driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
-  driverJoystick.Start().OnTrue(algaeintakeSub.Intake());
-
-  driverJoystick.Back().OnTrue(algaeintakeSub.Stow());
+  driverJoystick.Back().WhileTrue(algaeintakeSub.Poop());
+  driverJoystick.Start().WhileTrue(algaeintakeSub.Intake());
 
   driverJoystick.A().OnFalse(
       frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
