@@ -66,7 +66,7 @@ void Elevator::Periodic() {
       elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
           .WithEnableFOC(true));
 
-  isAtGoalHeight = units::math::abs(goalHeight - currentHeight) <
+  isAtGoalHeight = units::math::abs(expoGoal.position - currentHeight) <
                    consts::elevator::gains::HEIGHT_TOLERANCE;
 
   display.SetElevatorHeight(currentHeight);
@@ -82,7 +82,7 @@ void Elevator::UpdateNTEntries() {
           .convert<units::compound_unit<units::inches,
                                         units::inverse<units::seconds>>>()
           .value());
-  heightGoalPub.Set(goalHeight.convert<units::inches>().value());
+  heightGoalPub.Set(expoGoal.position.convert<units::inches>().value());
   heightPosSetpointPub.Set(
       expoSetpoint.position.convert<units::inches>().value());
   heightVelSetpointPub.Set(
@@ -160,10 +160,9 @@ frc2::CommandPtr Elevator::GoToHeightCmd(
 }
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
-  if (!units::essentiallyEqual(goalHeight, newHeight, 1e-6)) {
+  if (!units::essentiallyEqual(expoGoal.position, newHeight, 1e-6)) {
     isAtGoalHeight = false;
-    goalHeight = newHeight;
-    expoGoal = {goalHeight, 0_mps};
+    expoGoal = {newHeight, 0_mps};
   }
 }
 

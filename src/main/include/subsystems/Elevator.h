@@ -76,7 +76,6 @@ class Elevator : public frc2::SubsystemBase {
   ctre::phoenix6::hardware::TalonFX rightMotor{
       consts::elevator::can_ids::RIGHT_MOTOR};
 
-  units::meter_t goalHeight = 0_m;
   units::meter_t currentHeight = 0_m;
   bool isAtGoalHeight = false;
 
