@@ -19,6 +19,7 @@
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
 #include "frc/simulation/SingleJointedArmSim.h"
+#include "frc/trajectory/TrapezoidProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
@@ -29,6 +30,7 @@
 #include "str/SuperstructureDisplay.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
+#include "units/angular_acceleration.h"
 #include "units/voltage.h"
 
 class Pivot : public frc2::SubsystemBase {
@@ -39,12 +41,14 @@ class Pivot : public frc2::SubsystemBase {
   void Periodic() override;
   void SimulationPeriodic() override;
   units::turn_t GetAngle();
-  void GoToAngle(units::turn_t newAngle);
+  void GoToAngle(units::turn_t newAngle, bool isIntermediateState);
   frc2::Trigger IsAtGoalAngle();
   frc2::Trigger IsClearOfFunnel();
   void SetVoltage(units::volt_t volts);
   frc2::CommandPtr Coast();
   frc2::CommandPtr GoToAngleCmd(std::function<units::turn_t()> newAngle);
+  frc2::CommandPtr GoToAngleCmd(std::function<units::turn_t()> newAngle,
+                                std::function<bool()> isIntermediateState);
   frc2::CommandPtr SysIdPivotQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdPivotDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr TunePivotPID(std::function<bool()> isDone);
@@ -87,12 +91,18 @@ class Pivot : public frc2::SubsystemBase {
       consts::pivot::gains::PIVOT_GAINS};
   units::volt_t currentKg{consts::pivot::gains::kG};
 
-  frc::ExponentialProfile<units::turns, units::volts> expoProf{
-      frc::ExponentialProfile<units::turns, units::volts>::Constraints{
-          12_V, currentGains.motionMagicExpoKv,
-          currentGains.motionMagicExpoKa}};
-  frc::ExponentialProfile<units::turns, units::volts>::State expoSetpoint{};
-  frc::ExponentialProfile<units::turns, units::volts>::State expoGoal{};
+  frc::TrapezoidProfile<units::turns> trapProf{
+      {720_deg_per_s, 1000_deg_per_s_sq}};
+  frc::TrapezoidProfile<units::turns>::State trapSetpoint{};
+  frc::TrapezoidProfile<units::turns>::State trapGoal{};
+
+  //   frc::ExponentialProfile<units::turns, units::volts> expoProf{
+  //       frc::ExponentialProfile<units::turns, units::volts>::Constraints{
+  //           12_V, currentGains.motionMagicExpoKv,
+  //           currentGains.motionMagicExpoKa}};
+  //   frc::ExponentialProfile<units::turns, units::volts>::State
+  //   expoSetpoint{}; frc::ExponentialProfile<units::turns,
+  //   units::volts>::State expoGoal{};
 
   frc::ArmFeedforward ff{currentGains.kS, currentKg, currentGains.kV,
                          currentGains.kA};

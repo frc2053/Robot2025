@@ -20,6 +20,7 @@ class Coordinator {
   frc2::CommandPtr GoToAlgaeHold();
   frc2::CommandPtr GoToLoading();
   frc2::CommandPtr GetOutOfStartingConfig();
+  frc2::CommandPtr PrimeCoral();
 
  private:
   frc2::CommandPtr GoToL1Coral();

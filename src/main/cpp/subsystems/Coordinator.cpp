@@ -5,6 +5,7 @@
 #include "subsystems/Coordinator.h"
 
 #include "constants/Presets.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "subsystems/Manipulator.h"
 
@@ -50,10 +51,18 @@ frc2::CommandPtr Coordinator::GoToLoading() {
       piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }));
 }
 
+frc2::CommandPtr Coordinator::PrimeCoral() {
+  return frc2::cmd::Sequence(piv.GoToAngleCmd(
+      [] { return presets::wrist::primed; }, [] { return true; }));
+  // elev.GoToHeightCmd([] { return presets::elev::clearOfChassis; }));
+}
+
 frc2::CommandPtr Coordinator::GoToL1Coral() {
-  return frc2::cmd::Parallel(
-      elev.GoToHeightCmd([] { return presets::elev::coral::l1; }),
-      piv.GoToAngleCmd([] { return presets::wrist::coral::l1; }));
+  return frc2::cmd::Sequence(
+      PrimeCoral(),
+      frc2::cmd::Parallel(
+          piv.GoToAngleCmd([] { return presets::wrist::coral::l1; }),
+          elev.GoToHeightCmd([] { return presets::elev::coral::l1; })));
 }
 
 frc2::CommandPtr Coordinator::GoToAlgaeProcess() {
@@ -77,10 +86,10 @@ frc2::CommandPtr Coordinator::GoToL2Algae() {
 }
 
 frc2::CommandPtr Coordinator::GoToL3Coral() {
-  return frc2::cmd::Parallel(
-      piv.GoToAngleCmd([] { return presets::wrist::coral::l3; }),
-      frc2::cmd::Sequence(
-          frc2::cmd::WaitUntil([this] { return piv.IsClearOfFunnel().Get(); }),
+  return frc2::cmd::Sequence(
+      PrimeCoral(),
+      frc2::cmd::Parallel(
+          piv.GoToAngleCmd([] { return presets::wrist::coral::l3; }),
           elev.GoToHeightCmd([] { return presets::elev::coral::l3; })));
 }
 
@@ -91,10 +100,10 @@ frc2::CommandPtr Coordinator::GoToL3Algae() {
 }
 
 frc2::CommandPtr Coordinator::GoToL4Coral() {
-  return frc2::cmd::Parallel(
-      piv.GoToAngleCmd([] { return presets::wrist::coral::l4; }),
-      frc2::cmd::Sequence(
-          frc2::cmd::WaitUntil([this] { return piv.IsClearOfFunnel().Get(); }),
+  return frc2::cmd::Sequence(
+      PrimeCoral(),
+      frc2::cmd::Parallel(
+          piv.GoToAngleCmd([] { return presets::wrist::coral::l4; }),
           elev.GoToHeightCmd([] { return presets::elev::coral::l4; })));
 }
 

@@ -12,6 +12,7 @@
 #include "frc/system/plant/DCMotor.h"
 #include "str/GainTypes.h"
 #include "units/angle.h"
+#include "units/angular_velocity.h"
 #include "units/dimensionless.h"
 #include "units/moment_of_inertia.h"
 
@@ -51,6 +52,9 @@ inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 70_deg;
 namespace gains {
 
 inline constexpr units::radian_t ANGLE_TOLERANCE = 1_deg;
+
+inline constexpr units::turns_per_second_t INTERMEDIATE_STATE_MAX_VEL =
+    180_deg_per_s;
 
 inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
