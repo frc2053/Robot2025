@@ -14,6 +14,7 @@
 #include "constants/ElevatorConstants.h"
 #include "ctre/phoenix6/CANcoder.hpp"
 #include "ctre/phoenix6/SignalLogger.hpp"
+#include "ctre/phoenix6/controls/CoastOut.hpp"
 #include "ctre/phoenix6/controls/Follower.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
@@ -49,6 +50,7 @@ class Elevator : public frc2::SubsystemBase {
   void GoToHeight(units::meter_t newHeight);
   frc2::Trigger IsAtGoalHeight();
   void SetVoltage(units::volt_t volts);
+  frc2::CommandPtr Coast();
   frc2::CommandPtr GoToHeightCmd(std::function<units::meter_t()> newHeight);
   frc2::CommandPtr SysIdElevatorQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdElevatorDynamicVoltage(frc2::sysid::Direction dir);
@@ -97,6 +99,7 @@ class Elevator : public frc2::SubsystemBase {
       rightMotor.GetMotorVoltage();
 
   ctre::phoenix6::controls::VoltageOut elevatorVoltageSetter{0_V};
+  ctre::phoenix6::controls::CoastOut coastSetter{};
   ctre::phoenix6::controls::Follower followerSetter{
       consts::elevator::can_ids::LEFT_MOTOR, true};
 

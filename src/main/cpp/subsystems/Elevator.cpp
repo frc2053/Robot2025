@@ -9,6 +9,7 @@
 #include "constants/ElevatorConstants.h"
 #include "ctre/phoenix/StatusCodes.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
+#include "ctre/phoenix6/configs/Configs.hpp"
 #include "ctre/phoenix6/signals/SpnEnums.hpp"
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
@@ -140,6 +141,16 @@ units::meters_per_second_t Elevator::GetElevatorVel() {
 
 frc2::Trigger Elevator::IsAtGoalHeight() {
   return frc2::Trigger{[this] { return isAtGoalHeight; }};
+}
+
+frc2::CommandPtr Elevator::Coast() {
+  return frc2::cmd::Sequence(frc2::cmd::Run(
+                                 [this] {
+                                   leftMotor.SetControl(coastSetter);
+                                   rightMotor.SetControl(coastSetter);
+                                 },
+                                 {this}))
+      .IgnoringDisable(true);
 }
 
 frc2::CommandPtr Elevator::GoToHeightCmd(
@@ -348,6 +359,8 @@ void Elevator::ConfigureMotors() {
 
   // Empty config because we only want to follow left
   ctre::phoenix6::configs::TalonFXConfiguration rightConfig{};
+  rightConfig.MotorOutput.NeutralMode =
+      ctre::phoenix6::signals::NeutralModeValue::Brake;
 
   rightConfig.Feedback.SensorToMechanismRatio =
       consts::elevator::physical::GEARING;
