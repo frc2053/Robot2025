@@ -18,8 +18,10 @@
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
+#include "frc/controller/PIDController.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/simulation/ElevatorSim.h"
+#include "frc/trajectory/ExponentialProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
@@ -34,6 +36,7 @@
 #include "units/length.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
+#include <frc/controller/ElevatorFeedforward.h>
 
 class Elevator : public frc2::SubsystemBase {
  public:
@@ -57,7 +60,7 @@ class Elevator : public frc2::SubsystemBase {
   void ConfigureControlSignals();
   void UpdateNTEntries();
   units::meters_per_second_t GetElevatorVel();
-  void SetElevatorGains(str::gains::radial::VoltRadialGainsHolder newGains,
+  void SetElevatorGains(str::gains::linear::VoltLinearGainsHolder newGains,
                         units::volt_t kg);
   units::meter_t ConvertEncPosToHeight(units::turn_t rots);
   units::turn_t ConvertHeightToEncPos(units::meter_t height);
@@ -93,12 +96,11 @@ class Elevator : public frc2::SubsystemBase {
   ctre::phoenix6::StatusSignal<units::volt_t> rightVoltageSig =
       rightMotor.GetMotorVoltage();
 
-  ctre::phoenix6::controls::MotionMagicExpoVoltage elevatorHeightSetter{0_rad};
   ctre::phoenix6::controls::VoltageOut elevatorVoltageSetter{0_V};
   ctre::phoenix6::controls::Follower followerSetter{
       consts::elevator::can_ids::LEFT_MOTOR, true};
 
-  str::gains::radial::VoltRadialGainsHolder currentGains{
+  str::gains::linear::VoltLinearGainsHolder currentGains{
       consts::elevator::gains::ELEVATOR_GAINS};
   units::volt_t currentKg{consts::elevator::gains::kG};
 
@@ -112,14 +114,23 @@ class Elevator : public frc2::SubsystemBase {
                                     0_m,
                                     {0.00}};
 
+  frc::ExponentialProfile<units::meter, units::volts> expoProf{
+      {12_V, currentGains.motionMagicExpoKv, currentGains.motionMagicExpoKa}};
+  frc::ExponentialProfile<units::meter, units::volts>::State expoSetpoint{};
+  frc::ExponentialProfile<units::meter, units::volts>::State expoGoal{};
+
+  frc::ElevatorFeedforward ff{currentGains.kS, currentKg, currentGains.kV,
+                              currentGains.kA};
+
+  frc::PIDController elevatorPid{currentGains.kP.value(),
+                                 currentGains.kI.value(),
+                                 currentGains.kD.value()};
+
+  units::volt_t ffToSend{0_V};
+  double pidOutput{0};
+
   frc2::sysid::SysIdRoutine elevatorSysIdVoltage{
-      frc2::sysid::Config{
-          std::nullopt, 10_V, std::nullopt,
-          [](frc::sysid::State state) {
-            ctre::phoenix6::SignalLogger().WriteString(
-                "SysIdElevator_State",
-                frc::sysid::SysIdRoutineLog::StateEnumToString(state));
-          }},
+      frc2::sysid::Config{std::nullopt, 10_V, std::nullopt, nullptr},
       frc2::sysid::Mechanism{
           [this](units::volt_t voltsToSend) { SetVoltage(voltsToSend); },
           [this](frc::sysid::SysIdRoutineLog* log) { LogElevatorVolts(log); },
@@ -129,8 +140,13 @@ class Elevator : public frc2::SubsystemBase {
       nt::NetworkTableInstance::GetDefault().GetTable("Elevator")};
   nt::DoublePublisher currentHeightPub{
       nt->GetDoubleTopic("CurrentHeight").Publish()};
-  nt::DoublePublisher heightSetpointPub{
-      nt->GetDoubleTopic("HeightSetpoint").Publish()};
+  nt::DoublePublisher currentVelPub{
+      nt->GetDoubleTopic("CurrentVelocity").Publish()};
+  nt::DoublePublisher heightPosSetpointPub{
+      nt->GetDoubleTopic("HeightPosSetpoint").Publish()};
+  nt::DoublePublisher heightVelSetpointPub{
+      nt->GetDoubleTopic("HeightVelSetpoint").Publish()};
+  nt::DoublePublisher heightGoalPub{nt->GetDoubleTopic("HeightGoal").Publish()};
   nt::BooleanPublisher isAtSetpointPub{
       nt->GetBooleanTopic("IsAtRequestedHeight").Publish()};
   str::SuperstructureDisplay& display;

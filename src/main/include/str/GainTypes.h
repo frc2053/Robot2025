@@ -63,6 +63,63 @@ using meter_amp_kd_unit =
     units::compound_unit<units::amperes,
                          units::inverse<units::meters_per_second>>;
 using meter_amp_kd_unit_t = units::unit_t<meter_amp_kd_unit>;
+
+struct VoltLinearGainsHolder {
+  units::meters_per_second_t motionMagicCruiseVel;
+  meter_volt_ka_unit_t motionMagicExpoKa;
+  meter_volt_kv_unit_t motionMagicExpoKv;
+  meter_volt_ka_unit_t kA;
+  meter_volt_kv_unit_t kV;
+  units::volt_t kS;
+  meter_volt_kp_unit_t kP;
+  meter_volt_ki_unit_t kI;
+  meter_volt_kd_unit_t kD;
+
+  VoltLinearGainsHolder& operator=(const VoltLinearGainsHolder& other) =
+      default;
+  VoltLinearGainsHolder(const VoltLinearGainsHolder& other)
+      : motionMagicCruiseVel{other.motionMagicCruiseVel},
+        motionMagicExpoKa{other.motionMagicExpoKa},
+        motionMagicExpoKv{other.motionMagicExpoKv},
+        kA{other.kA},
+        kV{other.kV},
+        kS{other.kS},
+        kP{other.kP},
+        kI{other.kI},
+        kD{other.kD} {}
+  VoltLinearGainsHolder(units::meters_per_second_t mmCv,
+                        meter_volt_ka_unit_t mmKa, meter_volt_kv_unit_t mmKv,
+                        meter_volt_ka_unit_t ka, meter_volt_kv_unit_t kv,
+                        units::volt_t ks, meter_volt_kp_unit_t kp,
+                        meter_volt_ki_unit_t ki, meter_volt_kd_unit_t kd)
+      : motionMagicCruiseVel{mmCv},
+        motionMagicExpoKa{mmKa},
+        motionMagicExpoKv{mmKv},
+        kA{ka},
+        kV{kv},
+        kS{ks},
+        kP{kp},
+        kI{ki},
+        kD{kd} {}
+
+  bool operator==(const VoltLinearGainsHolder& rhs) const {
+    return units::essentiallyEqual(motionMagicCruiseVel,
+                                   rhs.motionMagicCruiseVel, 1e-6),
+           units::essentiallyEqual(motionMagicExpoKa, rhs.motionMagicExpoKa,
+                                   1e-6),
+           units::essentiallyEqual(motionMagicExpoKv, rhs.motionMagicExpoKv,
+                                   1e-6),
+           units::essentiallyEqual(kA, rhs.kA, 1e-6) &&
+               units::essentiallyEqual(kV, rhs.kV, 1e-6) &&
+               units::essentiallyEqual(kS, rhs.kS, 1e-6) &&
+               units::essentiallyEqual(kP, rhs.kP, 1e-6) &&
+               units::essentiallyEqual(kI, rhs.kI, 1e-6) &&
+               units::essentiallyEqual(kD, rhs.kD, 1e-6);
+  }
+  bool operator!=(const VoltLinearGainsHolder& rhs) const {
+    return !operator==(rhs);
+  }
+};
 }  // namespace linear
 
 namespace radial {

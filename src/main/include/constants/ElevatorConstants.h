@@ -47,20 +47,22 @@ namespace gains {
 
 inline constexpr units::meter_t HEIGHT_TOLERANCE = .25_in;
 
-inline const str::gains::radial::VoltRadialGainsHolder ELEVATOR_GAINS{
-    (consts::elevator::physical::MOTOR.freeSpeed /
-     consts::elevator::physical::GEARING),
-    str::gains::radial::turn_volt_ka_unit_t{0.017911},
-    str::gains::radial::turn_volt_kv_unit_t{2.1728},
-    str::gains::radial::turn_volt_ka_unit_t{0.017911},
-    str::gains::radial::turn_volt_kv_unit_t{2.1728},
-    0.037956_V,
-    str::gains::radial::turn_volt_kp_unit_t{20.843},
-    str::gains::radial::turn_volt_ki_unit_t{0},
-    str::gains::radial::turn_volt_kd_unit_t{0.043424},
+inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
+    ((consts::elevator::physical::MOTOR.freeSpeed /
+      consts::elevator::physical::GEARING) /
+     1_rad) *
+        (consts::elevator::physical::PULLEY_DIAM / 2.0),
+    str::gains::linear::meter_volt_ka_unit_t{0.041193 * 2},
+    str::gains::linear::meter_volt_kv_unit_t{4.4248},
+    str::gains::linear::meter_volt_ka_unit_t{0.041193},
+    str::gains::linear::meter_volt_kv_unit_t{2.2124},
+    0.015546_V,
+    str::gains::linear::meter_volt_kp_unit_t{35},
+    str::gains::linear::meter_volt_ki_unit_t{0},
+    str::gains::linear::meter_volt_kd_unit_t{1},
 };
 
-inline constexpr units::volt_t kG = 1.0877_V;
+inline constexpr units::volt_t kG = 1.0884_V;
 
 }  // namespace gains
 }  // namespace consts::elevator

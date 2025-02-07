@@ -13,6 +13,8 @@
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
 #include "frc/RobotController.h"
+#include "frc/controller/ElevatorFeedforward.h"
+#include "frc/trajectory/ExponentialProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
@@ -22,6 +24,7 @@
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/length.h"
+#include "units/time.h"
 #include "units/voltage.h"
 
 Elevator::Elevator(str::SuperstructureDisplay& display) : display{display} {
@@ -52,16 +55,40 @@ void Elevator::Periodic() {
 
   currentHeight = GetHeight();
 
+  auto next = expoProf.Calculate(20_ms, expoSetpoint, expoGoal);
+
+  ffToSend = ff.Calculate(expoSetpoint.velocity, next.velocity);
+  pidOutput =
+      elevatorPid.Calculate(GetHeight().value(), expoSetpoint.position.value());
+
+  leftMotor.SetControl(
+      elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+          .WithEnableFOC(true));
+
   isAtGoalHeight = units::math::abs(goalHeight - currentHeight) <
                    consts::elevator::gains::HEIGHT_TOLERANCE;
 
   display.SetElevatorHeight(currentHeight);
   UpdateNTEntries();
+
+  expoSetpoint = next;
 }
 
 void Elevator::UpdateNTEntries() {
   currentHeightPub.Set(currentHeight.convert<units::inches>().value());
-  heightSetpointPub.Set(goalHeight.convert<units::inches>().value());
+  currentVelPub.Set(
+      GetElevatorVel()
+          .convert<units::compound_unit<units::inches,
+                                        units::inverse<units::seconds>>>()
+          .value());
+  heightGoalPub.Set(goalHeight.convert<units::inches>().value());
+  heightPosSetpointPub.Set(
+      expoSetpoint.position.convert<units::inches>().value());
+  heightVelSetpointPub.Set(
+      expoSetpoint.velocity
+          .convert<units::compound_unit<units::inches,
+                                        units::inverse<units::seconds>>>()
+          .value());
   isAtSetpointPub.Set(isAtGoalHeight);
 }
 
@@ -125,12 +152,8 @@ void Elevator::GoToHeight(units::meter_t newHeight) {
   if (!units::essentiallyEqual(goalHeight, newHeight, 1e-6)) {
     isAtGoalHeight = false;
     goalHeight = newHeight;
+    expoGoal = {goalHeight, 0_mps};
   }
-  leftMotor.SetControl(
-      elevatorHeightSetter
-          .WithPosition(ConvertHeightToEncPos(
-              newHeight / consts::elevator::physical::NUM_OF_STAGES))
-          .WithEnableFOC(true));
 }
 
 void Elevator::SetVoltage(units::volt_t volts) {
@@ -189,24 +212,24 @@ frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
           {this}),
       frc2::cmd::Run(
           [this, tablePrefix] {
-            str::gains::radial::VoltRadialGainsHolder newGains{
-                units::turns_per_second_t{frc::SmartDashboard::GetNumber(
+            str::gains::linear::VoltLinearGainsHolder newGains{
+                units::meters_per_second_t{frc::SmartDashboard::GetNumber(
                     tablePrefix + "mmCruiseVel", 0)},
-                str::gains::radial::turn_volt_ka_unit_t{
+                str::gains::linear::meter_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
-                str::gains::radial::turn_volt_kv_unit_t{
+                str::gains::linear::meter_volt_kv_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
-                str::gains::radial::turn_volt_ka_unit_t{
+                str::gains::linear::meter_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
-                str::gains::radial::turn_volt_kv_unit_t{
+                str::gains::linear::meter_volt_kv_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
                 units::volt_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
-                str::gains::radial::turn_volt_kp_unit_t{
+                str::gains::linear::meter_volt_kp_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
-                str::gains::radial::turn_volt_ki_unit_t{
+                str::gains::linear::meter_volt_ki_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
-                str::gains::radial::turn_volt_kd_unit_t{
+                str::gains::linear::meter_volt_kd_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
 
             units::volt_t newKg = units::volt_t{
@@ -260,43 +283,15 @@ void Elevator::OptimizeBusSignals() {
 }
 
 void Elevator::SetElevatorGains(
-    str::gains::radial::VoltRadialGainsHolder newGains, units::volt_t kg) {
+    str::gains::linear::VoltLinearGainsHolder newGains, units::volt_t kg) {
   currentGains = newGains;
   currentKg = kg;
-  ctre::phoenix6::configs::Slot0Configs slotConfig{};
-  slotConfig.kV = currentGains.kV.value();
-  slotConfig.kA = currentGains.kA.value();
-  slotConfig.kS = currentGains.kS.value();
-  slotConfig.kP = currentGains.kP.value();
-  slotConfig.kI = currentGains.kI.value();
-  slotConfig.kD = currentGains.kD.value();
-  slotConfig.GravityType =
-      ctre::phoenix6::signals::GravityTypeValue::Elevator_Static;
-  slotConfig.kG = kg.value();
 
-  ctre::phoenix6::configs::MotionMagicConfigs mmConfig{};
-
-  mmConfig.MotionMagicCruiseVelocity = currentGains.motionMagicCruiseVel;
-  mmConfig.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
-  mmConfig.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
-
-  ctre::phoenix::StatusCode statusGains =
-      leftMotor.GetConfigurator().Apply(slotConfig);
-  if (!statusGains.IsOK()) {
-    frc::DataLogManager::Log(
-        fmt::format("Left Elevator Motor was unable to set new gains! "
-                    "Error: {}, More Info: {}",
-                    statusGains.GetName(), statusGains.GetDescription()));
-  }
-
-  ctre::phoenix::StatusCode statusMM =
-      leftMotor.GetConfigurator().Apply(mmConfig);
-  if (!statusMM.IsOK()) {
-    frc::DataLogManager::Log(fmt::format(
-        "Left Elevator Motor was unable to set new motion magic config! "
-        "Error: {}, More Info: {}",
-        statusMM.GetName(), statusMM.GetDescription()));
-  }
+  expoProf = frc::ExponentialProfile<units::meter, units::volts>{
+      {12_V, newGains.motionMagicExpoKv, newGains.motionMagicExpoKa}};
+  ff = frc::ElevatorFeedforward{newGains.kS, kg, newGains.kV, newGains.kA};
+  elevatorPid.SetPID(newGains.kP.value(), newGains.kI.value(),
+                     newGains.kD.value());
 }
 
 void Elevator::ConfigureMotors() {
@@ -314,10 +309,10 @@ void Elevator::ConfigureMotors() {
       ctre::phoenix6::signals::GravityTypeValue::Elevator_Static;
   config.Slot0 = gains;
 
-  config.MotionMagic.MotionMagicCruiseVelocity =
-      currentGains.motionMagicCruiseVel;
-  config.MotionMagic.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
-  config.MotionMagic.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
+  //   config.MotionMagic.MotionMagicCruiseVelocity =
+  //       currentGains.motionMagicCruiseVel;
+  //   config.MotionMagic.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
+  //   config.MotionMagic.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
 
   config.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
@@ -380,7 +375,7 @@ void Elevator::SetToZeroHeight() {
 }
 
 void Elevator::ConfigureControlSignals() {
-  elevatorHeightSetter.UpdateFreqHz = 250_Hz;
+  // elevatorHeightSetter.UpdateFreqHz = 250_Hz;
   elevatorVoltageSetter.UpdateFreqHz = 250_Hz;
   followerSetter.UpdateFreqHz = 250_Hz;
 }
