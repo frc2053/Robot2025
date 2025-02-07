@@ -4,6 +4,7 @@
 
 #include "subsystems/Pivot.h"
 
+#include <numbers>
 #include <string>
 
 #include "constants/PivotConstants.h"
@@ -13,6 +14,8 @@
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
 #include "frc/RobotController.h"
+#include "frc/controller/ArmFeedforward.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
@@ -42,11 +45,23 @@ void Pivot::Periodic() {
 
   currentAngle = GetAngle();
 
-  isAtGoalAngle = units::math::abs(goalAngle - currentAngle) <
+  auto next = expoProf.Calculate(20_ms, expoSetpoint, expoGoal);
+
+  ffToSend = ff.Calculate(GetAngle(), next.velocity);
+  pidOutput =
+      pivotPid.Calculate(GetAngle().value(), expoSetpoint.position.value());
+
+  pivotMotor.SetControl(
+      pivotVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+          .WithEnableFOC(true));
+
+  isAtGoalAngle = units::math::abs(expoGoal.position - currentAngle) <
                   consts::pivot::gains::ANGLE_TOLERANCE;
 
   display.SetPivotAngle(currentAngle);
   UpdateNTEntries();
+
+  expoSetpoint = next;
 }
 
 void Pivot::SetToStartingPosition() {
@@ -62,7 +77,12 @@ void Pivot::SetToStartingPosition() {
 
 void Pivot::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
-  angleSetpointPub.Set(goalAngle.convert<units::degrees>().value());
+  currentVelPub.Set(GetPivotVel().convert<units::degrees_per_second>().value());
+  angularPosSetpointPub.Set(
+      expoSetpoint.position.convert<units::degrees>().value());
+  angularVelSetpointPub.Set(
+      expoSetpoint.velocity.convert<units::degrees_per_second>().value());
+  angularGoalPub.Set(expoGoal.position.convert<units::degrees>().value());
   isAtSetpointPub.Set(isAtGoalAngle);
 }
 
@@ -84,14 +104,14 @@ void Pivot::SimulationPeriodic() {
   pivotMotorSim.SetRotorVelocity(encVel * consts::pivot::physical::GEARING);
 }
 
-units::radian_t Pivot::GetAngle() {
+units::turn_t Pivot::GetAngle() {
   units::turn_t latencyCompPosition =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(positionSig,
                                                                    velocitySig);
   return latencyCompPosition;
 }
 
-units::radians_per_second_t Pivot::GetPivotVel() {
+units::turns_per_second_t Pivot::GetPivotVel() {
   return velocitySig.GetValue();
 }
 
@@ -105,19 +125,23 @@ frc2::Trigger Pivot::IsAtGoalAngle() {
   return frc2::Trigger{[this] { return isAtGoalAngle; }};
 }
 
-frc2::CommandPtr Pivot::GoToAngleCmd(
-    std::function<units::radian_t()> newAngle) {
+frc2::CommandPtr Pivot::Coast() {
+  return frc2::cmd::Sequence(
+             frc2::cmd::Run([this] { pivotMotor.SetControl(coastSetter); },
+                            {this}))
+      .IgnoringDisable(true);
+}
+
+frc2::CommandPtr Pivot::GoToAngleCmd(std::function<units::turn_t()> newAngle) {
   return frc2::cmd::Run([this, newAngle] { GoToAngle(newAngle()); }, {this})
       .Until([this] { return isAtGoalAngle; });
 }
 
-void Pivot::GoToAngle(units::radian_t newAngle) {
-  if (!units::essentiallyEqual(goalAngle, newAngle, 1e-6)) {
+void Pivot::GoToAngle(units::turn_t newAngle) {
+  if (!units::essentiallyEqual(expoGoal.position, newAngle, 1e-6)) {
     isAtGoalAngle = false;
-    goalAngle = newAngle;
+    expoGoal = {newAngle, 0_rad_per_s};
   }
-  pivotMotor.SetControl(
-      pivotAngleSetter.WithPosition(newAngle).WithEnableFOC(true));
 }
 
 void Pivot::SetVoltage(units::volt_t volts) {
@@ -239,46 +263,18 @@ void Pivot::SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
                           units::volt_t kg) {
   currentGains = newGains;
   currentKg = kg;
-  ctre::phoenix6::configs::Slot0Configs slotConfig{};
-  slotConfig.kV = currentGains.kV.value();
-  slotConfig.kA = currentGains.kA.value();
-  slotConfig.kS = currentGains.kS.value();
-  slotConfig.kP = currentGains.kP.value();
-  slotConfig.kI = currentGains.kI.value();
-  slotConfig.kD = currentGains.kD.value();
-  slotConfig.GravityType =
-      ctre::phoenix6::signals::GravityTypeValue::Arm_Cosine;
-  slotConfig.kG = kg.value();
 
-  ctre::phoenix6::configs::MotionMagicConfigs mmConfig{};
-
-  mmConfig.MotionMagicCruiseVelocity = currentGains.motionMagicCruiseVel;
-  mmConfig.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
-  mmConfig.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
-
-  ctre::phoenix::StatusCode statusGains =
-      pivotMotor.GetConfigurator().Apply(slotConfig);
-  if (!statusGains.IsOK()) {
-    frc::DataLogManager::Log(
-        fmt::format("Pivot Motor was unable to set new gains! "
-                    "Error: {}, More Info: {}",
-                    statusGains.GetName(), statusGains.GetDescription()));
-  }
-
-  ctre::phoenix::StatusCode statusMM =
-      pivotMotor.GetConfigurator().Apply(mmConfig);
-  if (!statusMM.IsOK()) {
-    frc::DataLogManager::Log(
-        fmt::format("Pivot Motor was unable to set new motion magic config! "
-                    "Error: {}, More Info: {}",
-                    statusMM.GetName(), statusMM.GetDescription()));
-  }
+  expoProf = frc::ExponentialProfile<units::turns, units::volts>{
+      {12_V, newGains.motionMagicExpoKv, newGains.motionMagicExpoKa}};
+  ff = frc::ArmFeedforward{newGains.kS, kg, newGains.kV, newGains.kA};
+  pivotPid.SetPID(newGains.kP.value(), newGains.kI.value(),
+                  newGains.kD.value());
 }
 
 void Pivot::ConfigureMotors() {
   ctre::phoenix6::configs::CANcoderConfiguration encoderCfg{};
 
-  encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
+  encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1_tr;
 
   encoderCfg.MagnetSensor.SensorDirection =
       ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
@@ -300,22 +296,6 @@ void Pivot::ConfigureMotors() {
   configureEncoderAlert.Set(!configEncoderResult.IsOK());
 
   ctre::phoenix6::configs::TalonFXConfiguration config{};
-  ctre::phoenix6::configs::Slot0Configs gains{};
-
-  gains.kA = currentGains.kA.value();
-  gains.kV = currentGains.kV.value();
-  gains.kS = currentGains.kS.value();
-  gains.kP = currentGains.kP.value();
-  gains.kI = currentGains.kI.value();
-  gains.kD = currentGains.kD.value();
-  gains.kG = currentKg.value();
-  gains.GravityType = ctre::phoenix6::signals::GravityTypeValue::Arm_Cosine;
-  config.Slot0 = gains;
-
-  config.MotionMagic.MotionMagicCruiseVelocity =
-      currentGains.motionMagicCruiseVel;
-  config.MotionMagic.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
-  config.MotionMagic.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
 
   config.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
@@ -354,6 +334,6 @@ void Pivot::ConfigureMotors() {
 }
 
 void Pivot::ConfigureControlSignals() {
-  pivotAngleSetter.UpdateFreqHz = 100_Hz;
   pivotVoltageSetter.UpdateFreqHz = 100_Hz;
+  coastSetter.UpdateFreqHz = 100_Hz;
 }

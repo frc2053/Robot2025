@@ -13,9 +13,9 @@
 
 #include "constants/PivotConstants.h"
 #include "ctre/phoenix6/CANcoder.hpp"
-#include "ctre/phoenix6/SignalLogger.hpp"
-#include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
-#include "ctre/phoenix6/controls/MotionMagicVoltage.hpp"
+#include "frc/controller/ArmFeedforward.h"
+#include "frc/controller/PIDController.h"
+#include "frc/trajectory/ExponentialProfile.h"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
 #include "frc/simulation/SingleJointedArmSim.h"
@@ -38,12 +38,13 @@ class Pivot : public frc2::SubsystemBase {
 
   void Periodic() override;
   void SimulationPeriodic() override;
-  units::radian_t GetAngle();
-  void GoToAngle(units::radian_t newAngle);
+  units::turn_t GetAngle();
+  void GoToAngle(units::turn_t newAngle);
   frc2::Trigger IsAtGoalAngle();
   frc2::Trigger IsClearOfFunnel();
   void SetVoltage(units::volt_t volts);
-  frc2::CommandPtr GoToAngleCmd(std::function<units::radian_t()> newAngle);
+  frc2::CommandPtr Coast();
+  frc2::CommandPtr GoToAngleCmd(std::function<units::turn_t()> newAngle);
   frc2::CommandPtr SysIdPivotQuasistaticVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr SysIdPivotDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr TunePivotPID(std::function<bool()> isDone);
@@ -53,7 +54,7 @@ class Pivot : public frc2::SubsystemBase {
   void ConfigureMotors();
   void ConfigureControlSignals();
   void UpdateNTEntries();
-  units::radians_per_second_t GetPivotVel();
+  units::turns_per_second_t GetPivotVel();
   void SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
                      units::volt_t kg);
   void LogPivotVolts(frc::sysid::SysIdRoutineLog* log);
@@ -64,8 +65,7 @@ class Pivot : public frc2::SubsystemBase {
   ctre::phoenix6::hardware::CANcoder pivotEncoder{
       consts::pivot::can_ids::PIVOT_ENC};
 
-  units::radian_t goalAngle = 0_rad;
-  units::radian_t currentAngle = 0_rad;
+  units::turn_t currentAngle = 0_rad;
   bool isAtGoalAngle = false;
 
   ctre::phoenix6::sim::TalonFXSimState& pivotMotorSim =
@@ -80,12 +80,28 @@ class Pivot : public frc2::SubsystemBase {
   ctre::phoenix6::StatusSignal<units::volt_t> voltageSig =
       pivotMotor.GetMotorVoltage();
 
-  ctre::phoenix6::controls::MotionMagicExpoVoltage pivotAngleSetter{0_rad};
   ctre::phoenix6::controls::VoltageOut pivotVoltageSetter{0_V};
+  ctre::phoenix6::controls::CoastOut coastSetter{};
 
   str::gains::radial::VoltRadialGainsHolder currentGains{
       consts::pivot::gains::PIVOT_GAINS};
   units::volt_t currentKg{consts::pivot::gains::kG};
+
+  frc::ExponentialProfile<units::turns, units::volts> expoProf{
+      frc::ExponentialProfile<units::turns, units::volts>::Constraints{
+          12_V, currentGains.motionMagicExpoKv,
+          currentGains.motionMagicExpoKa}};
+  frc::ExponentialProfile<units::turns, units::volts>::State expoSetpoint{};
+  frc::ExponentialProfile<units::turns, units::volts>::State expoGoal{};
+
+  frc::ArmFeedforward ff{currentGains.kS, currentKg, currentGains.kV,
+                         currentGains.kA};
+
+  frc::PIDController pivotPid{currentGains.kP.value(), currentGains.kI.value(),
+                              currentGains.kD.value()};
+
+  units::volt_t ffToSend{0_V};
+  double pidOutput{0};
 
   frc::sim::SingleJointedArmSim pivotSim{consts::pivot::physical::MOTOR,
                                          consts::pivot::physical::GEARING,
@@ -97,13 +113,7 @@ class Pivot : public frc2::SubsystemBase {
                                          0_rad};
 
   frc2::sysid::SysIdRoutine pivotSysIdVoltage{
-      frc2::sysid::Config{
-          std::nullopt, 10_V, std::nullopt,
-          [](frc::sysid::State state) {
-            ctre::phoenix6::SignalLogger().WriteString(
-                "SysIdPivot_State",
-                frc::sysid::SysIdRoutineLog::StateEnumToString(state));
-          }},
+      frc2::sysid::Config{std::nullopt, 10_V, std::nullopt, nullptr},
       frc2::sysid::Mechanism{
           [this](units::volt_t voltsToSend) { SetVoltage(voltsToSend); },
           [this](frc::sysid::SysIdRoutineLog* log) { LogPivotVolts(log); },
@@ -111,10 +121,17 @@ class Pivot : public frc2::SubsystemBase {
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Pivot")};
+
   nt::DoublePublisher currentAnglePub{
       nt->GetDoubleTopic("CurrentAngle").Publish()};
-  nt::DoublePublisher angleSetpointPub{
-      nt->GetDoubleTopic("AngleSetpoint").Publish()};
+  nt::DoublePublisher currentVelPub{
+      nt->GetDoubleTopic("CurrentAngularVelocity").Publish()};
+  nt::DoublePublisher angularPosSetpointPub{
+      nt->GetDoubleTopic("AngularPosSetpoint").Publish()};
+  nt::DoublePublisher angularVelSetpointPub{
+      nt->GetDoubleTopic("AngularVelSetpoint").Publish()};
+  nt::DoublePublisher angularGoalPub{
+      nt->GetDoubleTopic("AngularGoal").Publish()};
   nt::BooleanPublisher isAtSetpointPub{
       nt->GetBooleanTopic("IsAtRequestedAngle").Publish()};
   str::SuperstructureDisplay& display;

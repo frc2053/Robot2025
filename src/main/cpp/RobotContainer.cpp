@@ -106,6 +106,7 @@ void RobotContainer::ConfigureSysIdBinds() {
   tuningTable->PutBoolean("AlgaePivotSysIdVolts", false);
   tuningTable->PutBoolean("AlgaePivotPidTuning", false);
   tuningTable->PutBoolean("CoastElevator", false);
+  tuningTable->PutBoolean("CoastPivot", false);
   tuningTable->PutBoolean("Quasistatic", true);
   tuningTable->PutBoolean("Forward", true);
 
@@ -148,6 +149,7 @@ void RobotContainer::ConfigureSysIdBinds() {
       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 
   coastElevatorBtn.WhileTrue(elevatorSub.Coast());
+  coastPivotBtn.WhileTrue(pivotSub.Coast());
 }
 
 frc2::CommandPtr RobotContainer::SteerVoltsSysIdCommands(

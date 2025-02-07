@@ -486,6 +486,32 @@
               "period": 0.06,
               "data_type": "boolean"
             }
+          },
+          {
+            "title": "CoastElevator",
+            "x": 384.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/Tuning/CoastElevator",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "CoastPivot",
+            "x": 384.0,
+            "y": 768.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/Tuning/CoastPivot",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
           }
         ]
       }

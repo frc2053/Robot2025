@@ -306,23 +306,6 @@ void Elevator::SetElevatorGains(
 
 void Elevator::ConfigureMotors() {
   ctre::phoenix6::configs::TalonFXConfiguration config{};
-  ctre::phoenix6::configs::Slot0Configs gains{};
-
-  gains.kA = currentGains.kA.value();
-  gains.kV = currentGains.kV.value();
-  gains.kS = currentGains.kS.value();
-  gains.kP = currentGains.kP.value();
-  gains.kI = currentGains.kI.value();
-  gains.kD = currentGains.kD.value();
-  gains.kG = currentKg.value();
-  gains.GravityType =
-      ctre::phoenix6::signals::GravityTypeValue::Elevator_Static;
-  config.Slot0 = gains;
-
-  //   config.MotionMagic.MotionMagicCruiseVelocity =
-  //       currentGains.motionMagicCruiseVel;
-  //   config.MotionMagic.MotionMagicExpo_kV = currentGains.motionMagicExpoKv;
-  //   config.MotionMagic.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
 
   config.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
@@ -387,9 +370,9 @@ void Elevator::SetToZeroHeight() {
 }
 
 void Elevator::ConfigureControlSignals() {
-  // elevatorHeightSetter.UpdateFreqHz = 250_Hz;
   elevatorVoltageSetter.UpdateFreqHz = 250_Hz;
   followerSetter.UpdateFreqHz = 250_Hz;
+  coastSetter.UpdateFreqHz = 250_Hz;
 }
 
 units::meter_t Elevator::ConvertEncPosToHeight(units::turn_t turns) {

@@ -87,4 +87,5 @@ class RobotContainer {
   frc2::NetworkButton algaePivotSysIdVoltsBtn{tuningTable,
                                               "AlgaePivotSysIdVolts"};
   frc2::NetworkButton coastElevatorBtn{tuningTable, "CoastElevator"};
+  frc2::NetworkButton coastPivotBtn{tuningTable, "CoastPivot"};
 };
