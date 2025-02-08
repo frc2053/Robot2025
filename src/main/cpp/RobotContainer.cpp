@@ -6,7 +6,6 @@
 
 #include <frc/MathUtil.h>
 #include <frc2/command/Commands.h>
-
 #include "constants/SwerveConstants.h"
 #include "frc/RobotBase.h"
 #include "frc2/command/button/Trigger.h"
@@ -49,24 +48,33 @@ void RobotContainer::ConfigureBindings() {
 
   driverJoystick.A().OnTrue(coordinator.GoToL1());
   driverJoystick.B().OnTrue(coordinator.GoToL2());
+
   driverJoystick.X().OnTrue(coordinator.GoToL3());
   driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
   driverJoystick.Back().WhileTrue(algaeintakeSub.Poop());
   driverJoystick.Start().WhileTrue(algaeintakeSub.Intake());
 
-  driverJoystick.A().OnFalse(
+  driverJoystick.POVUp().OnTrue(
       frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
                         [this] { return manipSub.HasAlgae(); }));
-  driverJoystick.B().OnFalse(
-      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
-                        [this] { return manipSub.HasAlgae(); }));
-  driverJoystick.X().OnFalse(
-      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
-                        [this] { return manipSub.HasAlgae(); }));
-  driverJoystick.Y().OnFalse(
-      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
-                        [this] { return manipSub.HasAlgae(); }));
+
+  //   driverJoystick.A().OnFalse(
+  //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
+  //       coordinator.GoToLoading(),
+  //                         [this] { return manipSub.HasAlgae(); }));
+  //   driverJoystick.B().OnFalse(
+  //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
+  //       coordinator.GoToLoading(),
+  //                         [this] { return manipSub.HasAlgae(); }));
+  // driverJoystick.X().OnFalse(frc2::cmd::Either(
+  //     coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
+  //     [this] { return manipSub.HasAlgae(); }));
+
+  //   driverJoystick.Y().OnFalse(
+  //       frc2::cmd::Either(coordinator.GoToAlgaeHold(),
+  //       coordinator.GoToLoading(),
+  //                         [this] { return manipSub.HasAlgae(); }));
 
   driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
       driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
