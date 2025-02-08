@@ -47,9 +47,19 @@ frc2::CommandPtr Coordinator::GoToAlgaeHold() {
 
 frc2::CommandPtr Coordinator::GoToLoading() {
   return frc2::cmd::Parallel(
-      elev.GoToHeightCmd([] { return presets::elev::coral::loading; }),
-      piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }));
+      piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }),
+      frc2::cmd::Sequence(
+          frc2::cmd::Wait(0.25_s),
+          elev.GoToHeightCmd([] {  // Unsure about the time - 0.25 works tho
+            return presets::elev::coral::loading;
+          })));
 }
+
+// frc2::CommandPtr Coordinator::GoToLoading() {
+//   return frc2::cmd::Parallel(
+//       elev.GoToHeightCmd([] { return presets::elev::coral::loading; }),
+//       piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }));
+// }
 
 frc2::CommandPtr Coordinator::PrimeCoral() {
   return frc2::cmd::Sequence(piv.GoToAngleCmd(
