@@ -46,13 +46,16 @@ frc2::CommandPtr Coordinator::GoToAlgaeHold() {
 }
 
 frc2::CommandPtr Coordinator::GoToLoading() {
-  return frc2::cmd::Parallel(
-      piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }),
-      frc2::cmd::Sequence(
-          frc2::cmd::Wait(0.25_s),
-          elev.GoToHeightCmd([] {  // Unsure about the time - 0.25 works tho
-            return presets::elev::coral::loading;
-          })));
+  return frc2::cmd::Either(
+      PrimeCoral([this] { return presets::wrist::primed; }),
+      frc2::cmd::Parallel(
+          piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }),
+          frc2::cmd::Sequence(
+              frc2::cmd::Wait(0.25_s),
+              elev.GoToHeightCmd([] {  // Unsure about the time - 0.25 works tho
+                return presets::elev::coral::loading;
+              }))),
+      [this] { return manip.HasCoral(); });
 }
 
 // frc2::CommandPtr Coordinator::GoToLoading() { //Original Version
@@ -61,18 +64,26 @@ frc2::CommandPtr Coordinator::GoToLoading() {
 //       piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }));
 // }
 
-frc2::CommandPtr Coordinator::PrimeCoral() {
-  return frc2::cmd::Sequence(piv.GoToAngleCmd(
-      [] { return presets::wrist::primed; }, [] { return true; }));
-  // elev.GoToHeightCmd([] { return presets::elev::clearOfChassis; }));
+frc2::CommandPtr Coordinator::WaitForPriming() {
+  return frc2::cmd::WaitUntil([this] {
+    bool clear = piv.IsClearOfFunnel().Get();
+    fmt::print("Clear of funnel: {}\n", clear);
+    return clear;
+  });
+}
+
+frc2::CommandPtr Coordinator::PrimeCoral(
+    std::function<units::radian_t()> finalAngle) {
+  return frc2::cmd::Sequence(
+      frc2::cmd::Race(WaitForPriming(), piv.GoToAngleCmd(finalAngle)),
+      frc2::cmd::Print("GoToHeight for prime"),
+      elev.GoToHeightCmd([this] { return presets::elev::clearOfChassis; }));
 }
 
 frc2::CommandPtr Coordinator::GoToL1Coral() {
   return frc2::cmd::Sequence(
-      PrimeCoral(),
-      frc2::cmd::Parallel(
-          piv.GoToAngleCmd([] { return presets::wrist::coral::l1; }),
-          elev.GoToHeightCmd([] { return presets::elev::coral::l1; })));
+      PrimeCoral([] { return presets::wrist::coral::l1; }),
+      elev.GoToHeightCmd([] { return presets::elev::coral::l1; }));
 }
 
 frc2::CommandPtr Coordinator::GoToAlgaeProcess() {
@@ -82,11 +93,9 @@ frc2::CommandPtr Coordinator::GoToAlgaeProcess() {
 }
 
 frc2::CommandPtr Coordinator::GoToL2Coral() {
-  return frc2::cmd::Parallel(
-      piv.GoToAngleCmd([] { return presets::wrist::coral::l2; }),
-      frc2::cmd::Sequence(
-          frc2::cmd::WaitUntil([this] { return piv.IsClearOfFunnel().Get(); }),
-          elev.GoToHeightCmd([] { return presets::elev::coral::l2; })));
+  return frc2::cmd::Sequence(
+      PrimeCoral([] { return presets::wrist::coral::l2; }),
+      elev.GoToHeightCmd([] { return presets::elev::coral::l2; }));
 }
 
 frc2::CommandPtr Coordinator::GoToL2Algae() {
@@ -97,10 +106,8 @@ frc2::CommandPtr Coordinator::GoToL2Algae() {
 
 frc2::CommandPtr Coordinator::GoToL3Coral() {
   return frc2::cmd::Sequence(
-      PrimeCoral(),
-      frc2::cmd::Parallel(
-          piv.GoToAngleCmd([] { return presets::wrist::coral::l3; }),
-          elev.GoToHeightCmd([] { return presets::elev::coral::l3; })));
+      PrimeCoral([] { return presets::wrist::coral::l3; }),
+      elev.GoToHeightCmd([] { return presets::elev::coral::l3; }));
 }
 
 frc2::CommandPtr Coordinator::GoToL3Algae() {
@@ -111,10 +118,8 @@ frc2::CommandPtr Coordinator::GoToL3Algae() {
 
 frc2::CommandPtr Coordinator::GoToL4Coral() {
   return frc2::cmd::Sequence(
-      PrimeCoral(),
-      frc2::cmd::Parallel(
-          piv.GoToAngleCmd([] { return presets::wrist::coral::l4; }),
-          elev.GoToHeightCmd([] { return presets::elev::coral::l4; })));
+      PrimeCoral([] { return presets::wrist::coral::l4; }),
+      elev.GoToHeightCmd([] { return presets::elev::coral::l4; }));
 }
 
 frc2::CommandPtr Coordinator::GoToNet() {

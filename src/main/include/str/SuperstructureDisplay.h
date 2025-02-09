@@ -62,6 +62,7 @@ class SuperstructureDisplay {
 
     elevatorCarriage->SetColor(frc::Color::kRed);
 
+    pivotCgVis->SetColor(frc::Color::kCyan);
     pivotJoint->SetColor(frc::Color::kBlue);
     uShapeBack->SetColor(frc::Color::kOrange);
     uShapeAround->SetColor(frc::Color::kOrange);
@@ -82,9 +83,10 @@ class SuperstructureDisplay {
     aScopeDisplay.Set(superstructurePoses);
   }
   void SetPivotAngle(units::radian_t newAngle) {
-    pivotJoint->SetAngle(newAngle - 90_deg);
-    uShapeBack->SetAngle(newAngle - 90_deg + 116.16_deg);
-    currentAngle = -(newAngle - 90_deg);
+    pivotCgVis->SetAngle(newAngle - 90_deg);
+    pivotJoint->SetAngle(newAngle - 90_deg + 55.7_deg);
+    uShapeBack->SetAngle(newAngle - 90_deg + 55.7_deg - 116.16_deg);
+    currentAngle = (newAngle - 90_deg + 55.7_deg);
 
     superstructurePoses[3] = iHonestlyForgetWhatThisRepresents.TransformBy(
         frc::Transform3d{superstructurePoses[2].Translation(),
@@ -188,42 +190,42 @@ class SuperstructureDisplay {
                                          TOTAL_SCREEN_HEIGHT.value()};
 
   // Reef L2-L4
-  frc::MechanismRoot2d* reef{
-      superstructureDisplay.GetRoot("Reef", (PIPE_THICKNESS.value() / 2), 0)};
+  frc::MechanismRoot2d* reef{superstructureDisplay.GetRoot(
+      "Reef", TOTAL_SCREEN_WIDTH.value() - (PIPE_THICKNESS.value() / 2), 0)};
   frc::MechanismLigament2d* reefMainPole{reef->Append<frc::MechanismLigament2d>(
       "MainPole", 24.149027_in / 1_m, 90_deg)};
   frc::MechanismLigament2d* reefL2{
       reefMainPole->Append<frc::MechanismLigament2d>("L2", 12.119637_in / 1_m,
-                                                     -55_deg)};
+                                                     55_deg)};
   frc::MechanismLigament2d* l2Pole{
       reefMainPole->Append<frc::MechanismLigament2d>("L2Pole", 15.84_in / 1_m,
                                                      0_deg)};
   frc::MechanismLigament2d* reefL3{l2Pole->Append<frc::MechanismLigament2d>(
-      "L3", 12.119637_in / 1_m, -55_deg)};
+      "L3", 12.119637_in / 1_m, 55_deg)};
   frc::MechanismLigament2d* l3Pole{l2Pole->Append<frc::MechanismLigament2d>(
       "L3Pole", 15.536492_in / 1_m, 0_deg)};
   frc::MechanismLigament2d* l4DiagPole{l3Pole->Append<frc::MechanismLigament2d>(
-      "L4DiagPole", 12.119637_in / 1_m, -55_deg)};
+      "L4DiagPole", 12.119637_in / 1_m, 55_deg)};
   frc::MechanismLigament2d* reefL4{l4DiagPole->Append<frc::MechanismLigament2d>(
-      "L4", 9.810891_in / 1_m, 55_deg)};
+      "L4", 9.810891_in / 1_m, -55_deg)};
 
   // Reef L1 Parts
   frc::MechanismLigament2d* reefBottom{reef->Append<frc::MechanismLigament2d>(
-      "ReefBottom", 12.052349_in / 1_m, 0_deg)};
+      "ReefBottom", 12.052349_in / 1_m, 180_deg)};
   frc::MechanismLigament2d* reefFrontPlate{
-      reefBottom->Append<frc::MechanismLigament2d>("ReefFrontPlate",
-                                                   17.875000_in / 1_m, 90_deg)};
+      reefBottom->Append<frc::MechanismLigament2d>(
+          "ReefFrontPlate", 17.875000_in / 1_m, -90_deg)};
 
   // Loading Station
   frc::MechanismRoot2d* coralStation{superstructureDisplay.GetRoot(
-      "CoralStation", 58_in / 1_m, 37.440179_in / 1_m)};
+      "CoralStation", (2_in / 1_m), 37.440179_in / 1_m)};
   frc::MechanismLigament2d* coralStationRamp{
       coralStation->Append<frc::MechanismLigament2d>("CoralRamp", 2_in / 1_m,
-                                                     35_deg)};
+                                                     -35_deg)};
 
   // Drivebase
-  frc::MechanismRoot2d* drivebaseCenter{
-      superstructureDisplay.GetRoot("Robot", MIDDLE_OF_SWERVE.value(), 0)};
+  frc::MechanismRoot2d* drivebaseCenter{superstructureDisplay.GetRoot(
+      "Robot", TOTAL_SCREEN_WIDTH.value() - MIDDLE_OF_SWERVE.value(), 0)};
   frc::MechanismLigament2d* drivebaseBottomLeft{
       drivebaseCenter->Append<frc::MechanismLigament2d>(
           "DTBottomLeft", (consts::swerve::physical::TOTAL_LENGTH / 2).value(),
@@ -244,7 +246,8 @@ class SuperstructureDisplay {
 
   // ALGAE INTAKE
   frc::MechanismRoot2d* algaeIntakeRoot{superstructureDisplay.GetRoot(
-      "AlgaeIntakeRoot", ALGAE_INTAKE.value(), TOP_OF_SWERVE.value())};
+      "AlgaeIntakeRoot", TOTAL_SCREEN_WIDTH.value() - ALGAE_INTAKE.value(),
+      TOP_OF_SWERVE.value())};
   frc::MechanismLigament2d* algaeIntakeUpright{
       algaeIntakeRoot->Append<frc::MechanismLigament2d>(
           "AlgaeIntakeUpright", ALGAE_INTAKE_UPRIGHT.value(), 90_deg)};
@@ -256,14 +259,17 @@ class SuperstructureDisplay {
           "AlgaeIntakeArmSecond", ALGAE_ARM_SECOND_PART.value(), -10.5_deg)};
 
   // Elevator
-  frc::MechanismRoot2d* elevatorRoot{
-      superstructureDisplay.GetRoot("ElevatorRoot", MIDDLE_OF_CARRIAGE.value(),
-                                    LOWEST_CARRIAGE_HEIGHT.value())};
+  frc::MechanismRoot2d* elevatorRoot{superstructureDisplay.GetRoot(
+      "ElevatorRoot", TOTAL_SCREEN_WIDTH.value() - MIDDLE_OF_CARRIAGE.value(),
+      LOWEST_CARRIAGE_HEIGHT.value())};
   frc::MechanismLigament2d* elevatorCarriage{
       elevatorRoot->Append<frc::MechanismLigament2d>("ElevatorCarriage", 0,
                                                      90_deg)};
 
   // Pivot
+  frc::MechanismLigament2d* pivotCgVis{
+      elevatorCarriage->Append<frc::MechanismLigament2d>(
+          "PivotCgVis", 4.37480954214_in / 1_m, 0_deg)};
   frc::MechanismLigament2d* pivotJoint{
       elevatorCarriage->Append<frc::MechanismLigament2d>(
           "PivotJoint", 9.508097_in / 1_m, 0_deg)};
@@ -272,6 +278,6 @@ class SuperstructureDisplay {
           "uShapeBack", 9.508097_in / 1_m, 0_deg)};
   frc::MechanismLigament2d* uShapeAround{
       uShapeBack->Append<frc::MechanismLigament2d>(
-          "uShapeAround", 13.808011_in / 1_m, -66.28_deg)};
+          "uShapeAround", 13.808011_in / 1_m, 66.28_deg)};
 };
 }  // namespace str

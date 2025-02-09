@@ -15,6 +15,7 @@
 #include "ctre/phoenix6/CANcoder.hpp"
 #include "frc/controller/ArmFeedforward.h"
 #include "frc/controller/PIDController.h"
+#include "frc/sysid/SysIdRoutineLog.h"
 #include "frc/trajectory/ExponentialProfile.h"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
@@ -26,6 +27,7 @@
 #include "networktables/BooleanTopic.h"
 #include "networktables/DoubleTopic.h"
 #include "networktables/NetworkTableInstance.h"
+#include "networktables/StringTopic.h"
 #include "str/GainTypes.h"
 #include "str/SuperstructureDisplay.h"
 #include "units/angle.h"
@@ -91,18 +93,12 @@ class Pivot : public frc2::SubsystemBase {
       consts::pivot::gains::PIVOT_GAINS};
   units::volt_t currentKg{consts::pivot::gains::kG};
 
-  frc::TrapezoidProfile<units::turns> trapProf{
-      {720_deg_per_s, 1000_deg_per_s_sq}};
-  frc::TrapezoidProfile<units::turns>::State trapSetpoint{};
-  frc::TrapezoidProfile<units::turns>::State trapGoal{};
-
-  //   frc::ExponentialProfile<units::turns, units::volts> expoProf{
-  //       frc::ExponentialProfile<units::turns, units::volts>::Constraints{
-  //           12_V, currentGains.motionMagicExpoKv,
-  //           currentGains.motionMagicExpoKa}};
-  //   frc::ExponentialProfile<units::turns, units::volts>::State
-  //   expoSetpoint{}; frc::ExponentialProfile<units::turns,
-  //   units::volts>::State expoGoal{};
+  frc::ExponentialProfile<units::turns, units::volts> expoProf{
+      frc::ExponentialProfile<units::turns, units::volts>::Constraints{
+          12_V, currentGains.motionMagicExpoKv,
+          currentGains.motionMagicExpoKa}};
+  frc::ExponentialProfile<units::turns, units::volts>::State expoSetpoint{};
+  frc::ExponentialProfile<units::turns, units::volts>::State expoGoal{};
 
   frc::ArmFeedforward ff{currentGains.kS, currentKg, currentGains.kV,
                          currentGains.kA};
@@ -112,6 +108,7 @@ class Pivot : public frc2::SubsystemBase {
 
   units::volt_t ffToSend{0_V};
   double pidOutput{0};
+  bool isCharacterizing{false};
 
   frc::sim::SingleJointedArmSim pivotSim{consts::pivot::physical::MOTOR,
                                          consts::pivot::physical::GEARING,
@@ -123,7 +120,12 @@ class Pivot : public frc2::SubsystemBase {
                                          0_rad};
 
   frc2::sysid::SysIdRoutine pivotSysIdVoltage{
-      frc2::sysid::Config{std::nullopt, 10_V, std::nullopt, nullptr},
+      frc2::sysid::Config{
+          (1_V / 1_s), 5_V, std::nullopt,
+          [this](frc::sysid::State state) {
+            pivotSysIdStatePub.Set(
+                frc::sysid::SysIdRoutineLog::StateEnumToString(state));
+          }},
       frc2::sysid::Mechanism{
           [this](units::volt_t voltsToSend) { SetVoltage(voltsToSend); },
           [this](frc::sysid::SysIdRoutineLog* log) { LogPivotVolts(log); },
@@ -132,6 +134,10 @@ class Pivot : public frc2::SubsystemBase {
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Pivot")};
 
+  nt::StringPublisher pivotSysIdStatePub{
+      nt->GetStringTopic("PivotSysIdState").Publish()};
+  nt::DoublePublisher appliedVoltagePub{
+      nt->GetDoubleTopic("AppliedVoltage").Publish()};
   nt::DoublePublisher currentAnglePub{
       nt->GetDoubleTopic("CurrentAngle").Publish()};
   nt::DoublePublisher currentVelPub{

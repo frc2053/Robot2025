@@ -10,18 +10,18 @@
 namespace presets {
 namespace wrist {
 namespace coral {
-inline constexpr units::radian_t loading = 35_deg;
-inline constexpr units::radian_t l1 = 180_deg;
-inline constexpr units::radian_t l2 = 200_deg;
-inline constexpr units::radian_t l3 = 200_deg;
-inline constexpr units::radian_t l4 = 205_deg;
+inline constexpr units::radian_t loading = 90_deg;
+inline constexpr units::radian_t l1 = -56_deg;
+inline constexpr units::radian_t l2 = -91_deg;
+inline constexpr units::radian_t l3 = -91_deg;
+inline constexpr units::radian_t l4 = -101_deg;
 }  // namespace coral
 
 inline constexpr units::radian_t algaeHold = 150_deg;
 inline constexpr units::radian_t algaeProcess = 150_deg;
 inline constexpr units::radian_t algaeGrab = 100_deg;
 inline constexpr units::radian_t algaeNet = 100_deg;
-inline constexpr units::radian_t primed = 70_deg;
+inline constexpr units::radian_t primed = 45_deg;
 inline constexpr units::radian_t outofstarting = 90_deg;
 }  // namespace wrist
 
@@ -43,6 +43,6 @@ inline constexpr units::meter_t l4 = 75_in;
 }  // namespace coral
 
 inline constexpr units::meter_t outofstarting = 12_in;
-inline constexpr units::meter_t clearOfChassis = 16_in;
+inline constexpr units::meter_t clearOfChassis = 14_in;
 }  // namespace elev
 }  // namespace presets

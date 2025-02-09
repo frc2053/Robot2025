@@ -16,7 +16,7 @@
 #include "frc/RobotController.h"
 #include "frc/controller/ArmFeedforward.h"
 #include "frc/smartdashboard/SmartDashboard.h"
-#include "frc/trajectory/TrapezoidProfile.h"
+#include "frc/trajectory/ExponentialProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
@@ -46,45 +46,50 @@ void Pivot::Periodic() {
 
   currentAngle = GetAngle();
 
-  auto next = trapProf.Calculate(20_ms, trapSetpoint, trapGoal);
+  auto next = expoProf.Calculate(20_ms, expoSetpoint, expoGoal);
 
   ffToSend = ff.Calculate(GetAngle(), next.velocity);
+  frc::SmartDashboard::PutNumber("Kg Applied", ffToSend.value());
   pidOutput =
-      pivotPid.Calculate(GetAngle().value(), trapSetpoint.position.value());
+      pivotPid.Calculate(GetAngle().value(), expoSetpoint.position.value());
 
-  pivotMotor.SetControl(
-      pivotVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
-          .WithEnableFOC(true));
+  if (!isCharacterizing) {
+    pivotMotor.SetControl(
+        pivotVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+            .WithEnableFOC(true));
+  }
 
-  isAtGoalAngle = units::math::abs(trapGoal.position - currentAngle) <
+  isAtGoalAngle = units::math::abs(expoGoal.position - currentAngle) <
                   consts::pivot::gains::ANGLE_TOLERANCE;
 
   display.SetPivotAngle(currentAngle);
   UpdateNTEntries();
 
-  trapSetpoint = next;
+  expoSetpoint = next;
 }
 
 void Pivot::SetToStartingPosition() {
   pivotSim.SetInputVoltage(0_V);
-  encoderSim.SetRawPosition(35_deg);
+  encoderSim.SetRawPosition(83.3_deg);
   encoderSim.SetVelocity(0_deg_per_s);
 
-  pivotMotorSim.SetRawRotorPosition(35_deg * consts::pivot::physical::GEARING);
+  pivotMotorSim.SetRawRotorPosition(83.3_deg *
+                                    consts::pivot::physical::GEARING);
 
-  pivotSim.SetState(35_deg, 0_deg_per_s);
-  GoToAngle(35_deg, false);
+  pivotSim.SetState(83.3_deg, 0_deg_per_s);
+  GoToAngle(83.3_deg, false);
 }
 
 void Pivot::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
   currentVelPub.Set(GetPivotVel().convert<units::degrees_per_second>().value());
   angularPosSetpointPub.Set(
-      trapSetpoint.position.convert<units::degrees>().value());
+      expoSetpoint.position.convert<units::degrees>().value());
   angularVelSetpointPub.Set(
-      trapSetpoint.velocity.convert<units::degrees_per_second>().value());
-  angularGoalPub.Set(trapGoal.position.convert<units::degrees>().value());
+      expoSetpoint.velocity.convert<units::degrees_per_second>().value());
+  angularGoalPub.Set(expoGoal.position.convert<units::degrees>().value());
   isAtSetpointPub.Set(isAtGoalAngle);
+  appliedVoltagePub.Set(voltageSig.GetValue().value());
 }
 
 void Pivot::SimulationPeriodic() {
@@ -118,7 +123,7 @@ units::turns_per_second_t Pivot::GetPivotVel() {
 
 frc2::Trigger Pivot::IsClearOfFunnel() {
   return frc2::Trigger{[this] {
-    return currentAngle >= consts::pivot::physical::CLEAR_OF_FUNNEL_ANGLE;
+    return currentAngle <= consts::pivot::physical::CLEAR_OF_FUNNEL_ANGLE;
   }};
 }
 
@@ -149,13 +154,13 @@ frc2::CommandPtr Pivot::GoToAngleCmd(
 }
 
 void Pivot::GoToAngle(units::turn_t newAngle, bool isIntermediateState) {
-  if (!units::essentiallyEqual(trapGoal.position, newAngle, 1e-6)) {
+  if (!units::essentiallyEqual(expoGoal.position, newAngle, 1e-6)) {
     isAtGoalAngle = false;
     units::turns_per_second_t velEnd = 0_rad_per_s;
     if (isIntermediateState) {
       velEnd = consts::pivot::gains::INTERMEDIATE_STATE_MAX_VEL;
     }
-    trapGoal = {newAngle, velEnd};
+    expoGoal = {newAngle, velEnd};
   }
 }
 
@@ -166,11 +171,17 @@ void Pivot::SetVoltage(units::volt_t volts) {
 
 frc2::CommandPtr Pivot::SysIdPivotQuasistaticVoltage(
     frc2::sysid::Direction dir) {
-  return pivotSysIdVoltage.Quasistatic(dir).WithName(
-      "Pivot Quasistatic Voltage");
+  return pivotSysIdVoltage.Quasistatic(dir)
+      .WithName("Pivot Quasistatic Voltage")
+      .BeforeStarting([this] { isCharacterizing = true; })
+      .AndThen([this] { isCharacterizing = false; });
+  ;
 }
 frc2::CommandPtr Pivot::SysIdPivotDynamicVoltage(frc2::sysid::Direction dir) {
-  return pivotSysIdVoltage.Dynamic(dir).WithName("Pivot Dynamic Voltage");
+  return pivotSysIdVoltage.Dynamic(dir)
+      .WithName("Pivot Dynamic Voltage")
+      .BeforeStarting([this] { isCharacterizing = true; })
+      .AndThen([this] { isCharacterizing = false; });
 }
 
 frc2::CommandPtr Pivot::TunePivotPID(std::function<bool()> isDone) {
@@ -280,8 +291,8 @@ void Pivot::SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
   currentGains = newGains;
   currentKg = kg;
 
-  // trapProf = frc::TrapezoidProfile<units::turns>{
-  //     {newGains.motionMagicExpoKv, newGains.motionMagicExpoKa}};
+  expoProf = frc::ExponentialProfile<units::turns, units::volts>{
+      {12_V, newGains.motionMagicExpoKv, newGains.motionMagicExpoKa}};
   ff = frc::ArmFeedforward{newGains.kS, kg, newGains.kV, newGains.kA};
   pivotPid.SetPID(newGains.kP.value(), newGains.kI.value(),
                   newGains.kD.value());
