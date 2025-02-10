@@ -6,6 +6,8 @@
 
 #include <frc/MathUtil.h>
 #include <frc2/command/Commands.h>
+#include <frc2/command/button/RobotModeTriggers.h>
+
 #include "constants/SwerveConstants.h"
 #include "frc/RobotBase.h"
 #include "frc/filter/Debouncer.h"
@@ -15,7 +17,6 @@
 #include "str/vision/VisionSystem.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
-#include <frc2/command/button/RobotModeTriggers.h>
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();

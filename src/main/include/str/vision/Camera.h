@@ -42,7 +42,7 @@ class Camera {
       photon::PhotonPipelineResult result);
   void AddYaw(units::radian_t yaw, units::second_t time) {
     yawBuffer.AddSample(time, yaw);
-  };
+  }
   std::optional<photon::EstimatedRobotPose> LatestSingleTagPose() {
     return singleTagPose;
   }

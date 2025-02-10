@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc/controller/ElevatorFeedforward.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <memory>
@@ -37,7 +38,6 @@
 #include "units/length.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
-#include <frc/controller/ElevatorFeedforward.h>
 
 class Elevator : public frc2::SubsystemBase {
  public:

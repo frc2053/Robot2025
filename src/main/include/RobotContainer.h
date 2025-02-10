@@ -18,12 +18,12 @@
 #include "frc2/command/button/Trigger.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
+#include "subsystems/AlgaeIntake.h"
 #include "subsystems/Coordinator.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
 #include "subsystems/Manipulator.h"
 #include "subsystems/Pivot.h"
-#include "subsystems/AlgaeIntake.h"
 
 class RobotContainer {
  public:

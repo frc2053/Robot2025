@@ -27,11 +27,11 @@
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "opencv2/core/types.hpp"
 #include "photon/PhotonPoseEstimator.h"
+#include "photon/PhotonUtils.h"
 #include "photon/estimation/TargetModel.h"
 #include "photon/simulation/VisionTargetSim.h"
 #include "photon/targeting/PhotonTrackedTarget.h"
 #include "photon/targeting/TargetCorner.h"
-#include "photon/PhotonUtils.h"
 #include "units/angle.h"
 #include "units/length.h"
 

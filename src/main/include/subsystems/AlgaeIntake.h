@@ -18,6 +18,7 @@
 #include "frc/filter/LinearFilter.h"
 #include "frc/simulation/FlywheelSim.h"
 #include "frc/simulation/SingleJointedArmSim.h"
+#include "frc/system/plant/LinearSystemId.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
@@ -29,7 +30,6 @@
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/voltage.h"
-#include "frc/system/plant/LinearSystemId.h"
 
 class AlgaeIntake : public frc2::SubsystemBase {
  public:
