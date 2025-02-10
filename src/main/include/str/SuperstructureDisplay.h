@@ -94,8 +94,7 @@ class SuperstructureDisplay {
   }
 
   void SetAlgaeIntakeAngle(units::radian_t newAngle) {
-    algaeIntakeArmFirstPart->SetAngle(newAngle - 90_deg);
-    currentAlgaeIntakeAngle = -(newAngle - 90_deg);
+    algaeIntakeArmFirstPart->SetAngle(-(newAngle - 90_deg));
 
     superstructurePoses[4] =
         frc::Pose3d{-0.3048_m, 0.11_m, 0.530225_m, frc::Rotation3d{}}
@@ -164,7 +163,6 @@ class SuperstructureDisplay {
 
   frc::Pose2d currentPose{};
   units::radian_t currentAngle{};
-  units::radian_t currentAlgaeIntakeAngle{};
 
   frc::Pose3d iHonestlyForgetWhatThisRepresents =
       frc::Pose3d{frc::Translation3d{0.1016508_m, -0.117274594_m, 0.263525_m},
@@ -256,7 +254,7 @@ class SuperstructureDisplay {
           "AlgaeIntakeArmFirst", ALGAE_ARM_FIRST_PART.value(), -109.5_deg)};
   frc::MechanismLigament2d* algaeIntakeArmSecondPart{
       algaeIntakeArmFirstPart->Append<frc::MechanismLigament2d>(
-          "AlgaeIntakeArmSecond", ALGAE_ARM_SECOND_PART.value(), -10.5_deg)};
+          "AlgaeIntakeArmSecond", ALGAE_ARM_SECOND_PART.value(), 10.5_deg)};
 
   // Elevator
   frc::MechanismRoot2d* elevatorRoot{superstructureDisplay.GetRoot(

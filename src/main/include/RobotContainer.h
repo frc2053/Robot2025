@@ -15,6 +15,7 @@
 
 #include "Autos.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc2/command/button/Trigger.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
 #include "subsystems/Coordinator.h"
@@ -54,6 +55,8 @@ class RobotContainer {
                                            std::function<bool()> quasistatic);
   frc2::CommandPtr AlgaeIntakePivotVoltsSysIdCommands(
       std::function<bool()> fwd, std::function<bool()> quasistatic);
+  frc2::CommandPtr HandleReturnToNeutralPosition();
+  frc2::Trigger NoButtonsPressed();
 
   frc2::CommandXboxController driverJoystick{0};
 

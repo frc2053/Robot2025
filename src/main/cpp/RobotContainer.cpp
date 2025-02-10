@@ -8,6 +8,7 @@
 #include <frc2/command/Commands.h>
 #include "constants/SwerveConstants.h"
 #include "frc/RobotBase.h"
+#include "frc/filter/Debouncer.h"
 #include "frc2/command/button/Trigger.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
 #include "str/DriverstationUtils.h"
@@ -52,21 +53,10 @@ void RobotContainer::ConfigureBindings() {
   driverJoystick.X().OnTrue(coordinator.GoToL3());
   driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
-  driverJoystick.Back().WhileTrue(algaeintakeSub.Poop());
-  driverJoystick.Start().WhileTrue(algaeintakeSub.Intake());
+  NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
-  driverJoystick.A().OnFalse(
-      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
-                        [this] { return manipSub.HasAlgae(); }));
-  driverJoystick.B().OnFalse(
-      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
-                        [this] { return manipSub.HasAlgae(); }));
-  driverJoystick.X().OnFalse(
-      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
-                        [this] { return manipSub.HasAlgae(); }));
-  driverJoystick.Y().OnFalse(
-      frc2::cmd::Either(coordinator.GoToAlgaeHold(), coordinator.GoToLoading(),
-                        [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.Back().OnTrue(algaeintakeSub.Poop());
+  driverJoystick.Start().OnTrue(algaeintakeSub.Intake());
 
   driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
       driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
@@ -285,4 +275,17 @@ str::vision::VisionSystem& RobotContainer::GetVision() {
 
 str::SuperstructureDisplay& RobotContainer::GetSuperStructureDisplay() {
   return display;
+}
+
+frc2::CommandPtr RobotContainer::HandleReturnToNeutralPosition() {
+  return frc2::cmd::Either(coordinator.GoToAlgaeHold(),
+                           coordinator.GoToLoading(),
+                           [this] { return manipSub.HasAlgae(); });
+}
+
+frc2::Trigger RobotContainer::NoButtonsPressed() {
+  return frc2::Trigger{[this] {
+    return !driverJoystick.A().Get() && !driverJoystick.B().Get() &&
+           !driverJoystick.X().Get() && !driverJoystick.Y().Get();
+  }};
 }

@@ -47,8 +47,12 @@ frc2::CommandPtr Coordinator::GoToAlgaeHold() {
 
 frc2::CommandPtr Coordinator::GoToLoading() {
   return frc2::cmd::Either(
-      PrimeCoral([this] { return presets::wrist::primed; }),
       frc2::cmd::Parallel(
+          frc2::cmd::Print("I have a coral, going to primed position"),
+          piv.GoToAngleCmd([] { return presets::wrist::primed; }),
+          elev.GoToHeightCmd([] { return presets::elev::coral::loading; })),
+      frc2::cmd::Parallel(
+          frc2::cmd::Print("I dont have a coral, going to loading position"),
           piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }),
           elev.GoToHeightCmd([] { return presets::elev::coral::loading; })),
       [this] {
@@ -75,14 +79,23 @@ frc2::CommandPtr Coordinator::WaitForPriming() {
 frc2::CommandPtr Coordinator::PrimeCoral(
     std::function<units::radian_t()> finalAngle) {
   return frc2::cmd::Sequence(
+      frc2::cmd::Print("Prime Coral"),
       frc2::cmd::Race(WaitForPriming(), piv.GoToAngleCmd(finalAngle)),
-      frc2::cmd::Print("GoToHeight for prime"),
-      elev.GoToHeightCmd([this] { return presets::elev::clearOfChassis; }));
+      frc2::cmd::Either(
+          frc2::cmd::None(),
+          elev.GoToHeightCmd([this] { return presets::elev::clearOfChassis; }),
+          [this] {
+            bool isClear = elev.GetHeight() >= presets::elev::clearOfChassis;
+            fmt::print("isClear, should skip me!: {}\n", isClear);
+            return isClear;
+          }));
 }
 
 frc2::CommandPtr Coordinator::GoToL1Coral() {
   return frc2::cmd::Sequence(
+      frc2::cmd::Print("L1 Coral Seq"),
       PrimeCoral([] { return presets::wrist::coral::l1; }),
+      frc2::cmd::Print("L1 Coral Elevator Height"),
       elev.GoToHeightCmd([] { return presets::elev::coral::l1; }));
 }
 
@@ -94,7 +107,9 @@ frc2::CommandPtr Coordinator::GoToAlgaeProcess() {
 
 frc2::CommandPtr Coordinator::GoToL2Coral() {
   return frc2::cmd::Sequence(
+      frc2::cmd::Print("L2 Coral Seq"),
       PrimeCoral([] { return presets::wrist::coral::l2; }),
+      frc2::cmd::Print("L2 Coral Elevator Height"),
       elev.GoToHeightCmd([] { return presets::elev::coral::l2; }));
 }
 
@@ -106,7 +121,9 @@ frc2::CommandPtr Coordinator::GoToL2Algae() {
 
 frc2::CommandPtr Coordinator::GoToL3Coral() {
   return frc2::cmd::Sequence(
+      frc2::cmd::Print("L3 Coral Seq"),
       PrimeCoral([] { return presets::wrist::coral::l3; }),
+      frc2::cmd::Print("L3 Coral Elevator Height"),
       elev.GoToHeightCmd([] { return presets::elev::coral::l3; }));
 }
 
@@ -118,7 +135,9 @@ frc2::CommandPtr Coordinator::GoToL3Algae() {
 
 frc2::CommandPtr Coordinator::GoToL4Coral() {
   return frc2::cmd::Sequence(
+      frc2::cmd::Print("L4 Coral Seq"),
       PrimeCoral([] { return presets::wrist::coral::l4; }),
+      frc2::cmd::Print("L4 Coral Elevator Height"),
       elev.GoToHeightCmd([] { return presets::elev::coral::l4; }));
 }
 

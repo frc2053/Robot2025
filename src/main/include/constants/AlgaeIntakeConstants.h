@@ -47,7 +47,7 @@ inline constexpr units::kilogram_square_meter_t MOI = 0.009044167_kg_sq_m;
 
 inline constexpr units::meter_t ARM_LENGTH = 13.219105_in;
 
-inline constexpr units::radian_t MIN_ANGLE = -80_deg;
+inline constexpr units::radian_t MIN_ANGLE = -90_deg;
 inline constexpr units::radian_t MAX_ANGLE = 100_deg;
 
 inline constexpr units::radian_t ALGAE_INTAKE_ANGLE = -10_deg;
