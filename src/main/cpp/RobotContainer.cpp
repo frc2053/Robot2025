@@ -42,7 +42,6 @@ void RobotContainer::ConfigureBindings() {
   frc2::RobotModeTriggers::Teleop().OnTrue(
       coordinator.GetOutOfStartingConfig());
 
-  driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
 
   driverJoystick.Start().OnTrue(coordinator.GoToLoading());

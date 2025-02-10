@@ -115,6 +115,7 @@ frc2::CommandPtr Coordinator::GoToL2Coral() {
 
 frc2::CommandPtr Coordinator::GoToL2Algae() {
   return frc2::cmd::Parallel(
+      manip.SuckUntilAlgae(),
       elev.GoToHeightCmd([] { return presets::elev::algae::l2; }),
       piv.GoToAngleCmd([] { return presets::wrist::algaeGrab; }));
 }
@@ -129,6 +130,7 @@ frc2::CommandPtr Coordinator::GoToL3Coral() {
 
 frc2::CommandPtr Coordinator::GoToL3Algae() {
   return frc2::cmd::Parallel(
+      manip.SuckUntilAlgae(),
       elev.GoToHeightCmd([] { return presets::elev::algae::l3; }),
       piv.GoToAngleCmd([] { return presets::wrist::algaeGrab; }));
 }
