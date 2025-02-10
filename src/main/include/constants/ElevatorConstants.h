@@ -19,8 +19,8 @@ namespace consts::elevator {
 inline constexpr units::hertz_t BUS_UPDATE_FREQ = 250_Hz;
 
 namespace can_ids {
-inline constexpr int LEFT_MOTOR = 15;
-inline constexpr int RIGHT_MOTOR = 16;
+inline constexpr int FRONT_MOTOR = 15;
+inline constexpr int BACK_MOTOR = 16;
 }  // namespace can_ids
 
 namespace current_limits {
@@ -30,8 +30,7 @@ inline constexpr units::ampere_t STATOR_LIMIT = 60_A;
 
 namespace physical {
 inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(2);
-inline constexpr bool INVERT_LEFT = false;
-inline constexpr bool INVERT_RIGHT = true;
+inline constexpr bool INVERT_FRONT = true;
 
 inline constexpr units::meter_t PULLEY_DIAM = 1.75_in;
 inline constexpr int NUM_OF_STAGES = 3;

@@ -38,21 +38,16 @@ Elevator::Elevator(str::SuperstructureDisplay& display) : display{display} {
 void Elevator::Periodic() {
   ctre::phoenix::StatusCode status =
       ctre::phoenix6::BaseStatusSignal::WaitForAll(
-          2.0 / consts::elevator::BUS_UPDATE_FREQ, leftPositionSig,
-          leftVelocitySig, leftVoltageSig, rightPositionSig, rightVelocitySig,
-          rightVoltageSig);
+          2.0 / consts::elevator::BUS_UPDATE_FREQ, frontPositionSig,
+          frontVelocitySig, frontVoltageSig, backPositionSig, backVelocitySig,
+          backVoltageSig);
 
   if (!status.IsOK()) {
     frc::DataLogManager::Log(fmt::format(
         "Error updating elevator positions! Error was: {}", status.GetName()));
   }
 
-  // sim is not inverted
-  if (frc::RobotBase::IsSimulation()) {
-    rightMotor.SetControl(followerSetter.WithOpposeMasterDirection(false));
-  } else {
-    rightMotor.SetControl(followerSetter);
-  }
+  backMotor.SetControl(followerSetter);
 
   currentHeight = GetHeight();
 
@@ -62,7 +57,7 @@ void Elevator::Periodic() {
   pidOutput =
       elevatorPid.Calculate(GetHeight().value(), expoSetpoint.position.value());
 
-  leftMotor.SetControl(
+  frontMotor.SetControl(
       elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
           .WithEnableFOC(true));
 
@@ -94,11 +89,11 @@ void Elevator::UpdateNTEntries() {
 }
 
 void Elevator::SimulationPeriodic() {
-  leftMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
-  rightMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  frontMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  backMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
   elevatorSim.SetInputVoltage(
-      (leftMotorSim.GetMotorVoltage() + rightMotorSim.GetMotorVoltage()) / 2.0);
+      (frontMotorSim.GetMotorVoltage() + backMotorSim.GetMotorVoltage()) / 2.0);
 
   elevatorSim.Update(20_ms);
 
@@ -107,25 +102,25 @@ void Elevator::SimulationPeriodic() {
   units::turns_per_second_t encVel =
       ConvertHeightVelToEncVel(elevatorSim.GetVelocity());
 
-  leftMotorSim.SetRawRotorPosition(encPos *
-                                   consts::elevator::physical::GEARING);
-  leftMotorSim.SetRotorVelocity(encVel * consts::elevator::physical::GEARING);
-
-  rightMotorSim.SetRawRotorPosition(encPos *
+  frontMotorSim.SetRawRotorPosition(encPos *
                                     consts::elevator::physical::GEARING);
-  rightMotorSim.SetRotorVelocity(encVel * consts::elevator::physical::GEARING);
+  frontMotorSim.SetRotorVelocity(encVel * consts::elevator::physical::GEARING);
+
+  backMotorSim.SetRawRotorPosition(encPos *
+                                   consts::elevator::physical::GEARING);
+  backMotorSim.SetRotorVelocity(encVel * consts::elevator::physical::GEARING);
 }
 
 units::meter_t Elevator::GetHeight() {
-  units::turn_t latencyCompLeft =
+  units::turn_t latencyCompFront =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
-          leftPositionSig, leftVelocitySig);
-  units::turn_t latencyCompRight =
+          frontPositionSig, frontVelocitySig);
+  units::turn_t latencyCompBack =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
-          rightPositionSig, rightVelocitySig);
+          backPositionSig, backVelocitySig);
 
   units::meter_t avgHeight =
-      ConvertEncPosToHeight((latencyCompLeft + latencyCompRight) / 2.0) *
+      ConvertEncPosToHeight((latencyCompFront + latencyCompBack) / 2.0) *
       consts::elevator::physical::NUM_OF_STAGES;
 
   return avgHeight;
@@ -134,7 +129,7 @@ units::meter_t Elevator::GetHeight() {
 units::meters_per_second_t Elevator::GetElevatorVel() {
   units::meters_per_second_t avgVel =
       ConvertEncVelToHeightVel(
-          (leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) / 2.0) *
+          (frontVelocitySig.GetValue() + backVelocitySig.GetValue()) / 2.0) *
       consts::elevator::physical::NUM_OF_STAGES;
   return avgVel;
 }
@@ -146,8 +141,8 @@ frc2::Trigger Elevator::IsAtGoalHeight() {
 frc2::CommandPtr Elevator::Coast() {
   return frc2::cmd::Sequence(frc2::cmd::Run(
                                  [this] {
-                                   leftMotor.SetControl(coastSetter);
-                                   rightMotor.SetControl(coastSetter);
+                                   frontMotor.SetControl(coastSetter);
+                                   backMotor.SetControl(coastSetter);
                                  },
                                  {this}))
       .IgnoringDisable(true);
@@ -167,7 +162,7 @@ void Elevator::GoToHeight(units::meter_t newHeight) {
 }
 
 void Elevator::SetVoltage(units::volt_t volts) {
-  leftMotor.SetControl(
+  frontMotor.SetControl(
       elevatorVoltageSetter.WithEnableFOC(true).WithOutput(volts));
 }
 
@@ -259,18 +254,18 @@ frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
 
 void Elevator::LogElevatorVolts(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("elevator")
-      .voltage((leftVoltageSig.GetValue() + rightVoltageSig.GetValue()) / 2.0)
-      .position((leftPositionSig.GetValue() + rightPositionSig.GetValue()) /
+      .voltage((frontVoltageSig.GetValue() + backVoltageSig.GetValue()) / 2.0)
+      .position((frontPositionSig.GetValue() + backPositionSig.GetValue()) /
                 2.0)
-      .velocity((leftVelocitySig.GetValue() + rightVelocitySig.GetValue()) /
+      .velocity((frontVelocitySig.GetValue() + backVelocitySig.GetValue()) /
                 2.0);
 }
 
 void Elevator::OptimizeBusSignals() {
   ctre::phoenix::StatusCode freqSetterStatus =
       ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
-          consts::elevator::BUS_UPDATE_FREQ, leftPositionSig, leftVelocitySig,
-          leftVoltageSig, rightPositionSig, rightVelocitySig, rightVoltageSig);
+          consts::elevator::BUS_UPDATE_FREQ, frontPositionSig, frontVelocitySig,
+          frontVoltageSig, backPositionSig, backVelocitySig, backVoltageSig);
 
   frc::DataLogManager::Log(
       fmt::format("Set bus signal frequenceies for elevator. Result was: {}",
@@ -278,18 +273,18 @@ void Elevator::OptimizeBusSignals() {
 
   signalFrequencyAlert.Set(!freqSetterStatus.IsOK());
 
-  ctre::phoenix::StatusCode optimizeLeftResult =
-      leftMotor.OptimizeBusUtilization();
+  ctre::phoenix::StatusCode optimizeFrontResult =
+      frontMotor.OptimizeBusUtilization();
   frc::DataLogManager::Log(fmt::format(
-      "Optimized bus signals for left elevator motor. Result was: {}",
-      optimizeLeftResult.GetName()));
-  ctre::phoenix::StatusCode optimizeRightResult =
-      rightMotor.OptimizeBusUtilization();
+      "Optimized bus signals for front elevator motor. Result was: {}",
+      optimizeFrontResult.GetName()));
+  ctre::phoenix::StatusCode optimizeBackResult =
+      backMotor.OptimizeBusUtilization();
   frc::DataLogManager::Log(fmt::format(
-      "Optimized bus signals for right elevator motor. Result was {}",
-      optimizeRightResult.GetName()));
-  optiLeftAlert.Set(!optimizeLeftResult.IsOK());
-  optiRightAlert.Set(!optimizeRightResult.IsOK());
+      "Optimized bus signals for back elevator motor. Result was {}",
+      optimizeBackResult.GetName()));
+  optiFrontAlert.Set(!optimizeFrontResult.IsOK());
+  optiBackAlert.Set(!optimizeBackResult.IsOK());
 }
 
 void Elevator::SetElevatorGains(
@@ -310,7 +305,7 @@ void Elevator::ConfigureMotors() {
   config.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
   config.MotorOutput.Inverted =
-      consts::elevator::physical::INVERT_LEFT
+      consts::elevator::physical::INVERT_FRONT
           ? ctre::phoenix6::signals::InvertedValue::Clockwise_Positive
           : ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
 
@@ -330,40 +325,40 @@ void Elevator::ConfigureMotors() {
 
   config.Feedback.SensorToMechanismRatio = consts::elevator::physical::GEARING;
 
-  ctre::phoenix::StatusCode configLeftResult =
-      leftMotor.GetConfigurator().Apply(config);
+  ctre::phoenix::StatusCode configFrontResult =
+      frontMotor.GetConfigurator().Apply(config);
 
   frc::DataLogManager::Log(
-      fmt::format("Configured left motor on elevator. Result was: {}",
-                  configLeftResult.GetName()));
+      fmt::format("Configured front motor on elevator. Result was: {}",
+                  configFrontResult.GetName()));
 
-  configureLeftAlert.Set(!configLeftResult.IsOK());
+  configureFrontAlert.Set(!configFrontResult.IsOK());
 
-  // Empty config because we only want to follow left
-  ctre::phoenix6::configs::TalonFXConfiguration rightConfig{};
-  rightConfig.MotorOutput.NeutralMode =
+  // Empty config because we only want to follow front
+  ctre::phoenix6::configs::TalonFXConfiguration backConfig{};
+  backConfig.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
 
-  rightConfig.Feedback.SensorToMechanismRatio =
+  backConfig.Feedback.SensorToMechanismRatio =
       consts::elevator::physical::GEARING;
 
-  ctre::phoenix::StatusCode configRightResult =
-      rightMotor.GetConfigurator().Apply(rightConfig);
+  ctre::phoenix::StatusCode configBackResult =
+      backMotor.GetConfigurator().Apply(backConfig);
 
   frc::DataLogManager::Log(
-      fmt::format("Configured right motor on elevator. Result was: {}",
-                  configRightResult.GetName()));
+      fmt::format("Configured back motor on elevator. Result was: {}",
+                  configBackResult.GetName()));
 
-  configureRightAlert.Set(!configRightResult.IsOK());
+  configureBackAlert.Set(!configBackResult.IsOK());
 }
 
 void Elevator::SetToZeroHeight() {
   elevatorSim.SetInputVoltage(0_V);
-  leftMotorSim.SetRawRotorPosition(0_tr);
-  leftMotorSim.SetRotorVelocity(0_deg_per_s);
+  frontMotorSim.SetRawRotorPosition(0_tr);
+  frontMotorSim.SetRotorVelocity(0_deg_per_s);
 
-  rightMotorSim.SetRawRotorPosition(0_tr);
-  rightMotorSim.SetRotorVelocity(0_deg_per_s);
+  backMotorSim.SetRawRotorPosition(0_tr);
+  backMotorSim.SetRotorVelocity(0_deg_per_s);
 
   elevatorSim.SetState(0_m, 0_mps);
   GoToHeight(0_m);
