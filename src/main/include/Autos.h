@@ -23,15 +23,16 @@ class Autos {
     selectCommand = frc2::cmd::Select<AutoSelector>(
         [this] { return autoChooser.GetSelected(); },
         std::pair{NOTHING, frc2::cmd::None()},
-        std::pair{TEST_NON_MIRROR,
-                  pathplanner::PathPlannerAuto("Test").ToPtr()},
-        std::pair{TEST_MIRROR, pathplanner::PathPlannerAuto("Test").ToPtr()},
-        std::pair{TESTPP, pathplanner::PathPlannerAuto("TestPP").ToPtr()});
+        std::pair{LEFT_EDGE_TWO_CORAL,
+                  pathplanner::PathPlannerAuto("LeftEdgeTwoCoral").ToPtr()},
+        std::pair{RIGHT_EDGE_TWO_CORAL,
+                  pathplanner::PathPlannerAuto("RightEdgeTwoCoral").ToPtr()});
 
     autoChooser.SetDefaultOption("Do Nothing", AutoSelector::NOTHING);
-    autoChooser.AddOption("Test Non-Mirror", AutoSelector::TEST_NON_MIRROR);
-    autoChooser.AddOption("Test Mirror", AutoSelector::TEST_MIRROR);
-    autoChooser.AddOption("TestPP", AutoSelector::TESTPP);
+    autoChooser.AddOption("Left Edge Two Coral",
+                          AutoSelector::LEFT_EDGE_TWO_CORAL);
+    autoChooser.AddOption("Right Edge Two Coral",
+                          AutoSelector::RIGHT_EDGE_TWO_CORAL);
 
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
@@ -54,7 +55,7 @@ class Autos {
         "Score", m_manipSub.PoopPiece([] { return 1_s; }));
   }
 
-  enum AutoSelector { NOTHING, TEST_MIRROR, TESTPP, TEST_NON_MIRROR };
+  enum AutoSelector { NOTHING, LEFT_EDGE_TWO_CORAL, RIGHT_EDGE_TWO_CORAL };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 

@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "EdgeTwoCoral.0"
+                  "pathName": "RightEdgeTwoCoral.0"
                 }
               },
               {
@@ -37,7 +37,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "EdgeTwoCoral.1"
+                  "pathName": "RightEdgeTwoCoral.1"
                 }
               },
               {
@@ -68,7 +68,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "EdgeTwoCoral.2"
+                  "pathName": "RightEdgeTwoCoral.2"
                 }
               },
               {
@@ -89,7 +89,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "EdgeTwoCoral.3"
+            "pathName": "RightEdgeTwoCoral.3"
           }
         },
         {
@@ -99,7 +99,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "EdgeTwoCoral.4"
+                  "pathName": "RightEdgeTwoCoral.4"
                 }
               },
               {
