@@ -17,10 +17,10 @@ inline constexpr units::radian_t l3 = -91_deg;
 inline constexpr units::radian_t l4 = -101_deg;
 }  // namespace coral
 
-inline constexpr units::radian_t algaeHold = 150_deg;
-inline constexpr units::radian_t algaeProcess = 150_deg;
-inline constexpr units::radian_t algaeGrab = 100_deg;
-inline constexpr units::radian_t algaeNet = 100_deg;
+inline constexpr units::radian_t algaeHold = 10_deg;
+inline constexpr units::radian_t algaeProcess = -30_deg;
+inline constexpr units::radian_t algaeGrab = 45_deg;
+inline constexpr units::radian_t algaeNet = 80_deg;
 inline constexpr units::radian_t primed = 45_deg;
 inline constexpr units::radian_t outofstarting = 90_deg;
 }  // namespace wrist
