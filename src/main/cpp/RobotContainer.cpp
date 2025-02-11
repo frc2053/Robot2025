@@ -66,13 +66,13 @@ void RobotContainer::ConfigureBindings() {
   //       driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false;
   //       }), [this] { return manipSub.HasAlgae(); }));
 
-  //   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
-  //       [this] {
-  //         elevatorSub.SetVoltage(
-  //             frc::ApplyDeadband<double>(-driverJoystick.GetRightY(), .1) *
-  //             12_V);
-  //       },
-  //       {&elevatorSub}));
+  elevatorSub.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        elevatorSub.SetVoltage(
+            frc::ApplyDeadband<double>(-operatorJoystick.GetRightY(), .1) *
+            12_V);
+      },
+      {&elevatorSub}));
 
   //   pivotSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {
@@ -128,9 +128,9 @@ void RobotContainer::ConfigureSysIdBinds() {
   wheelRadiusBtn.WhileTrue(WheelRadiusSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); }));
 
-  //   elevatorSysIdVoltsBtn.WhileTrue(ElevatorVoltsSysIdCommands(
-  //       [this] { return tuningTable->GetBoolean("Forward", true); },
-  //       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+  elevatorSysIdVoltsBtn.WhileTrue(ElevatorVoltsSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 
   //   pivotSysIdVoltsBtn.WhileTrue(PivotVoltsSysIdCommands(
   //       [this] { return tuningTable->GetBoolean("Forward", true); },
@@ -140,7 +140,7 @@ void RobotContainer::ConfigureSysIdBinds() {
   //       [this] { return tuningTable->GetBoolean("Forward", true); },
   //       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 
-  //   coastElevatorBtn.WhileTrue(elevatorSub.Coast());
+  coastElevatorBtn.WhileTrue(elevatorSub.Coast());
   //   coastPivotBtn.WhileTrue(pivotSub.Coast());
 }
 
@@ -176,21 +176,21 @@ frc2::CommandPtr RobotContainer::SteerTorqueCurrentSysIdCommands(
       fwd);
 }
 
-// frc2::CommandPtr RobotContainer::ElevatorVoltsSysIdCommands(
-//     std::function<bool()> fwd, std::function<bool()> quasistatic) {
-//   return frc2::cmd::Either(
-//       frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
-//                             frc2::sysid::Direction::kForward),
-//                         elevatorSub.SysIdElevatorDynamicVoltage(
-//                             frc2::sysid::Direction::kForward),
-//                         quasistatic),
-//       frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
-//                             frc2::sysid::Direction::kReverse),
-//                         elevatorSub.SysIdElevatorDynamicVoltage(
-//                             frc2::sysid::Direction::kReverse),
-//                         quasistatic),
-//       fwd);
-// }
+frc2::CommandPtr RobotContainer::ElevatorVoltsSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
+                            frc2::sysid::Direction::kForward),
+                        elevatorSub.SysIdElevatorDynamicVoltage(
+                            frc2::sysid::Direction::kForward),
+                        quasistatic),
+      frc2::cmd::Either(elevatorSub.SysIdElevatorQuasistaticVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        elevatorSub.SysIdElevatorDynamicVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        quasistatic),
+      fwd);
+}
 
 // frc2::CommandPtr RobotContainer::PivotVoltsSysIdCommands(
 //     std::function<bool()> fwd, std::function<bool()> quasistatic) {
@@ -256,9 +256,9 @@ Drive& RobotContainer::GetDrive() {
   return driveSub;
 }
 
-// Elevator& RobotContainer::GetElevator() {
-//   return elevatorSub;
-// }
+Elevator& RobotContainer::GetElevator() {
+  return elevatorSub;
+}
 
 // Pivot& RobotContainer::GetPivot() {
 //   return pivotSub;

@@ -31,7 +31,7 @@ class RobotContainer {
 
   frc2::Command* GetAutonomousCommand();
   Drive& GetDrive();
-  // Elevator& GetElevator();
+  Elevator& GetElevator();
   // Pivot& GetPivot();
   // Manipulator& GetManipulator();
   // Coordinator& GetCoordinator();
@@ -59,11 +59,12 @@ class RobotContainer {
   frc2::Trigger NoButtonsPressed();
 
   frc2::CommandXboxController driverJoystick{0};
+  frc2::CommandXboxController operatorJoystick{1};
 
   str::SuperstructureDisplay display{};
 
   Drive driveSub{};
-  //   Elevator elevatorSub{display};
+  Elevator elevatorSub{display};
   //   Pivot pivotSub{display};
   //   Manipulator manipSub{display};
   //   AlgaeIntake algaeintakeSub{display};

@@ -72,9 +72,9 @@ class Elevator : public frc2::SubsystemBase {
       units::meters_per_second_t vel);
   void LogElevatorVolts(frc::sysid::SysIdRoutineLog* log);
   ctre::phoenix6::hardware::TalonFX frontMotor{
-      consts::elevator::can_ids::FRONT_MOTOR};
+      consts::elevator::can_ids::FRONT_MOTOR, "*"};
   ctre::phoenix6::hardware::TalonFX backMotor{
-      consts::elevator::can_ids::BACK_MOTOR};
+      consts::elevator::can_ids::BACK_MOTOR, "*"};
 
   units::meter_t currentHeight = 0_m;
   bool isAtGoalHeight = false;

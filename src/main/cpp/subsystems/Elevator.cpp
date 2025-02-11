@@ -57,9 +57,9 @@ void Elevator::Periodic() {
   pidOutput =
       elevatorPid.Calculate(GetHeight().value(), expoSetpoint.position.value());
 
-  frontMotor.SetControl(
-      elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
-          .WithEnableFOC(true));
+  //   frontMotor.SetControl(
+  //       elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+  //           .WithEnableFOC(true));
 
   isAtGoalHeight = units::math::abs(expoGoal.position - currentHeight) <
                    consts::elevator::gains::HEIGHT_TOLERANCE;
