@@ -51,17 +51,17 @@ inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
       consts::elevator::physical::GEARING) /
      1_rad) *
         (consts::elevator::physical::PULLEY_DIAM / 2.0),
-    str::gains::linear::meter_volt_ka_unit_t{0.041193 * 2},
-    str::gains::linear::meter_volt_kv_unit_t{4.4248},
-    str::gains::linear::meter_volt_ka_unit_t{0.041193},
-    str::gains::linear::meter_volt_kv_unit_t{2.2124},
-    0.015546_V,
-    str::gains::linear::meter_volt_kp_unit_t{35},
+    str::gains::linear::meter_volt_ka_unit_t{0},
+    str::gains::linear::meter_volt_kv_unit_t{0},
+    str::gains::linear::meter_volt_ka_unit_t{0},
+    str::gains::linear::meter_volt_kv_unit_t{0},
+    0_V,
+    str::gains::linear::meter_volt_kp_unit_t{0},
     str::gains::linear::meter_volt_ki_unit_t{0},
-    str::gains::linear::meter_volt_kd_unit_t{1},
+    str::gains::linear::meter_volt_kd_unit_t{0},
 };
 
-inline constexpr units::volt_t kG = 1.0884_V;
+inline constexpr units::volt_t kG = 0_V;
 
 }  // namespace gains
 }  // namespace consts::elevator
