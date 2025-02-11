@@ -105,9 +105,8 @@ void RobotContainer::ConfigureSysIdBinds() {
       driveSub.TuneSteerPID([this] { return !steerTuneBtn.Get(); }));
   driveTuneBtn.OnTrue(
       driveSub.TuneDrivePID([this] { return !driveTuneBtn.Get(); }));
-  //   elevatorTuneBtn.OnTrue(
-  //       elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get();
-  //       }));
+  elevatorTuneBtn.OnTrue(
+      elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get(); }));
   //   pivotTuneBtn.OnTrue(
   //       pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
   //   algaePivotTuneBtn.OnTrue(algaeintakeSub.TuneAlgaePivotPID(
