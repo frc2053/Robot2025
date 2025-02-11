@@ -87,14 +87,14 @@ inline constexpr units::meter_t TOTAL_LENGTH =
 
 inline constexpr units::meter_t MANIP_CENTER_OFFSET = 4.5_in;
 
-inline constexpr units::degree_t IMU_MOUNT_ROLL = 0_deg;
-inline constexpr units::degree_t IMU_MOUNT_PITCH = 0_deg;
-inline constexpr units::degree_t IMU_MOUNT_YAW = 0_deg;
+inline constexpr units::degree_t IMU_MOUNT_ROLL = -0.3409_deg;
+inline constexpr units::degree_t IMU_MOUNT_PITCH = 0.3149_deg;
+inline constexpr units::degree_t IMU_MOUNT_YAW = 0.0131_deg;
 
-inline constexpr units::turn_t FL_ENC_OFFSET = -0.272949_tr;
-inline constexpr units::turn_t FR_ENC_OFFSET = 0.356201_tr;
-inline constexpr units::turn_t BL_ENC_OFFSET = .195068_tr;
-inline constexpr units::turn_t BR_ENC_OFFSET = -0.492676_tr;
+inline constexpr units::turn_t FL_ENC_OFFSET = 0.296875_tr;
+inline constexpr units::turn_t FR_ENC_OFFSET = -0.046387_tr;
+inline constexpr units::turn_t BL_ENC_OFFSET = -0.396973_tr;
+inline constexpr units::turn_t BR_ENC_OFFSET = 0.124512_tr;
 
 inline constexpr bool FL_STEER_INVERT = true;
 inline constexpr bool FR_STEER_INVERT = true;
@@ -157,17 +157,17 @@ inline constexpr units::meters_per_second_squared_t MAX_ACCEL = 2000_fps_sq;
 }  // namespace physical
 
 namespace gains {
-inline const str::gains::radial::AmpRadialGainsHolder STEER{
+inline const str::gains::radial::VoltRadialGainsHolder STEER{
     consts::swerve::physical::STEER_MOTOR.freeSpeed /
         consts::swerve::physical::STEER_GEARING,
-    str::gains::radial::turn_volt_ka_unit_t{0.017218},
-    str::gains::radial::turn_volt_kv_unit_t{0},
-    str::gains::radial::turn_amp_ka_unit_t{0.70949},
-    str::gains::radial::turn_amp_kv_unit_t{0},
-    9.7875_A,
-    str::gains::radial::turn_amp_kp_unit_t{250},
-    str::gains::radial::turn_amp_ki_unit_t{0},
-    str::gains::radial::turn_amp_kd_unit_t{40},
+    str::gains::radial::turn_volt_ka_unit_t{0.085024},
+    str::gains::radial::turn_volt_kv_unit_t{2.5028},
+    str::gains::radial::turn_volt_ka_unit_t{0.085024},
+    str::gains::radial::turn_volt_kv_unit_t{2.5028},
+    0.21176_V,
+    str::gains::radial::turn_volt_kp_unit_t{45.01},
+    str::gains::radial::turn_volt_ki_unit_t{0},
+    str::gains::radial::turn_volt_kd_unit_t{2.6793},
 };
 
 inline const str::swerve::DriveGains DRIVE{

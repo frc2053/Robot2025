@@ -347,24 +347,24 @@ frc2::CommandPtr Drive::TuneSteerPID(std::function<bool()> isDone) {
           {this}),
       frc2::cmd::Run(
           [this, tablePrefix] {
-            str::gains::radial::AmpRadialGainsHolder newGains{
+            str::gains::radial::VoltRadialGainsHolder newGains{
                 units::turns_per_second_t{frc::SmartDashboard::GetNumber(
                     tablePrefix + "mmCruiseVel", 0)},
                 str::gains::radial::turn_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
                 str::gains::radial::turn_volt_kv_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
-                str::gains::radial::turn_amp_ka_unit_t{
+                str::gains::radial::turn_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
-                str::gains::radial::turn_amp_kv_unit_t{
+                str::gains::radial::turn_volt_kv_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
-                units::ampere_t{
+                units::volt_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
-                str::gains::radial::turn_amp_kp_unit_t{
+                str::gains::radial::turn_volt_kp_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
-                str::gains::radial::turn_amp_ki_unit_t{
+                str::gains::radial::turn_volt_ki_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
-                str::gains::radial::turn_amp_kd_unit_t{
+                str::gains::radial::turn_volt_kd_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
 
             if (newGains != swerveDrive.GetSteerGains()) {
