@@ -32,7 +32,9 @@ namespace physical {
 inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(2);
 inline constexpr bool INVERT_FRONT = true;
 
-inline constexpr units::meter_t PULLEY_DIAM = 1.7566685458330675_in;
+inline constexpr units::scalar_t PULLEY_FUDGE_FACTOR = 1.0;
+inline constexpr units::meter_t PULLEY_DIAM =
+    1.7566685458330675_in * PULLEY_FUDGE_FACTOR;
 inline constexpr int NUM_OF_STAGES = 3;
 inline constexpr units::scalar_t GEARING =
     (3.0 / 1.0) * (44.0 / 16.0) * (32.0 / 14.0);
