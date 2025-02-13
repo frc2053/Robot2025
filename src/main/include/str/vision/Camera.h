@@ -33,11 +33,12 @@ class Camera {
  public:
   Camera(std::string cameraName, frc::Transform3d robotToCamera,
          Eigen::Matrix<double, 3, 1> singleTagStdDev,
-         Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate);
+         Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate,
+         std::function<void(const frc::Pose2d&, units::second_t,
+                            const Eigen::Vector3d& stdDevs)>
+             visionConsumer);
   void SimPeriodic(frc::Pose2d robotSimPose);
-  std::optional<photon::EstimatedRobotPose> GetEstimatedGlobalPose(
-      frc::Pose3d robotPose);
-  Eigen::Matrix<double, 3, 1> GetEstimationStdDevs(frc::Pose2d estimatedPose);
+  void UpdatePoseEstimator(frc::Pose3d robotPose);
   std::optional<photon::EstimatedRobotPose> ImuTagOnRio(
       photon::PhotonPipelineResult result);
   void AddYaw(units::radian_t yaw, units::second_t time) {
@@ -48,7 +49,12 @@ class Camera {
   }
 
  private:
+  Eigen::Matrix<double, 3, 1> GetEstimationStdDevs(frc::Pose2d estimatedPose);
+
   bool simulate;
+  std::function<void(const frc::Pose2d&, units::second_t,
+                     const Eigen::Vector3d& stdDevs)>
+      consumer;
   std::unique_ptr<photon::PhotonPoseEstimator> photonEstimator;
   std::unique_ptr<photon::PhotonCamera> camera;
   std::unique_ptr<photon::VisionSystemSim> visionSim;
@@ -83,6 +89,7 @@ class Camera {
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Vision")};
   nt::StructPublisher<frc::Pose2d> posePub;
+  nt::StructPublisher<frc::Pose2d> singleTagPosePub;
   nt::DoublePublisher stdDevXPosePub;
   nt::DoublePublisher stdDevYPosePub;
   nt::DoublePublisher stdDevRotPosePub;

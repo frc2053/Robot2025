@@ -49,42 +49,16 @@ void Robot::RobotPeriodic() {
 }
 
 void Robot::SimulationPeriodic() {
-  // m_container.GetVision().SimulationPeriodic(
-  //     m_container.GetDrive().GetOdomPose());
+  m_container.GetVision().SimulationPeriodic(
+      m_container.GetDrive().GetOdomPose());
 }
 
 void Robot::UpdateVision() {
-  // m_container.GetVision().UpdateYaws(m_container.GetDrive().GetGyroYaw(),
-  //                                    frc::Timer::GetFPGATimestamp());
-  // auto visionEstimates = m_container.GetVision().GetCameraEstimatedPoses(
-  //     frc::Pose3d{m_container.GetDrive().GetRobotPose()});
-
-  // auto stdDevs = m_container.GetVision().GetPoseStdDevs(visionEstimates);
-
-  // frc::Pose3d pose = frc::Pose3d{m_container.GetDrive().GetRobotPose()};
-
-  // m_container.GetVision().UpdateCameraPositionVis(pose);
-
-  // int i = 0;
-  // for (const auto& est : visionEstimates) {
-  //   if (est.has_value()) {
-  //     // TRICKING PHOTON STRATS
-  //     // WE ONLY WANT SINGLE TAG RESULTS TO BE ADDED IF THEY ARE OUR TRIG
-  //     METHOD if (est->targetsUsed.size() == 1) {
-  //       if (est->strategy == photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT)
-  //       {
-  //         m_container.GetDrive().AddVisionMeasurement(
-  //             est.value().estimatedPose.ToPose2d(), est.value().timestamp,
-  //             stdDevs[i].value());
-  //       }
-  //     } else {
-  //       m_container.GetDrive().AddVisionMeasurement(
-  //           est.value().estimatedPose.ToPose2d(), est.value().timestamp,
-  //           stdDevs[i].value());
-  //     }
-  //   }
-  //   i++;
-  // }
+  auto robotPose = frc::Pose3d{m_container.GetDrive().GetRobotPose()};
+  m_container.GetVision().UpdateYaws(m_container.GetDrive().GetGyroYaw(),
+                                     frc::Timer::GetFPGATimestamp());
+  m_container.GetVision().UpdatePoseEstimators(robotPose);
+  m_container.GetVision().UpdateCameraPositionVis(robotPose);
 }
 
 void Robot::DisabledInit() {

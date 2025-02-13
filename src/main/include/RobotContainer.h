@@ -35,7 +35,7 @@ class RobotContainer {
   // Pivot& GetPivot();
   // Manipulator& GetManipulator();
   // Coordinator& GetCoordinator();
-  // str::vision::VisionSystem& GetVision();
+  str::vision::VisionSystem& GetVision();
   // AlgaeIntake& GetAlgaeIntake();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
@@ -70,7 +70,11 @@ class RobotContainer {
   //   AlgaeIntake algaeintakeSub{display};
   //   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
-  // str::vision::VisionSystem vision;
+  str::vision::VisionSystem vision{[this](const frc::Pose2d& pose,
+                                          units::second_t time,
+                                          const Eigen::Vector3d& stdDevs) {
+    driveSub.AddVisionMeasurement(pose, time, stdDevs);
+  }};
 
   // Autos autos{driveSub, coordinator, manipSub};
 

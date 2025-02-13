@@ -271,9 +271,9 @@ Elevator& RobotContainer::GetElevator() {
 //   return algaeintakeSub;
 // }
 
-// str::vision::VisionSystem& RobotContainer::GetVision() {
-//   return vision;
-// }
+str::vision::VisionSystem& RobotContainer::GetVision() {
+  return vision;
+}
 
 str::SuperstructureDisplay& RobotContainer::GetSuperStructureDisplay() {
   return display;

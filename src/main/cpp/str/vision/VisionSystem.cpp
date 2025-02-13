@@ -7,8 +7,27 @@
 #include <frc/geometry/Pose2d.h>
 
 #include <vector>
+#include "constants/VisionConstants.h"
 
 using namespace str::vision;
+
+VisionSystem::VisionSystem(
+    std::function<void(const frc::Pose2d&, units::second_t,
+                       const Eigen::Vector3d& stdDevs)>
+        visionConsumer)
+    : cameras{
+          Camera{consts::vision::FL_CAM_NAME, consts::vision::FL_ROBOT_TO_CAM,
+                 consts::vision::SINGLE_TAG_STD_DEV,
+                 consts::vision::MULTI_TAG_STD_DEV, true, visionConsumer},
+          Camera{consts::vision::FR_CAM_NAME, consts::vision::FR_ROBOT_TO_CAM,
+                 consts::vision::SINGLE_TAG_STD_DEV,
+                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer},
+          Camera{consts::vision::BL_CAM_NAME, consts::vision::BL_ROBOT_TO_CAM,
+                 consts::vision::SINGLE_TAG_STD_DEV,
+                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer},
+          Camera{consts::vision::BR_CAM_NAME, consts::vision::BR_ROBOT_TO_CAM,
+                 consts::vision::SINGLE_TAG_STD_DEV,
+                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer}} {}
 
 void VisionSystem::UpdateCameraPositionVis(frc::Pose3d robotPose) {
   cameraLocations[0] = robotPose.TransformBy(consts::vision::FL_ROBOT_TO_CAM);
@@ -19,32 +38,10 @@ void VisionSystem::UpdateCameraPositionVis(frc::Pose3d robotPose) {
   cameraLocationsPub.Set(cameraLocations);
 }
 
-std::vector<std::optional<Eigen::Matrix<double, 3, 1>>>
-VisionSystem::GetPoseStdDevs(
-    const std::vector<std::optional<photon::EstimatedRobotPose>>& poses) {
-  std::vector<std::optional<Eigen::Matrix<double, 3, 1>>> allStdDevs;
-  int i = 0;
+void VisionSystem::UpdatePoseEstimators(frc::Pose3d robotPose) {
   for (auto& cam : cameras) {
-    if (poses[i].has_value()) {
-      auto stddev =
-          cam.GetEstimationStdDevs(poses[i].value().estimatedPose.ToPose2d());
-      allStdDevs.push_back(stddev);
-    } else {
-      allStdDevs.push_back(std::nullopt);
-    }
-    i++;
+    cam.UpdatePoseEstimator(robotPose);
   }
-  return allStdDevs;
-}
-
-std::vector<std::optional<photon::EstimatedRobotPose>>
-VisionSystem::GetCameraEstimatedPoses(frc::Pose3d robotPose) {
-  std::vector<std::optional<photon::EstimatedRobotPose>> allPoses;
-  for (auto& cam : cameras) {
-    allPoses.push_back(cam.GetEstimatedGlobalPose(robotPose));
-    allPoses.push_back(cam.LatestSingleTagPose());
-  }
-  return allPoses;
 }
 
 void VisionSystem::SimulationPeriodic(frc::Pose2d simRobotPose) {
