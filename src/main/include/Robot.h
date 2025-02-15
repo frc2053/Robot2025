@@ -37,7 +37,7 @@ class Robot : public frc::TimedRobot {
   frc2::Command* m_autonomousCommand = nullptr;
 
   RobotContainer m_container;
-  frc::PowerDistribution pdp{0, frc::PowerDistribution::ModuleType::kRev};
+  frc::PowerDistribution pdp{1, frc::PowerDistribution::ModuleType::kRev};
 
   units::second_t lastTotalLoopTime;
   nt::DoublePublisher loopTimePub{nt::NetworkTableInstance::GetDefault()
