@@ -15,7 +15,8 @@
 
 namespace consts::yearspecific {
 inline const frc::AprilTagFieldLayout TAG_LAYOUT =
-    frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025Reefscape);
+    frc::AprilTagFieldLayout::LoadField(
+        frc::AprilTagField::k2025ReefscapeWelded);
 // inline const frc::AprilTag singleTagTesting{
 //     19,
 //     frc::Pose3d{frc::Translation3d{4.073905999999999_m, 4.745482_m,

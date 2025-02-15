@@ -176,7 +176,7 @@ class SuperstructureDisplay {
       TOTAL_SCREEN_WIDTH / 2;
   inline static constexpr units::meter_t MIDDLE_OF_CARRIAGE =
       MIDDLE_OF_SWERVE - 4_in;
-  inline static constexpr units::meter_t LOWEST_CARRIAGE_HEIGHT = 9.875000_in;
+  inline static constexpr units::meter_t LOWEST_CARRIAGE_HEIGHT = 9.5000_in;
 
   inline static constexpr units::meter_t ALGAE_INTAKE =
       MIDDLE_OF_SWERVE + 12_in;
