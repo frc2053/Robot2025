@@ -18,12 +18,12 @@
 #include "frc2/command/button/Trigger.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
+#include "subsystems/AlgaeIntake.h"
 #include "subsystems/Coordinator.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
 #include "subsystems/Manipulator.h"
 #include "subsystems/Pivot.h"
-#include "subsystems/AlgaeIntake.h"
 
 class RobotContainer {
  public:
@@ -32,11 +32,11 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
   Drive& GetDrive();
   Elevator& GetElevator();
-  Pivot& GetPivot();
-  Manipulator& GetManipulator();
-  Coordinator& GetCoordinator();
+  // Pivot& GetPivot();
+  // Manipulator& GetManipulator();
+  // Coordinator& GetCoordinator();
   str::vision::VisionSystem& GetVision();
-  AlgaeIntake& GetAlgaeIntake();
+  // AlgaeIntake& GetAlgaeIntake();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
  private:
@@ -59,19 +59,24 @@ class RobotContainer {
   frc2::Trigger NoButtonsPressed();
 
   frc2::CommandXboxController driverJoystick{0};
+  frc2::CommandXboxController operatorJoystick{1};
 
   str::SuperstructureDisplay display{};
 
   Drive driveSub{};
   Elevator elevatorSub{display};
-  Pivot pivotSub{display};
-  Manipulator manipSub{display};
-  AlgaeIntake algaeintakeSub{display};
-  Coordinator coordinator{elevatorSub, pivotSub, manipSub};
+  //   Pivot pivotSub{display};
+  //   Manipulator manipSub{display};
+  //   AlgaeIntake algaeintakeSub{display};
+  //   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
-  str::vision::VisionSystem vision;
+  str::vision::VisionSystem vision{[this](const frc::Pose2d& pose,
+                                          units::second_t time,
+                                          const Eigen::Vector3d& stdDevs) {
+    driveSub.AddVisionMeasurement(pose, time, stdDevs);
+  }};
 
-  Autos autos{driveSub, coordinator, manipSub};
+  // Autos autos{driveSub, coordinator, manipSub};
 
   std::shared_ptr<nt::NetworkTable> tuningTable{
       nt::NetworkTableInstance::GetDefault().GetTable("Tuning")};

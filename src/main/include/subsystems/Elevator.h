@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc/controller/ElevatorFeedforward.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <memory>
@@ -37,7 +38,6 @@
 #include "units/length.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
-#include <frc/controller/ElevatorFeedforward.h>
 
 class Elevator : public frc2::SubsystemBase {
  public:
@@ -71,36 +71,36 @@ class Elevator : public frc2::SubsystemBase {
   units::turns_per_second_t ConvertHeightVelToEncVel(
       units::meters_per_second_t vel);
   void LogElevatorVolts(frc::sysid::SysIdRoutineLog* log);
-  ctre::phoenix6::hardware::TalonFX leftMotor{
-      consts::elevator::can_ids::LEFT_MOTOR};
-  ctre::phoenix6::hardware::TalonFX rightMotor{
-      consts::elevator::can_ids::RIGHT_MOTOR};
+  ctre::phoenix6::hardware::TalonFX frontMotor{
+      consts::elevator::can_ids::FRONT_MOTOR, "*"};
+  ctre::phoenix6::hardware::TalonFX backMotor{
+      consts::elevator::can_ids::BACK_MOTOR, "*"};
 
   units::meter_t currentHeight = 0_m;
   bool isAtGoalHeight = false;
 
-  ctre::phoenix6::sim::TalonFXSimState& leftMotorSim = leftMotor.GetSimState();
-  ctre::phoenix6::sim::TalonFXSimState& rightMotorSim =
-      rightMotor.GetSimState();
+  ctre::phoenix6::sim::TalonFXSimState& frontMotorSim =
+      frontMotor.GetSimState();
+  ctre::phoenix6::sim::TalonFXSimState& backMotorSim = backMotor.GetSimState();
 
-  ctre::phoenix6::StatusSignal<units::turn_t> leftPositionSig =
-      leftMotor.GetPosition();
-  ctre::phoenix6::StatusSignal<units::turns_per_second_t> leftVelocitySig =
-      leftMotor.GetVelocity();
-  ctre::phoenix6::StatusSignal<units::volt_t> leftVoltageSig =
-      leftMotor.GetMotorVoltage();
+  ctre::phoenix6::StatusSignal<units::turn_t> frontPositionSig =
+      frontMotor.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> frontVelocitySig =
+      frontMotor.GetVelocity();
+  ctre::phoenix6::StatusSignal<units::volt_t> frontVoltageSig =
+      frontMotor.GetMotorVoltage();
 
-  ctre::phoenix6::StatusSignal<units::turn_t> rightPositionSig =
-      rightMotor.GetPosition();
-  ctre::phoenix6::StatusSignal<units::turns_per_second_t> rightVelocitySig =
-      rightMotor.GetVelocity();
-  ctre::phoenix6::StatusSignal<units::volt_t> rightVoltageSig =
-      rightMotor.GetMotorVoltage();
+  ctre::phoenix6::StatusSignal<units::turn_t> backPositionSig =
+      backMotor.GetPosition();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_t> backVelocitySig =
+      backMotor.GetVelocity();
+  ctre::phoenix6::StatusSignal<units::volt_t> backVoltageSig =
+      backMotor.GetMotorVoltage();
 
   ctre::phoenix6::controls::VoltageOut elevatorVoltageSetter{0_V};
   ctre::phoenix6::controls::CoastOut coastSetter{};
   ctre::phoenix6::controls::Follower followerSetter{
-      consts::elevator::can_ids::LEFT_MOTOR, true};
+      consts::elevator::can_ids::FRONT_MOTOR, false};
 
   str::gains::linear::VoltLinearGainsHolder currentGains{
       consts::elevator::gains::ELEVATOR_GAINS};
@@ -152,14 +152,14 @@ class Elevator : public frc2::SubsystemBase {
   nt::BooleanPublisher isAtSetpointPub{
       nt->GetBooleanTopic("IsAtRequestedHeight").Publish()};
   str::SuperstructureDisplay& display;
-  std::string leftAlertMsg{"Elevator Left Motor Config"};
-  std::string rightAlertMsg{"Elevator Right Motor Config"};
-  frc::Alert configureLeftAlert{leftAlertMsg, frc::Alert::AlertType::kError};
-  frc::Alert configureRightAlert{rightAlertMsg, frc::Alert::AlertType::kError};
-  std::string leftOptiAlertMsg{"Elevator Left Bus Optimization"};
-  std::string rightOptiAlertMsg{"Elevator Right Bus Optimization"};
-  frc::Alert optiLeftAlert{leftOptiAlertMsg, frc::Alert::AlertType::kError};
-  frc::Alert optiRightAlert{rightOptiAlertMsg, frc::Alert::AlertType::kError};
+  std::string frontAlertMsg{"Elevator Front Motor Config"};
+  std::string backAlertMsg{"Elevator Back Motor Config"};
+  frc::Alert configureFrontAlert{frontAlertMsg, frc::Alert::AlertType::kError};
+  frc::Alert configureBackAlert{backAlertMsg, frc::Alert::AlertType::kError};
+  std::string frontOptiAlertMsg{"Elevator Front Bus Optimization"};
+  std::string backOptiAlertMsg{"Elevator Back Bus Optimization"};
+  frc::Alert optiFrontAlert{frontOptiAlertMsg, frc::Alert::AlertType::kError};
+  frc::Alert optiBackAlert{backOptiAlertMsg, frc::Alert::AlertType::kError};
   std::string signalFrequencyAlertStr{"Elevator Signal Frequency Set"};
   frc::Alert signalFrequencyAlert{signalFrequencyAlertStr,
                                   frc::Alert::AlertType::kError};

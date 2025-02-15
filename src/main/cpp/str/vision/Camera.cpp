@@ -7,7 +7,6 @@
 #include <frc/DataLogManager.h>
 #include <frc/RobotBase.h>
 
-#include <algorithm>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -15,7 +14,6 @@
 #include <vector>
 
 #include "constants/Constants.h"
-#include "constants/VisionConstants.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -24,14 +22,10 @@
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
-#include "frc/smartdashboard/SmartDashboard.h"
 #include "opencv2/core/types.hpp"
 #include "photon/PhotonPoseEstimator.h"
-#include "photon/estimation/TargetModel.h"
-#include "photon/simulation/VisionTargetSim.h"
 #include "photon/targeting/PhotonTrackedTarget.h"
 #include "photon/targeting/TargetCorner.h"
-#include "photon/PhotonUtils.h"
 #include "units/angle.h"
 #include "units/length.h"
 
@@ -39,13 +33,20 @@ using namespace str::vision;
 
 Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
                Eigen::Matrix<double, 3, 1> singleTagStdDev,
-               Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate)
+               Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate,
+               std::function<void(const frc::Pose2d&, units::second_t,
+                                  const Eigen::Vector3d& stdDevs)>
+                   visionConsumer)
     : simulate(simulate),
+      consumer(visionConsumer),
       robotToCam(robotToCamera),
       singleTagDevs(singleTagStdDev),
       multiTagDevs(multiTagDevs),
       posePub(nt->GetStructTopic<frc::Pose2d>(cameraName + "PoseEstimation")
                   .Publish()),
+      singleTagPosePub(
+          nt->GetStructTopic<frc::Pose2d>(cameraName + "SingleTagPose")
+              .Publish()),
       stdDevXPosePub(nt->GetDoubleTopic(cameraName + "StdDevsX").Publish()),
       stdDevYPosePub(nt->GetDoubleTopic(cameraName + "StdDevsY").Publish()),
       stdDevRotPosePub(nt->GetDoubleTopic(cameraName + "StdDevsRot").Publish()),
@@ -85,8 +86,7 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
   }
 }
 
-std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose(
-    frc::Pose3d robotPose) {
+void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
   std::optional<photon::EstimatedRobotPose> visionEst;
 
   auto allUnread = camera->GetAllUnreadResults();
@@ -118,8 +118,26 @@ std::optional<photon::EstimatedRobotPose> Camera::GetEstimatedGlobalPose(
     }
     targetPosesPub.Set(targetPoses);
     cornersPub.Set(cornerPxs);
+
+    // TRICKING PHOTON STRATS
+    // WE ONLY WANT SINGLE TAG RESULTS TO BE ADDED IF THEY ARE OUR TRIG
+    if (result.targets.size() == 1) {
+      if (singleTagPose->strategy ==
+          photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT) {
+        if (singleTagPose.has_value()) {
+          singleTagPosePub.Set(singleTagPose->estimatedPose.ToPose2d());
+          consumer(
+              singleTagPose->estimatedPose.ToPose2d(), singleTagPose->timestamp,
+              GetEstimationStdDevs(singleTagPose->estimatedPose.ToPose2d()));
+        }
+      }
+    } else {
+      if (visionEst.has_value()) {
+        consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
+                 GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
+      }
+    }
   }
-  return visionEst;
 }
 
 std::optional<photon::EstimatedRobotPose> Camera::ImuTagOnRio(

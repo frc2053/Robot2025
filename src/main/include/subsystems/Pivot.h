@@ -13,13 +13,13 @@
 
 #include "constants/PivotConstants.h"
 #include "ctre/phoenix6/CANcoder.hpp"
-#include "frc/controller/ArmFeedforward.h"
-#include "frc/controller/PIDController.h"
-#include "frc/sysid/SysIdRoutineLog.h"
-#include "frc/trajectory/ExponentialProfile.h"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
+#include "frc/controller/ArmFeedforward.h"
+#include "frc/controller/PIDController.h"
 #include "frc/simulation/SingleJointedArmSim.h"
+#include "frc/sysid/SysIdRoutineLog.h"
+#include "frc/trajectory/ExponentialProfile.h"
 #include "frc/trajectory/TrapezoidProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
@@ -31,8 +31,8 @@
 #include "str/GainTypes.h"
 #include "str/SuperstructureDisplay.h"
 #include "units/angle.h"
-#include "units/angular_velocity.h"
 #include "units/angular_acceleration.h"
+#include "units/angular_velocity.h"
 #include "units/voltage.h"
 
 class Pivot : public frc2::SubsystemBase {

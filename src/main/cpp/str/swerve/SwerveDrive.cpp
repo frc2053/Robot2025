@@ -345,12 +345,12 @@ std::array<units::ampere_t, 4> SwerveDrive::ConvertModuleForcesToTorqueCurrent(
   return retVal;
 }
 
-str::gains::radial::AmpRadialGainsHolder SwerveDrive::GetSteerGains() const {
+str::gains::radial::VoltRadialGainsHolder SwerveDrive::GetSteerGains() const {
   return modules[0].GetSteerGains();
 }
 
 void SwerveDrive::SetSteerGains(
-    str::gains::radial::AmpRadialGainsHolder newGains) {
+    str::gains::radial::VoltRadialGainsHolder newGains) {
   for (int i = 0; i < 4; i++) {
     modules[i].SetSteerGains(newGains);
   }
