@@ -73,7 +73,7 @@ void Robot::DisabledPeriodic() {
 void Robot::DisabledExit() {}
 
 void Robot::AutonomousInit() {
-  // m_container.GetManipulator().OverrideHasCoral(true);
+  m_container.GetManipulator().OverrideHasCoral(true);
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand != nullptr) {

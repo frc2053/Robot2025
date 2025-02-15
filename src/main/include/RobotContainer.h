@@ -33,8 +33,8 @@ class RobotContainer {
   Drive& GetDrive();
   Elevator& GetElevator();
   Pivot& GetPivot();
-  // Manipulator& GetManipulator();
-  // Coordinator& GetCoordinator();
+  Manipulator& GetManipulator();
+  Coordinator& GetCoordinator();
   str::vision::VisionSystem& GetVision();
   // AlgaeIntake& GetAlgaeIntake();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
@@ -66,9 +66,9 @@ class RobotContainer {
   Drive driveSub{};
   Elevator elevatorSub{display};
   Pivot pivotSub{display};
-  //   Manipulator manipSub{display};
+  Manipulator manipSub{display};
   //   AlgaeIntake algaeintakeSub{display};
-  //   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
+  Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
   str::vision::VisionSystem vision{[this](const frc::Pose2d& pose,
                                           units::second_t time,
@@ -76,7 +76,7 @@ class RobotContainer {
     driveSub.AddVisionMeasurement(pose, time, stdDevs);
   }};
 
-  // Autos autos{driveSub, coordinator, manipSub};
+  Autos autos{driveSub, coordinator, manipSub};
 
   std::shared_ptr<nt::NetworkTable> tuningTable{
       nt::NetworkTableInstance::GetDefault().GetTable("Tuning")};
