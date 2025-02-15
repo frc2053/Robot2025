@@ -53,11 +53,11 @@ void Pivot::Periodic() {
   pidOutput =
       pivotPid.Calculate(GetAngle().value(), expoSetpoint.position.value());
 
-  if (!isCharacterizing) {
-    pivotMotor.SetControl(
-        pivotVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
-            .WithEnableFOC(true));
-  }
+  // if (!isCharacterizing) {
+  //   pivotMotor.SetControl(
+  //       pivotVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+  //           .WithEnableFOC(true));
+  // }
 
   isAtGoalAngle = units::math::abs(expoGoal.position - currentAngle) <
                   consts::pivot::gains::ANGLE_TOLERANCE;

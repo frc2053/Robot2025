@@ -32,7 +32,7 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
   Drive& GetDrive();
   Elevator& GetElevator();
-  // Pivot& GetPivot();
+  Pivot& GetPivot();
   // Manipulator& GetManipulator();
   // Coordinator& GetCoordinator();
   str::vision::VisionSystem& GetVision();
@@ -65,7 +65,7 @@ class RobotContainer {
 
   Drive driveSub{};
   Elevator elevatorSub{display};
-  //   Pivot pivotSub{display};
+  Pivot pivotSub{display};
   //   Manipulator manipSub{display};
   //   AlgaeIntake algaeintakeSub{display};
   //   Coordinator coordinator{elevatorSub, pivotSub, manipSub};

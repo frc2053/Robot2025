@@ -74,13 +74,13 @@ void RobotContainer::ConfigureBindings() {
       },
       {&elevatorSub}));
 
-  //   pivotSub.SetDefaultCommand(frc2::cmd::Run(
-  //       [this] {
-  //         pivotSub.SetVoltage(
-  //             frc::ApplyDeadband<double>(-driverJoystick.GetRightX(), .1) *
-  //             12_V);
-  //       },
-  //       {&pivotSub}));
+  pivotSub.SetDefaultCommand(frc2::cmd::Run(
+      [this] {
+        pivotSub.SetVoltage(
+            frc::ApplyDeadband<double>(-operatorJoystick.GetRightX(), .1) *
+            12_V);
+      },
+      {&pivotSub}));
 }
 
 void RobotContainer::ConfigureSysIdBinds() {
@@ -259,9 +259,9 @@ Elevator& RobotContainer::GetElevator() {
   return elevatorSub;
 }
 
-// Pivot& RobotContainer::GetPivot() {
-//   return pivotSub;
-// }
+Pivot& RobotContainer::GetPivot() {
+  return pivotSub;
+}
 
 // Manipulator& RobotContainer::GetManipulator() {
 //   return manipSub;
