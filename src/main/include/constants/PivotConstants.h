@@ -45,6 +45,8 @@ inline constexpr units::radian_t MIN_ANGLE = -270_deg;
 inline constexpr units::radian_t MAX_ANGLE = 270_deg;
 
 inline constexpr units::turn_t ENCODER_OFFSET = .32_tr;
+inline constexpr units::turn_t SOFT_LIMIT_REV = -90_deg;
+inline constexpr units::turn_t SOFT_LIMIT_FWD = 180_deg;
 
 inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 90_deg;
 }  // namespace physical

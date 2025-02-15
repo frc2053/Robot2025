@@ -351,6 +351,13 @@ void Pivot::ConfigureMotors() {
   config.Feedback.SensorToMechanismRatio = 1.0;
   config.Feedback.RotorToSensorRatio = consts::pivot::physical::GEARING;
 
+  config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+  config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+  config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+      consts::pivot::physical::SOFT_LIMIT_FWD;
+  config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+      consts::pivot::physical::SOFT_LIMIT_REV;
+
   ctre::phoenix::StatusCode configPivotResult =
       pivotMotor.GetConfigurator().Apply(config);
 
