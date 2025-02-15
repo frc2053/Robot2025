@@ -30,6 +30,7 @@ Robot::Robot() {
   wpi::WebServer::GetInstance().Start(5800,
                                       frc::filesystem::GetDeployDirectory());
   m_container.GetSuperStructureDisplay().Draw();
+  pdp.ClearStickyFaults();
 }
 
 void Robot::RobotPeriodic() {
