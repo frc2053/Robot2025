@@ -301,7 +301,7 @@ void Pivot::SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
 void Pivot::ConfigureMotors() {
   ctre::phoenix6::configs::CANcoderConfiguration encoderCfg{};
 
-  encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1_tr;
+  encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
 
   encoderCfg.MagnetSensor.SensorDirection =
       ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;

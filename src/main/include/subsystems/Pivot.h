@@ -13,6 +13,7 @@
 
 #include "constants/PivotConstants.h"
 #include "ctre/phoenix6/CANcoder.hpp"
+#include "ctre/phoenix6/SignalLogger.hpp"
 #include "ctre/phoenix6/sim/CANcoderSimState.hpp"
 #include "frc/Alert.h"
 #include "frc/controller/ArmFeedforward.h"
@@ -123,6 +124,9 @@ class Pivot : public frc2::SubsystemBase {
       frc2::sysid::Config{
           (1_V / 1_s), 5_V, std::nullopt,
           [this](frc::sysid::State state) {
+            ctre::phoenix6::SignalLogger::WriteString(
+                "SysIdPivot-State",
+                frc::sysid::SysIdRoutineLog::StateEnumToString(state));
             pivotSysIdStatePub.Set(
                 frc::sysid::SysIdRoutineLog::StateEnumToString(state));
           }},
