@@ -152,7 +152,7 @@ inline constexpr units::meters_per_second_t DRIVE_MAX_SPEED =
 inline constexpr units::radians_per_second_t MAX_ROT_SPEED = 540_deg_per_s;
 inline constexpr units::radians_per_second_squared_t MAX_ROT_ACCEL =
     720_deg_per_s_sq;
-inline constexpr units::meters_per_second_squared_t MAX_ACCEL = 2000_fps_sq;
+inline constexpr units::meters_per_second_squared_t MAX_ACCEL = 10_fps_sq;
 
 }  // namespace physical
 

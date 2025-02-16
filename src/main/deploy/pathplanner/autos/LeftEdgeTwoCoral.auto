@@ -11,20 +11,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftEdgeTwoCoral.0"
+                  "pathName": "MiddleToKL.0"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "GetOutOfStarting"
-                      }
-                    }
-                  ]
+                  "name": "GetOutOfStarting"
                 }
               }
             ]
@@ -35,9 +28,9 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "LeftEdgeTwoCoral.1"
+                  "name": "DriveToLeftReef"
                 }
               },
               {
@@ -68,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftEdgeTwoCoral.2"
+                  "pathName": "KToLSB.0"
                 }
               },
               {
@@ -89,7 +82,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftEdgeTwoCoral.3"
+            "pathName": "LSBToApproach.0"
           }
         },
         {
@@ -97,9 +90,9 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "LeftEdgeTwoCoral.4"
+                  "name": "DriveToRightReef"
                 }
               },
               {

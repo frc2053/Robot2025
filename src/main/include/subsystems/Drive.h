@@ -17,6 +17,7 @@
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "frc/geometry/Pose2d.h"
 #include "frc2/command/CommandPtr.h"
+#include "networktables/BooleanTopic.h"
 #include "str/swerve/SwerveDrive.h"
 #include "str/swerve/SwerveModuleHelpers.h"
 #include "units/angle.h"
@@ -99,6 +100,8 @@ class Drive : public frc2::SubsystemBase {
       nt::NetworkTableInstance::GetDefault().GetTable("Swerve")};
   nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{
       nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
+  nt::BooleanPublisher isAtGoalPosePub{
+      nt->GetBooleanTopic("PIDToPoseIsAtGoal").Publish()};
 
   str::swerve::WheelRadiusCharData wheelRadiusData{};
 
