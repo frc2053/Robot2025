@@ -44,7 +44,7 @@ inline constexpr units::meter_t ARM_LENGTH = 4.37480954214_in;
 inline constexpr units::radian_t MIN_ANGLE = -270_deg;
 inline constexpr units::radian_t MAX_ANGLE = 270_deg;
 
-inline constexpr units::turn_t ENCODER_OFFSET = .32_tr;
+inline constexpr units::turn_t ENCODER_OFFSET = -0.295654_tr;
 inline constexpr units::turn_t SOFT_LIMIT_REV = -150_deg;
 inline constexpr units::turn_t SOFT_LIMIT_FWD = 180_deg;
 
@@ -60,17 +60,17 @@ inline constexpr units::turns_per_second_t INTERMEDIATE_STATE_MAX_VEL =
 
 inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
-    str::gains::radial::turn_volt_ka_unit_t{1},
-    str::gains::radial::turn_volt_kv_unit_t{10},
-    str::gains::radial::turn_volt_ka_unit_t{0},
-    str::gains::radial::turn_volt_kv_unit_t{2.64827585793},
+    str::gains::radial::turn_volt_ka_unit_t{0.21507 * 5},
+    str::gains::radial::turn_volt_kv_unit_t{2.4077 * 5},
+    str::gains::radial::turn_volt_ka_unit_t{0.21507},
+    str::gains::radial::turn_volt_kv_unit_t{2.4077},
     0_V,
-    str::gains::radial::turn_volt_kp_unit_t{20},
+    str::gains::radial::turn_volt_kp_unit_t{31},
     str::gains::radial::turn_volt_ki_unit_t{0},
-    str::gains::radial::turn_volt_kd_unit_t{.2},
+    str::gains::radial::turn_volt_kd_unit_t{2.6702},
 };
 
-inline constexpr units::volt_t kG = 1.553_V;
+inline constexpr units::volt_t kG = 0.53646_V;
 
 }  // namespace gains
 }  // namespace consts::pivot

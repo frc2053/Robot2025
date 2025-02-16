@@ -55,6 +55,10 @@ frc2::CommandPtr Manipulator::StopCmd() {
   return frc2::cmd::RunOnce([this] { Stop(); });
 }
 
+frc2::CommandPtr Manipulator::HoldCmd() {
+  return frc2::cmd::Run([this] { SetVoltage(-2_V); });
+}
+
 // This method will be called once per scheduler run
 void Manipulator::Periodic() {
   ctre::phoenix::StatusCode status =
@@ -69,7 +73,7 @@ void Manipulator::Periodic() {
 
   previouslyHadCoral = hasCoral;
   previouslyHadAlgae = hasAlgae;
-  hasAlgae = fwdLimitPressedSig.GetValue() ==
+  hasAlgae = revLimitPressedSig.GetValue() ==
              ctre::phoenix6::signals::ForwardLimitValue::ClosedToGround;
 
   currentVoltage = voltageSig.GetValue();
@@ -125,7 +129,7 @@ frc2::Trigger Manipulator::GotAlgae() {
 
 frc2::Trigger Manipulator::DroppedCoral() {
   return frc2::Trigger{[this] {
-           return (filteredCurrent <
+           return (filteredCurrent >
                    consts::manip::gains::DROPPED_GAME_PIECE_CURRENT) &&
                   (previouslyHadCoral == true);
          }}
@@ -134,7 +138,7 @@ frc2::Trigger Manipulator::DroppedCoral() {
 
 frc2::Trigger Manipulator::GotCoral() {
   return frc2::Trigger{[this] {
-           return (filteredCurrent >
+           return (filteredCurrent <
                    consts::manip::gains::GOT_GAME_PIECE_CURRENT) &&
                   (previouslyHadCoral == false);
          }}

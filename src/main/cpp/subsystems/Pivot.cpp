@@ -53,11 +53,11 @@ void Pivot::Periodic() {
   pidOutput =
       pivotPid.Calculate(GetAngle().value(), expoSetpoint.position.value());
 
-  // if (!isCharacterizing) {
-  //   pivotMotor.SetControl(
-  //       pivotVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
-  //           .WithEnableFOC(true));
-  // }
+  if (!isCharacterizing) {
+    pivotMotor.SetControl(
+        pivotVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+            .WithEnableFOC(true));
+  }
 
   isAtGoalAngle = units::math::abs(expoGoal.position - currentAngle) <
                   consts::pivot::gains::ANGLE_TOLERANCE;
@@ -301,10 +301,10 @@ void Pivot::SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
 void Pivot::ConfigureMotors() {
   ctre::phoenix6::configs::CANcoderConfiguration encoderCfg{};
 
-  encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
+  encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.891113_tr;
 
   encoderCfg.MagnetSensor.SensorDirection =
-      ctre::phoenix6::signals::SensorDirectionValue::CounterClockwise_Positive;
+      ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive;
 
   if (frc::RobotBase::IsSimulation()) {
     encoderCfg.MagnetSensor.MagnetOffset = 0_tr;

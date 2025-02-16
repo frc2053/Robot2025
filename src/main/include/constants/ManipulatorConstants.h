@@ -29,7 +29,7 @@ inline constexpr units::ampere_t STATOR_LIMIT = 40_A;
 
 namespace physical {
 inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(1);
-inline constexpr bool INVERT_ROLLER = false;
+inline constexpr bool INVERT_ROLLER = true;
 inline constexpr units::dimensionless::scalar_t CORAL_REDUCTION = 36.0 / 30.0;
 inline constexpr units::moment_of_inertia::kilogram_square_meter_t MOI =
     0.0001_kg_sq_m;
@@ -37,10 +37,10 @@ inline constexpr units::moment_of_inertia::kilogram_square_meter_t MOI =
 
 namespace gains {
 inline constexpr units::volt_t POOP_VOLTS = 6_V;
-inline constexpr units::volt_t SUCK_VOLTS = 10_V;
+inline constexpr units::volt_t SUCK_VOLTS = 6_V;
 
-inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = 20_A;
-inline constexpr units::ampere_t DROPPED_GAME_PIECE_CURRENT = -20_A;
+inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = -20_A;
+inline constexpr units::ampere_t DROPPED_GAME_PIECE_CURRENT = 20_A;
 inline constexpr units::second_t CORAL_DEBOUNCE_TIME = 40_ms;
 }  // namespace gains
 }  // namespace consts::manip

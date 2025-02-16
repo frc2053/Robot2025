@@ -44,7 +44,9 @@ void RobotContainer::ConfigureBindings() {
   //   frc2::RobotModeTriggers::Teleop().OnTrue(
   //       coordinator.GetOutOfStartingConfig());
 
-  // driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
+  driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
+
+  driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
 
   // driverJoystick.Start().OnTrue(coordinator.GoToLoading());
 
@@ -74,13 +76,13 @@ void RobotContainer::ConfigureBindings() {
       },
       {&elevatorSub}));
 
-  pivotSub.SetDefaultCommand(frc2::cmd::Run(
-      [this] {
-        pivotSub.SetVoltage(
-            frc::ApplyDeadband<double>(-operatorJoystick.GetRightX(), .1) *
-            12_V);
-      },
-      {&pivotSub}));
+  //   pivotSub.SetDefaultCommand(frc2::cmd::Run(
+  //       [this] {
+  //         pivotSub.SetVoltage(
+  //             frc::ApplyDeadband<double>(-operatorJoystick.GetRightX(), .1) *
+  //             12_V);
+  //       },
+  //       {&pivotSub}));
 }
 
 void RobotContainer::ConfigureSysIdBinds() {

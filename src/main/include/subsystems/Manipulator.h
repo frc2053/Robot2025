@@ -19,6 +19,7 @@
 #include "frc/simulation/FlywheelSim.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc2/command/Command.h"
+#include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
 #include "networktables/BooleanTopic.h"
 #include "networktables/DoubleTopic.h"
@@ -52,6 +53,7 @@ class Manipulator : public frc2::SubsystemBase {
   frc2::CommandPtr SuckUntilAlgae();
   frc2::CommandPtr SuckUntilCoral();
   frc2::CommandPtr StopCmd();
+  frc2::CommandPtr HoldCmd();
 
  private:
   void ConfigureMotors();
