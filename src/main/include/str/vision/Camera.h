@@ -36,7 +36,10 @@ class Camera {
          Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate,
          std::function<void(const frc::Pose2d&, units::second_t,
                             const Eigen::Vector3d& stdDevs)>
-             visionConsumer);
+             visionConsumer,
+         std::function<void(const frc::Pose2d&, units::second_t,
+                            const Eigen::Vector3d& stdDevs)>
+             singleTagCon);
   void SimPeriodic(frc::Pose2d robotSimPose);
   void UpdatePoseEstimator(frc::Pose3d robotPose);
   std::optional<photon::EstimatedRobotPose> ImuTagOnRio(
@@ -55,6 +58,9 @@ class Camera {
   std::function<void(const frc::Pose2d&, units::second_t,
                      const Eigen::Vector3d& stdDevs)>
       consumer;
+  std::function<void(const frc::Pose2d&, units::second_t,
+                     const Eigen::Vector3d& stdDevs)>
+      singleTagConsumer;
   std::unique_ptr<photon::PhotonPoseEstimator> photonEstimator;
   std::unique_ptr<photon::PhotonCamera> camera;
   std::unique_ptr<photon::VisionSystemSim> visionSim;

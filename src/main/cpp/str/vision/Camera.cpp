@@ -36,9 +36,13 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
                Eigen::Matrix<double, 3, 1> multiTagDevs, bool simulate,
                std::function<void(const frc::Pose2d&, units::second_t,
                                   const Eigen::Vector3d& stdDevs)>
-                   visionConsumer)
+                   visionConsumer,
+               std::function<void(const frc::Pose2d&, units::second_t,
+                                  const Eigen::Vector3d& stdDevs)>
+                   singleTagCon)
     : simulate(simulate),
       consumer(visionConsumer),
+      singleTagConsumer(singleTagCon),
       robotToCam(robotToCamera),
       singleTagDevs(singleTagStdDev),
       multiTagDevs(multiTagDevs),
@@ -126,7 +130,7 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
           photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT) {
         if (singleTagPose.has_value()) {
           singleTagPosePub.Set(singleTagPose->estimatedPose.ToPose2d());
-          consumer(
+          singleTagConsumer(
               singleTagPose->estimatedPose.ToPose2d(), singleTagPose->timestamp,
               GetEstimationStdDevs(singleTagPose->estimatedPose.ToPose2d()));
         }

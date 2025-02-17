@@ -14,20 +14,27 @@ using namespace str::vision;
 VisionSystem::VisionSystem(
     std::function<void(const frc::Pose2d&, units::second_t,
                        const Eigen::Vector3d& stdDevs)>
-        visionConsumer)
+        visionConsumer,
+    std::function<void(const frc::Pose2d&, units::second_t,
+                       const Eigen::Vector3d& stdDevs)>
+        singleTagConsumer)
     : cameras{
           Camera{consts::vision::FL_CAM_NAME, consts::vision::FL_ROBOT_TO_CAM,
                  consts::vision::SINGLE_TAG_STD_DEV,
-                 consts::vision::MULTI_TAG_STD_DEV, true, visionConsumer},
+                 consts::vision::MULTI_TAG_STD_DEV, true, visionConsumer,
+                 singleTagConsumer},
           Camera{consts::vision::FR_CAM_NAME, consts::vision::FR_ROBOT_TO_CAM,
                  consts::vision::SINGLE_TAG_STD_DEV,
-                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer},
+                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer,
+                 singleTagConsumer},
           Camera{consts::vision::BL_CAM_NAME, consts::vision::BL_ROBOT_TO_CAM,
                  consts::vision::SINGLE_TAG_STD_DEV,
-                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer},
+                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer,
+                 singleTagConsumer},
           Camera{consts::vision::BR_CAM_NAME, consts::vision::BR_ROBOT_TO_CAM,
                  consts::vision::SINGLE_TAG_STD_DEV,
-                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer}} {}
+                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer,
+                 singleTagConsumer}} {}
 
 void VisionSystem::UpdateCameraPositionVis(frc::Pose3d robotPose) {
   cameraLocations[0] = robotPose.TransformBy(consts::vision::FL_ROBOT_TO_CAM);

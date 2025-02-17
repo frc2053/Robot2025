@@ -70,11 +70,15 @@ class RobotContainer {
   //   AlgaeIntake algaeintakeSub{display};
   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
-  str::vision::VisionSystem vision{[this](const frc::Pose2d& pose,
-                                          units::second_t time,
-                                          const Eigen::Vector3d& stdDevs) {
-    driveSub.AddVisionMeasurement(pose, time, stdDevs);
-  }};
+  str::vision::VisionSystem vision{
+      [this](const frc::Pose2d& pose, units::second_t time,
+             const Eigen::Vector3d& stdDevs) {
+        driveSub.AddVisionMeasurement(pose, time, stdDevs);
+      },
+      [this](const frc::Pose2d& pose, units::second_t time,
+             const Eigen::Vector3d& stdDevs) {
+        driveSub.AddSingleTagVisionMeasurement(pose, time, stdDevs);
+      }};
 
   Autos autos{driveSub, coordinator, manipSub};
 

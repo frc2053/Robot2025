@@ -13,7 +13,10 @@ class VisionSystem {
  public:
   explicit VisionSystem(std::function<void(const frc::Pose2d&, units::second_t,
                                            const Eigen::Vector3d& stdDevs)>
-                            visionConsumer);
+                            visionConsumer,
+                        std::function<void(const frc::Pose2d&, units::second_t,
+                                           const Eigen::Vector3d& stdDevs)>
+                            singleTagConsumer);
   void UpdateCameraPositionVis(frc::Pose3d robotPose);
   void SimulationPeriodic(frc::Pose2d simRobotPose);
   void UpdateYaws(units::radian_t yaw, units::second_t time) {

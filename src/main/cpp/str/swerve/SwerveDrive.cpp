@@ -56,6 +56,10 @@ frc::Pose2d SwerveDrive::GetOdomPose() const {
   return odom.GetPose();
 }
 
+frc::Pose2d SwerveDrive::GetSingleTagPose() const {
+  return singleTagPoseEstimator.GetEstimatedPosition();
+}
+
 void SwerveDrive::SetXModuleForces(const std::vector<units::newton_t>& xForce) {
   xModuleForce = xForce;
 }
@@ -90,6 +94,8 @@ void SwerveDrive::UpdateOdom() {
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(
           imu.GetYaw(), imu.GetAngularVelocityZWorld());
   poseEstimator.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
+  singleTagPoseEstimator.Update(frc::Rotation2d{yawLatencyComped},
+                                modulePositions);
   odom.Update(frc::Rotation2d{yawLatencyComped}, modulePositions);
 
   units::second_t now = frc::Timer::GetFPGATimestamp();
@@ -106,6 +112,23 @@ void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& measurement,
     wpi::array<double, 3> newStdDevs{stdDevs(0), stdDevs(1), stdDevs(2)};
     addedVisionPosesPub.Set(measurement);
     poseEstimator.AddVisionMeasurement(measurement, timestamp, newStdDevs);
+  } else {
+    // frc::DataLogManager::Log(
+    //     "WARNING: Vision pose was outside of field! Not adding to
+    //     estimator!");
+  }
+}
+
+void SwerveDrive::AddSingleTagVisionMeasurement(
+    const frc::Pose2d& measurement, units::second_t timestamp,
+    const Eigen::Vector3d& stdDevs) {
+  if (str::math::IsRobotInsideField(consts::swerve::physical::TOTAL_LENGTH,
+                                    consts::swerve::physical::TOTAL_WIDTH,
+                                    measurement)) {
+    wpi::array<double, 3> newStdDevs{stdDevs(0), stdDevs(1), stdDevs(2)};
+    addedSingleTagVisionPosesPub.Set(measurement);
+    singleTagPoseEstimator.AddVisionMeasurement(measurement, timestamp,
+                                                newStdDevs);
   } else {
     // frc::DataLogManager::Log(
     //     "WARNING: Vision pose was outside of field! Not adding to
@@ -142,6 +165,7 @@ void SwerveDrive::UpdateNTEntries() {
   currentPositionsPub.Set(modulePositions);
   odomUpdateRatePub.Set(odomUpdateRate.value());
   estimatorPub.Set(poseEstimator.GetEstimatedPosition());
+  singleTagEstimatorPub.Set(singleTagPoseEstimator.GetEstimatedPosition());
   odomPosePub.Set(odom.GetPose());
   swerveField.SetRobotPose(poseEstimator.GetEstimatedPosition());
   swerveField.GetObject("FL Pos")->SetPose(
@@ -247,6 +271,8 @@ void SwerveDrive::ResetPose(const frc::Pose2d& resetPose) {
                      resetPose);
   poseEstimator.ResetPosition(frc::Rotation2d{GetYawFromImu()}, modulePositions,
                               resetPose);
+  singleTagPoseEstimator.ResetPosition(frc::Rotation2d{GetYawFromImu()},
+                                       modulePositions, resetPose);
 }
 
 void SwerveDrive::DriveFieldRelative(units::meters_per_second_t xVel,

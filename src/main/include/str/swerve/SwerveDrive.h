@@ -37,6 +37,7 @@ class SwerveDrive {
   SwerveDrive();
   frc::Pose2d GetPose() const;
   frc::Pose2d GetOdomPose() const;
+  frc::Pose2d GetSingleTagPose() const;
 
   void SetXModuleForces(const std::vector<units::newton_t>& xForce);
   void SetYModuleForces(const std::vector<units::newton_t>& yForce);
@@ -46,6 +47,9 @@ class SwerveDrive {
   void AddVisionMeasurement(const frc::Pose2d& measurement,
                             units::second_t timestamp,
                             const Eigen::Vector3d& stdDevs);
+  void AddSingleTagVisionMeasurement(const frc::Pose2d& measurement,
+                                     units::second_t timestamp,
+                                     const Eigen::Vector3d& stdDevs);
   void DriveFieldRelative(units::meters_per_second_t xVel,
                           units::meters_per_second_t yVel,
                           units::radians_per_second_t omega, bool openLoop);
@@ -116,6 +120,9 @@ class SwerveDrive {
   frc::SwerveDrivePoseEstimator<4> poseEstimator{
       consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg},
       modulePositions, frc::Pose2d{}};
+  frc::SwerveDrivePoseEstimator<4> singleTagPoseEstimator{
+      consts::swerve::physical::KINEMATICS, frc::Rotation2d{0_deg},
+      modulePositions, frc::Pose2d{}};
 
   static constexpr std::string_view imuConfigAlertStr = "Imu Configuration";
   static constexpr std::string_view imuOptimizeAlertStr = "Imu Optimization";
@@ -155,6 +162,10 @@ class SwerveDrive {
       nt->GetStructTopic<frc::Pose2d>("AddedVisionPoses").Publish()};
   nt::StructPublisher<frc::Pose2d> estimatorPub{
       nt->GetStructTopic<frc::Pose2d>("PoseEstimatorPose").Publish()};
+  nt::StructPublisher<frc::Pose2d> addedSingleTagVisionPosesPub{
+      nt->GetStructTopic<frc::Pose2d>("AddedSingleTagVisionPoses").Publish()};
+  nt::StructPublisher<frc::Pose2d> singleTagEstimatorPub{
+      nt->GetStructTopic<frc::Pose2d>("SingleTagPoseEstimatorPose").Publish()};
   nt::DoublePublisher odomUpdateRatePub{
       nt->GetDoubleTopic("OdomUpdateRate").Publish()};
 };
