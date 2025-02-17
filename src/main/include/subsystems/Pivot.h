@@ -63,7 +63,8 @@ class Pivot : public frc2::SubsystemBase {
   void UpdateNTEntries();
   units::turns_per_second_t GetPivotVel();
   void SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
-                     units::volt_t kg);
+                     units::volt_t kg, units::turns_per_second_t newMaxVel,
+                     units::turns_per_second_squared_t newMaxAccel);
   void LogPivotVolts(frc::sysid::SysIdRoutineLog* log);
 
   ctre::phoenix6::hardware::TalonFX pivotMotor{
@@ -94,15 +95,17 @@ class Pivot : public frc2::SubsystemBase {
       consts::pivot::gains::PIVOT_GAINS};
   units::volt_t currentKg{consts::pivot::gains::kG};
 
-  frc::ExponentialProfile<units::turns, units::volts> expoProf{
-      frc::ExponentialProfile<units::turns, units::volts>::Constraints{
-          12_V, currentGains.motionMagicExpoKv,
-          currentGains.motionMagicExpoKa}};
-  frc::ExponentialProfile<units::turns, units::volts>::State expoSetpoint{};
-  frc::ExponentialProfile<units::turns, units::volts>::State expoGoal{};
-
   frc::ArmFeedforward ff{currentGains.kS, currentKg, currentGains.kV,
                          currentGains.kA};
+
+  units::degrees_per_second_t maxProfVel = 1500_deg_per_s;
+  units::degrees_per_second_squared_t maxProfAccel = 8000_deg_per_s_sq;
+
+  frc::TrapezoidProfile<units::turns> trapProf{
+      frc::TrapezoidProfile<units::turns>::Constraints{maxProfVel,
+                                                       maxProfAccel}};
+  frc::TrapezoidProfile<units::turns>::State trapSetpoint{};
+  frc::TrapezoidProfile<units::turns>::State trapGoal{};
 
   frc::PIDController pivotPid{currentGains.kP.value(), currentGains.kI.value(),
                               currentGains.kD.value()};

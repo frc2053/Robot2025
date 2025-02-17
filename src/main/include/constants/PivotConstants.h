@@ -60,17 +60,17 @@ inline constexpr units::turns_per_second_t INTERMEDIATE_STATE_MAX_VEL =
 
 inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
-    str::gains::radial::turn_volt_ka_unit_t{0.21507 * 5},
-    str::gains::radial::turn_volt_kv_unit_t{2.4077 * 5},
-    str::gains::radial::turn_volt_ka_unit_t{0.21507},
-    str::gains::radial::turn_volt_kv_unit_t{2.4077},
+    str::gains::radial::turn_volt_ka_unit_t{0},
+    str::gains::radial::turn_volt_kv_unit_t{0},
+    str::gains::radial::turn_volt_ka_unit_t{0.1},
+    str::gains::radial::turn_volt_kv_unit_t{2},
     0_V,
-    str::gains::radial::turn_volt_kp_unit_t{31},
+    str::gains::radial::turn_volt_kp_unit_t{20},
     str::gains::radial::turn_volt_ki_unit_t{0},
-    str::gains::radial::turn_volt_kd_unit_t{2.6702},
+    str::gains::radial::turn_volt_kd_unit_t{0},
 };
 
-inline constexpr units::volt_t kG = 0.53646_V;
+inline constexpr units::volt_t kG = 1.533_V;
 
 }  // namespace gains
 }  // namespace consts::pivot

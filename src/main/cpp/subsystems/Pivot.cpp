@@ -17,12 +17,14 @@
 #include "frc/controller/ArmFeedforward.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "frc/trajectory/ExponentialProfile.h"
+#include "frc/trajectory/TrapezoidProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
 #include "str/GainTypes.h"
 #include "str/Units.h"
 #include "units/angle.h"
+#include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/voltage.h"
@@ -46,12 +48,13 @@ void Pivot::Periodic() {
 
   currentAngle = GetAngle();
 
-  auto next = expoProf.Calculate(20_ms, expoSetpoint, expoGoal);
+  auto next = trapProf.Calculate(20_ms, trapSetpoint, trapGoal);
 
-  ffToSend = ff.Calculate(GetAngle(), next.velocity);
+  ffToSend = ff.Calculate(GetAngle().convert<units::radians>(),
+                          GetPivotVel().convert<units::radians_per_second>(),
+                          next.velocity.convert<units::radians_per_second>());
   frc::SmartDashboard::PutNumber("Kg Applied", ffToSend.value());
-  pidOutput =
-      pivotPid.Calculate(GetAngle().value(), expoSetpoint.position.value());
+  pidOutput = pivotPid.Calculate(GetAngle().value(), next.position.value());
 
   if (!isCharacterizing) {
     pivotMotor.SetControl(
@@ -59,13 +62,13 @@ void Pivot::Periodic() {
             .WithEnableFOC(true));
   }
 
-  isAtGoalAngle = units::math::abs(expoGoal.position - currentAngle) <
+  isAtGoalAngle = units::math::abs(trapGoal.position - currentAngle) <
                   consts::pivot::gains::ANGLE_TOLERANCE;
 
   display.SetPivotAngle(currentAngle);
   UpdateNTEntries();
 
-  expoSetpoint = next;
+  trapSetpoint = next;
 }
 
 void Pivot::SetToStartingPosition() {
@@ -84,10 +87,10 @@ void Pivot::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
   currentVelPub.Set(GetPivotVel().convert<units::degrees_per_second>().value());
   angularPosSetpointPub.Set(
-      expoSetpoint.position.convert<units::degrees>().value());
+      trapSetpoint.position.convert<units::degrees>().value());
   angularVelSetpointPub.Set(
-      expoSetpoint.velocity.convert<units::degrees_per_second>().value());
-  angularGoalPub.Set(expoGoal.position.convert<units::degrees>().value());
+      trapSetpoint.velocity.convert<units::degrees_per_second>().value());
+  angularGoalPub.Set(trapGoal.position.convert<units::degrees>().value());
   isAtSetpointPub.Set(isAtGoalAngle);
   appliedVoltagePub.Set(voltageSig.GetValue().value());
 }
@@ -154,13 +157,13 @@ frc2::CommandPtr Pivot::GoToAngleCmd(
 }
 
 void Pivot::GoToAngle(units::turn_t newAngle, bool isIntermediateState) {
-  if (!units::essentiallyEqual(expoGoal.position, newAngle, 1e-6)) {
+  if (!units::essentiallyEqual(trapGoal.position, newAngle, 1e-6)) {
     isAtGoalAngle = false;
     units::turns_per_second_t velEnd = 0_rad_per_s;
     if (isIntermediateState) {
       velEnd = consts::pivot::gains::INTERMEDIATE_STATE_MAX_VEL;
     }
-    expoGoal = {newAngle, velEnd};
+    trapGoal = {newAngle, velEnd};
   }
 }
 
@@ -191,14 +194,12 @@ frc2::CommandPtr Pivot::TunePivotPID(std::function<bool()> isDone) {
           [tablePrefix, this] {
             frc::SmartDashboard::PutNumber(tablePrefix + "setpoint", 0);
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmCruiseVel",
-                consts::pivot::gains::PIVOT_GAINS.motionMagicCruiseVel.value());
+                tablePrefix + "maxVel",
+                maxProfVel.convert<units::degrees_per_second>().value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmKA",
-                consts::pivot::gains::PIVOT_GAINS.motionMagicExpoKa.value());
-            frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmKV",
-                consts::pivot::gains::PIVOT_GAINS.motionMagicExpoKv.value());
+                tablePrefix + "maxAccel",
+                maxProfAccel.convert<units::degrees_per_second_squared>()
+                    .value());
             frc::SmartDashboard::PutNumber(
                 tablePrefix + "kA",
                 consts::pivot::gains::PIVOT_GAINS.kA.value());
@@ -225,12 +226,9 @@ frc2::CommandPtr Pivot::TunePivotPID(std::function<bool()> isDone) {
       frc2::cmd::Run(
           [this, tablePrefix] {
             str::gains::radial::VoltRadialGainsHolder newGains{
-                units::turns_per_second_t{frc::SmartDashboard::GetNumber(
-                    tablePrefix + "mmCruiseVel", 0)},
-                str::gains::radial::turn_volt_ka_unit_t{
-                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
-                str::gains::radial::turn_volt_kv_unit_t{
-                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
+                units::turns_per_second_t{0},
+                str::gains::radial::turn_volt_ka_unit_t{0},
+                str::gains::radial::turn_volt_kv_unit_t{0},
                 str::gains::radial::turn_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
                 str::gains::radial::turn_volt_kv_unit_t{
@@ -244,12 +242,21 @@ frc2::CommandPtr Pivot::TunePivotPID(std::function<bool()> isDone) {
                 str::gains::radial::turn_volt_kd_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
 
+            units::degrees_per_second_t newMaxVel = units::degrees_per_second_t{
+                frc::SmartDashboard::GetNumber(tablePrefix + "maxVel", 0)};
+            units::degrees_per_second_squared_t newMaxAccel =
+                units::degrees_per_second_squared_t{
+                    frc::SmartDashboard::GetNumber(tablePrefix + "maxAccel",
+                                                   0)};
+
             units::volt_t newKg = units::volt_t{
                 frc::SmartDashboard::GetNumber(tablePrefix + "kG", 0)};
 
             if (newGains != currentGains ||
-                !(units::essentiallyEqual(newKg, currentKg, 1e-6))) {
-              SetPivotGains(newGains, newKg);
+                !(units::essentiallyEqual(newKg, currentKg, 1e-6)) ||
+                !(units::essentiallyEqual(newMaxVel, maxProfVel, 1e-6)) ||
+                !(units::essentiallyEqual(newMaxAccel, maxProfAccel, 1e-6))) {
+              SetPivotGains(newGains, newKg, newMaxVel, newMaxAccel);
             }
 
             GoToAngle(units::degree_t{frc::SmartDashboard::GetNumber(
@@ -287,12 +294,15 @@ void Pivot::OptimizeBusSignals() {
 }
 
 void Pivot::SetPivotGains(str::gains::radial::VoltRadialGainsHolder newGains,
-                          units::volt_t kg) {
+                          units::volt_t kg, units::turns_per_second_t newMaxVel,
+                          units::turns_per_second_squared_t newMaxAccel) {
   currentGains = newGains;
   currentKg = kg;
+  maxProfVel = newMaxVel;
+  maxProfAccel = newMaxAccel;
 
-  expoProf = frc::ExponentialProfile<units::turns, units::volts>{
-      {12_V, newGains.motionMagicExpoKv, newGains.motionMagicExpoKa}};
+  trapProf = frc::TrapezoidProfile<units::turns>{
+      frc::TrapezoidProfile<units::turns>::Constraints{newMaxVel, newMaxAccel}};
   ff = frc::ArmFeedforward{newGains.kS, kg, newGains.kV, newGains.kA};
   pivotPid.SetPID(newGains.kP.value(), newGains.kI.value(),
                   newGains.kD.value());
@@ -303,12 +313,13 @@ void Pivot::ConfigureMotors() {
 
   encoderCfg.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.891113_tr;
 
-  encoderCfg.MagnetSensor.SensorDirection =
-      ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive;
-
   if (frc::RobotBase::IsSimulation()) {
+    encoderCfg.MagnetSensor.SensorDirection = ctre::phoenix6::signals::
+        SensorDirectionValue::CounterClockwise_Positive;
     encoderCfg.MagnetSensor.MagnetOffset = 0_tr;
   } else {
+    encoderCfg.MagnetSensor.SensorDirection =
+        ctre::phoenix6::signals::SensorDirectionValue::Clockwise_Positive;
     encoderCfg.MagnetSensor.MagnetOffset =
         consts::pivot::physical::ENCODER_OFFSET;
   }
