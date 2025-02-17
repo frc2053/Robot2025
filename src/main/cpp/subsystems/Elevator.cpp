@@ -16,16 +16,19 @@
 #include "frc/RobotController.h"
 #include "frc/controller/ElevatorFeedforward.h"
 #include "frc/trajectory/ExponentialProfile.h"
+#include "frc/trajectory/TrapezoidProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
 #include "str/GainTypes.h"
 #include "str/Units.h"
+#include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/length.h"
 #include "units/time.h"
+#include "units/velocity.h"
 #include "units/voltage.h"
 
 Elevator::Elevator(str::SuperstructureDisplay& display) : display{display} {
@@ -51,23 +54,22 @@ void Elevator::Periodic() {
 
   currentHeight = GetHeight();
 
-  auto next = expoProf.Calculate(20_ms, expoSetpoint, expoGoal);
+  auto next = trapProf.Calculate(20_ms, trapSetpoint, trapGoal);
 
-  ffToSend = ff.Calculate(expoSetpoint.velocity, next.velocity);
-  pidOutput =
-      elevatorPid.Calculate(GetHeight().value(), expoSetpoint.position.value());
+  ffToSend = ff.Calculate(GetElevatorVel(), next.velocity);
+  pidOutput = elevatorPid.Calculate(GetHeight().value(), next.position.value());
 
-  //   frontMotor.SetControl(
-  //       elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
-  //           .WithEnableFOC(true));
+  frontMotor.SetControl(
+      elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+          .WithEnableFOC(true));
 
-  isAtGoalHeight = units::math::abs(expoGoal.position - currentHeight) <
+  isAtGoalHeight = units::math::abs(trapGoal.position - currentHeight) <
                    consts::elevator::gains::HEIGHT_TOLERANCE;
 
   display.SetElevatorHeight(currentHeight);
   UpdateNTEntries();
 
-  expoSetpoint = next;
+  trapSetpoint = next;
 }
 
 void Elevator::UpdateNTEntries() {
@@ -77,11 +79,11 @@ void Elevator::UpdateNTEntries() {
           .convert<units::compound_unit<units::inches,
                                         units::inverse<units::seconds>>>()
           .value());
-  heightGoalPub.Set(expoGoal.position.convert<units::inches>().value());
+  heightGoalPub.Set(trapGoal.position.convert<units::inches>().value());
   heightPosSetpointPub.Set(
-      expoSetpoint.position.convert<units::inches>().value());
+      trapSetpoint.position.convert<units::inches>().value());
   heightVelSetpointPub.Set(
-      expoSetpoint.velocity
+      trapSetpoint.velocity
           .convert<units::compound_unit<units::inches,
                                         units::inverse<units::seconds>>>()
           .value());
@@ -155,9 +157,9 @@ frc2::CommandPtr Elevator::GoToHeightCmd(
 }
 
 void Elevator::GoToHeight(units::meter_t newHeight) {
-  if (!units::essentiallyEqual(expoGoal.position, newHeight, 1e-6)) {
+  if (!units::essentiallyEqual(trapGoal.position, newHeight, 1e-6)) {
     isAtGoalHeight = false;
-    expoGoal = {newHeight, 0_mps};
+    trapGoal = {newHeight, 0_mps};
   }
 }
 
@@ -183,15 +185,11 @@ frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
           [tablePrefix, this] {
             frc::SmartDashboard::PutNumber(tablePrefix + "setpoint", 0);
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmCruiseVel",
-                consts::elevator::gains::ELEVATOR_GAINS.motionMagicCruiseVel
-                    .value());
+                tablePrefix + "maxVel",
+                maxProfVel.convert<units::feet_per_second>().value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmKA", consts::elevator::gains::ELEVATOR_GAINS
-                                          .motionMagicExpoKa.value());
-            frc::SmartDashboard::PutNumber(
-                tablePrefix + "mmKV", consts::elevator::gains::ELEVATOR_GAINS
-                                          .motionMagicExpoKv.value());
+                tablePrefix + "maxAccel",
+                maxProfAccel.convert<units::feet_per_second_squared>().value());
             frc::SmartDashboard::PutNumber(
                 tablePrefix + "kA",
                 consts::elevator::gains::ELEVATOR_GAINS.kA.value());
@@ -218,12 +216,9 @@ frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
       frc2::cmd::Run(
           [this, tablePrefix] {
             str::gains::linear::VoltLinearGainsHolder newGains{
-                units::meters_per_second_t{frc::SmartDashboard::GetNumber(
-                    tablePrefix + "mmCruiseVel", 0)},
-                str::gains::linear::meter_volt_ka_unit_t{
-                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKA", 0)},
-                str::gains::linear::meter_volt_kv_unit_t{
-                    frc::SmartDashboard::GetNumber(tablePrefix + "mmKV", 0)},
+                units::meters_per_second_t{0},
+                str::gains::linear::meter_volt_ka_unit_t{0},
+                str::gains::linear::meter_volt_kv_unit_t{0},
                 str::gains::linear::meter_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
                 str::gains::linear::meter_volt_kv_unit_t{
@@ -240,9 +235,17 @@ frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
             units::volt_t newKg = units::volt_t{
                 frc::SmartDashboard::GetNumber(tablePrefix + "kG", 0)};
 
+            units::meters_per_second_t newMaxVel = units::feet_per_second_t{
+                frc::SmartDashboard::GetNumber(tablePrefix + "maxVel", 0)};
+            units::meters_per_second_squared_t newMaxAccel =
+                units::feet_per_second_squared_t{frc::SmartDashboard::GetNumber(
+                    tablePrefix + "maxAccel", 0)};
+
             if (newGains != currentGains ||
-                !(units::essentiallyEqual(newKg, currentKg, 1e-6))) {
-              SetElevatorGains(newGains, newKg);
+                !(units::essentiallyEqual(newKg, currentKg, 1e-6)) ||
+                !(units::essentiallyEqual(newMaxVel, maxProfVel, 1e-6)) ||
+                !(units::essentiallyEqual(newMaxAccel, maxProfAccel, 1e-6))) {
+              SetElevatorGains(newGains, newKg, newMaxVel, newMaxAccel);
             }
 
             GoToHeight(units::inch_t{
@@ -288,12 +291,15 @@ void Elevator::OptimizeBusSignals() {
 }
 
 void Elevator::SetElevatorGains(
-    str::gains::linear::VoltLinearGainsHolder newGains, units::volt_t kg) {
+    str::gains::linear::VoltLinearGainsHolder newGains, units::volt_t kg,
+    units::meters_per_second_t newMaxVel,
+    units::meters_per_second_squared_t newMaxAccel) {
   currentGains = newGains;
   currentKg = kg;
+  maxProfAccel = newMaxAccel;
+  maxProfVel = newMaxVel;
 
-  expoProf = frc::ExponentialProfile<units::meter, units::volts>{
-      {12_V, newGains.motionMagicExpoKv, newGains.motionMagicExpoKa}};
+  trapProf = frc::TrapezoidProfile<units::meter>{{newMaxVel, newMaxAccel}};
   ff = frc::ElevatorFeedforward{newGains.kS, kg, newGains.kV, newGains.kA};
   elevatorPid.SetPID(newGains.kP.value(), newGains.kI.value(),
                      newGains.kD.value());

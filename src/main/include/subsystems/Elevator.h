@@ -24,6 +24,7 @@
 #include "frc/geometry/Pose3d.h"
 #include "frc/simulation/ElevatorSim.h"
 #include "frc/trajectory/ExponentialProfile.h"
+#include "frc/trajectory/TrapezoidProfile.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
 #include "frc2/command/sysid/SysIdRoutine.h"
@@ -33,6 +34,7 @@
 #include "networktables/StructArrayTopic.h"
 #include "str/GainTypes.h"
 #include "str/SuperstructureDisplay.h"
+#include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/length.h"
@@ -63,7 +65,8 @@ class Elevator : public frc2::SubsystemBase {
   void UpdateNTEntries();
   units::meters_per_second_t GetElevatorVel();
   void SetElevatorGains(str::gains::linear::VoltLinearGainsHolder newGains,
-                        units::volt_t kg);
+                        units::volt_t kg, units::meters_per_second_t newMaxVel,
+                        units::meters_per_second_squared_t newMaxAccel);
   units::meter_t ConvertEncPosToHeight(units::turn_t rots);
   units::turn_t ConvertHeightToEncPos(units::meter_t height);
   units::meters_per_second_t ConvertEncVelToHeightVel(
@@ -116,13 +119,15 @@ class Elevator : public frc2::SubsystemBase {
                                     0_m,
                                     {0.00}};
 
-  frc::ExponentialProfile<units::meter, units::volts> expoProf{
-      {12_V, currentGains.motionMagicExpoKv, currentGains.motionMagicExpoKa}};
-  frc::ExponentialProfile<units::meter, units::volts>::State expoSetpoint{};
-  frc::ExponentialProfile<units::meter, units::volts>::State expoGoal{};
-
   frc::ElevatorFeedforward ff{currentGains.kS, currentKg, currentGains.kV,
                               currentGains.kA};
+
+  units::meters_per_second_t maxProfVel = 5_fps;
+  units::meters_per_second_squared_t maxProfAccel = 10_fps_sq;
+
+  frc::TrapezoidProfile<units::meter> trapProf{{maxProfVel, maxProfAccel}};
+  frc::TrapezoidProfile<units::meter>::State trapSetpoint{};
+  frc::TrapezoidProfile<units::meter>::State trapGoal{};
 
   frc::PIDController elevatorPid{currentGains.kP.value(),
                                  currentGains.kI.value(),
