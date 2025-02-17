@@ -53,7 +53,7 @@ inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 90_deg;
 
 namespace gains {
 
-inline constexpr units::radian_t ANGLE_TOLERANCE = 1_deg;
+inline constexpr units::radian_t ANGLE_TOLERANCE = 1.5_deg;
 
 inline constexpr units::turns_per_second_t INTERMEDIATE_STATE_MAX_VEL =
     180_deg_per_s;

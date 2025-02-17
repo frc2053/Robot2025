@@ -81,6 +81,7 @@ class Elevator : public frc2::SubsystemBase {
 
   units::meter_t currentHeight = 0_m;
   bool isAtGoalHeight = false;
+  bool isCharacterizing = false;
 
   ctre::phoenix6::sim::TalonFXSimState& frontMotorSim =
       frontMotor.GetSimState();

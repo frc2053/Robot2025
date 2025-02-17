@@ -68,13 +68,13 @@ void RobotContainer::ConfigureBindings() {
   //       driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false;
   //       }), [this] { return manipSub.HasAlgae(); }));
 
-  elevatorSub.SetDefaultCommand(frc2::cmd::Run(
-      [this] {
-        elevatorSub.SetVoltage(
-            frc::ApplyDeadband<double>(-operatorJoystick.GetRightY(), .1) *
-            12_V);
-      },
-      {&elevatorSub}));
+  //   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
+  //       [this] {
+  //         elevatorSub.SetVoltage(
+  //             frc::ApplyDeadband<double>(-operatorJoystick.GetRightY(), .1) *
+  //             12_V);
+  //       },
+  //       {&elevatorSub}));
 
   //   pivotSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {

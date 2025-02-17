@@ -59,9 +59,11 @@ void Elevator::Periodic() {
   ffToSend = ff.Calculate(GetElevatorVel(), next.velocity);
   pidOutput = elevatorPid.Calculate(GetHeight().value(), next.position.value());
 
-  frontMotor.SetControl(
-      elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
-          .WithEnableFOC(true));
+  if (!isCharacterizing) {
+    frontMotor.SetControl(
+        elevatorVoltageSetter.WithOutput(ffToSend + units::volt_t{pidOutput})
+            .WithEnableFOC(true));
+  }
 
   isAtGoalHeight = units::math::abs(trapGoal.position - currentHeight) <
                    consts::elevator::gains::HEIGHT_TOLERANCE;
@@ -170,12 +172,17 @@ void Elevator::SetVoltage(units::volt_t volts) {
 
 frc2::CommandPtr Elevator::SysIdElevatorQuasistaticVoltage(
     frc2::sysid::Direction dir) {
-  return elevatorSysIdVoltage.Quasistatic(dir).WithName(
-      "Elevator Quasistatic Voltage");
+  return elevatorSysIdVoltage.Quasistatic(dir)
+      .WithName("Elevator Quasistatic Voltage")
+      .BeforeStarting([this] { isCharacterizing = true; })
+      .AndThen([this] { isCharacterizing = false; });
 }
 frc2::CommandPtr Elevator::SysIdElevatorDynamicVoltage(
     frc2::sysid::Direction dir) {
-  return elevatorSysIdVoltage.Dynamic(dir).WithName("Elevator Dynamic Voltage");
+  return elevatorSysIdVoltage.Dynamic(dir)
+      .WithName("Elevator Dynamic Voltage")
+      .BeforeStarting([this] { isCharacterizing = true; })
+      .AndThen([this] { isCharacterizing = false; });
 }
 
 frc2::CommandPtr Elevator::TuneElevatorPID(std::function<bool()> isDone) {
