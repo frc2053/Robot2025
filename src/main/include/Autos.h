@@ -24,12 +24,16 @@ class Autos {
         [this] { return autoChooser.GetSelected(); },
         std::pair{NOTHING, frc2::cmd::None()},
         std::pair{LEFT_EDGE_TWO_CORAL,
-                  pathplanner::PathPlannerAuto("LeftEdgeTwoCoral").ToPtr()});
+                  pathplanner::PathPlannerAuto("LeftEdgeTwoCoral").ToPtr()},
+        std::pair{
+            RIGHT_EDGE_TWO_CORAL,
+            pathplanner::PathPlannerAuto("LeftEdgeTwoCoral", true).ToPtr()});
 
     autoChooser.SetDefaultOption("Do Nothing", AutoSelector::NOTHING);
     autoChooser.AddOption("Left Edge Two Coral",
                           AutoSelector::LEFT_EDGE_TWO_CORAL);
-
+    autoChooser.AddOption("Right Edge Two Coral",
+                          AutoSelector::RIGHT_EDGE_TWO_CORAL);
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
 
