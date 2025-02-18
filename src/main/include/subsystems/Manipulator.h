@@ -101,7 +101,7 @@ class Manipulator : public frc2::SubsystemBase {
                                       consts::manip::physical::MOTOR};
 
   frc::LinearFilter<units::ampere_t> currentFilter =
-      frc::LinearFilter<units::ampere_t>::MovingAverage(5);
+      frc::LinearFilter<units::ampere_t>::MovingAverage(3);
 
   frc2::Trigger gotCoral{GotCoral()};
   frc2::Trigger gotAlgae{GotAlgae()};

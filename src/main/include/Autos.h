@@ -27,13 +27,16 @@ class Autos {
                   pathplanner::PathPlannerAuto("LeftEdgeTwoCoral").ToPtr()},
         std::pair{
             RIGHT_EDGE_TWO_CORAL,
-            pathplanner::PathPlannerAuto("LeftEdgeTwoCoral", true).ToPtr()});
+            pathplanner::PathPlannerAuto("LeftEdgeTwoCoral", true).ToPtr()},
+        std::pair{MIDDLE_CORAL_NET,
+                  pathplanner::PathPlannerAuto("MiddleCoralNet").ToPtr()});
 
     autoChooser.SetDefaultOption("Do Nothing", AutoSelector::NOTHING);
     autoChooser.AddOption("Left Edge Two Coral",
                           AutoSelector::LEFT_EDGE_TWO_CORAL);
     autoChooser.AddOption("Right Edge Two Coral",
                           AutoSelector::RIGHT_EDGE_TWO_CORAL);
+    autoChooser.AddOption("Middle Coral Net", AutoSelector::MIDDLE_CORAL_NET);
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
 
@@ -43,24 +46,32 @@ class Autos {
   void BindCommandsAndTriggers() {
     pathplanner::NamedCommands::registerCommand(
         "GetOutOfStarting", m_coordinator.GetOutOfStartingConfig());
-    pathplanner::NamedCommands::registerCommand("PrimeToScore",
-                                                m_coordinator.GoToL2());
+    pathplanner::NamedCommands::registerCommand("L2", m_coordinator.GoToL2());
     pathplanner::NamedCommands::registerCommand("L4Coral",
                                                 m_coordinator.GoToL4());
     pathplanner::NamedCommands::registerCommand("Loading",
                                                 m_coordinator.GoToLoading());
     pathplanner::NamedCommands::registerCommand("WaitForCoral",
                                                 m_manipSub.SuckUntilCoral());
+    pathplanner::NamedCommands::registerCommand("SuckUntilAlgae",
+                                                m_manipSub.SuckUntilAlgae());
     pathplanner::NamedCommands::registerCommand(
         "Score", m_manipSub.PoopPiece([] { return 1_s; }));
 
     pathplanner::NamedCommands::registerCommand(
         "DriveToLeftReef", m_driveSub.AlignToReef([] { return true; }));
+    pathplanner::NamedCommands::registerCommand("DriveToClosestAlgae",
+                                                m_driveSub.AlignToAlgae());
     pathplanner::NamedCommands::registerCommand(
         "DriveToRightReef", m_driveSub.AlignToReef([] { return false; }));
   }
 
-  enum AutoSelector { NOTHING, LEFT_EDGE_TWO_CORAL, RIGHT_EDGE_TWO_CORAL };
+  enum AutoSelector {
+    NOTHING,
+    LEFT_EDGE_TWO_CORAL,
+    RIGHT_EDGE_TWO_CORAL,
+    MIDDLE_CORAL_NET
+  };
 
   frc::SendableChooser<AutoSelector> autoChooser;
 
