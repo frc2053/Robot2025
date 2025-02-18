@@ -82,10 +82,10 @@ void Manipulator::Periodic() {
 
   if (frc::RobotBase::IsSimulation()) {
     if (fakeCoralSuck) {
-      torqueCurrent = 400_A;
+      torqueCurrent = -400_A;
     }
     if (fakeCoralDrop) {
-      torqueCurrent = -400_A;
+      torqueCurrent = 400_A;
     }
   }
 
@@ -111,7 +111,7 @@ void Manipulator::Stop() {
 void Manipulator::SimulationPeriodic() {
   fakeCoralSuck = gotCorralSub.Get();
   fakeCoralDrop = droppedCoralSub.Get();
-  rollerSim.SetForwardLimit(bumpSwitchSub.Get());
+  rollerSim.SetReverseLimit(bumpSwitchSub.Get());
   rollerSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
 
   coralWheelSim.SetInputVoltage(rollerSim.GetMotorVoltage());

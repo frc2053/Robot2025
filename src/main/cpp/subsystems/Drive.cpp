@@ -121,7 +121,7 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                    thetaController.SetTolerance(
                        consts::swerve::pathplanning::rotationalPIDTolerance,
                        consts::swerve::pathplanning::rotationalVelPIDTolerance);
-                   pidPoseSetpointPub.Set(goalPose());
+                   pidPoseGoalPub.Set(goalPose());
                  },
                  {this})
                  .WithName("PIDToPose Init"),
@@ -134,7 +134,11 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                    xPoseController.SetGoal(goalPose().X());
                    yPoseController.SetGoal(goalPose().Y());
                    thetaController.SetGoal(goalPose().Rotation().Radians());
-                   pidPoseSetpointPub.Set(goalPose());
+                   pidPoseGoalPub.Set(goalPose());
+                   pidPoseSetpointPub.Set(
+                       frc::Pose2d{xPoseController.GetSetpoint().position,
+                                   yPoseController.GetSetpoint().position,
+                                   thetaController.GetSetpoint().position});
 
                    units::meters_per_second_t xSpeed{xPoseController.Calculate(
                        currentPose.Translation().X())};

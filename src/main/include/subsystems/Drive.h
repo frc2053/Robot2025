@@ -102,6 +102,8 @@ class Drive : public frc2::SubsystemBase {
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Swerve")};
+  nt::StructPublisher<frc::Pose2d> pidPoseGoalPub{
+      nt->GetStructTopic<frc::Pose2d>("PIDToPoseGoal").Publish()};
   nt::StructPublisher<frc::Pose2d> pidPoseSetpointPub{
       nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
   nt::BooleanPublisher isAtGoalPosePub{
