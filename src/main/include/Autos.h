@@ -28,15 +28,15 @@ class Autos {
         std::pair{
             RIGHT_EDGE_TWO_CORAL,
             pathplanner::PathPlannerAuto("LeftEdgeTwoCoral", true).ToPtr()},
-        std::pair{MIDDLE_CORAL_NET,
-                  pathplanner::PathPlannerAuto("MiddleCoralNet").ToPtr()});
+        std::pair{MIDDLE_CORAL_PROC,
+                  pathplanner::PathPlannerAuto("MiddleCoralProc").ToPtr()});
 
     autoChooser.SetDefaultOption("Do Nothing", AutoSelector::NOTHING);
     autoChooser.AddOption("Left Edge Two Coral",
                           AutoSelector::LEFT_EDGE_TWO_CORAL);
     autoChooser.AddOption("Right Edge Two Coral",
                           AutoSelector::RIGHT_EDGE_TWO_CORAL);
-    autoChooser.AddOption("Middle Coral Net", AutoSelector::MIDDLE_CORAL_NET);
+    autoChooser.AddOption("Middle Coral Net", AutoSelector::MIDDLE_CORAL_PROC);
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
 
@@ -46,6 +46,7 @@ class Autos {
   void BindCommandsAndTriggers() {
     pathplanner::NamedCommands::registerCommand(
         "GetOutOfStarting", m_coordinator.GetOutOfStartingConfig());
+    pathplanner::NamedCommands::registerCommand("L1", m_coordinator.GoToL1());
     pathplanner::NamedCommands::registerCommand("L2", m_coordinator.GoToL2());
     pathplanner::NamedCommands::registerCommand("L4Coral",
                                                 m_coordinator.GoToL4());
@@ -70,7 +71,7 @@ class Autos {
     NOTHING,
     LEFT_EDGE_TWO_CORAL,
     RIGHT_EDGE_TWO_CORAL,
-    MIDDLE_CORAL_NET
+    MIDDLE_CORAL_PROC
   };
 
   frc::SendableChooser<AutoSelector> autoChooser;

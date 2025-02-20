@@ -56,7 +56,7 @@ frc2::CommandPtr Manipulator::StopCmd() {
 }
 
 frc2::CommandPtr Manipulator::HoldCmd() {
-  return frc2::cmd::Run([this] { SetVoltage(-2_V); });
+  return frc2::cmd::RunOnce([this] { SetVoltage(-2_V); });
 }
 
 // This method will be called once per scheduler run
