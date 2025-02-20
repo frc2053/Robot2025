@@ -36,7 +36,7 @@ class Autos {
                           AutoSelector::LEFT_EDGE_TWO_CORAL);
     autoChooser.AddOption("Right Edge Two Coral",
                           AutoSelector::RIGHT_EDGE_TWO_CORAL);
-    autoChooser.AddOption("Middle Coral Net", AutoSelector::MIDDLE_CORAL_PROC);
+    autoChooser.AddOption("Middle Coral", AutoSelector::MIDDLE_CORAL_PROC);
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
 
