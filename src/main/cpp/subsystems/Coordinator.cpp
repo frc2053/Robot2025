@@ -104,9 +104,11 @@ frc2::CommandPtr Coordinator::GoToAlgaeProcess() {
 }
 
 frc2::CommandPtr Coordinator::GoToL2Coral() {
-  return frc2::cmd::Sequence(
+  return frc2::cmd::Parallel(
       elev.GoToHeightCmd([] { return presets::elev::coral::l2; }),
-      piv.GoToAngleCmd([] { return presets::wrist::coral::l2; }));
+      frc2::cmd::Sequence(
+          frc2::cmd::WaitUntil([this] { return elev.GetHeight() > 30_in; }),
+          piv.GoToAngleCmd([] { return presets::wrist::coral::l2; })));
 }
 
 frc2::CommandPtr Coordinator::GoToL2Algae() {
@@ -117,9 +119,11 @@ frc2::CommandPtr Coordinator::GoToL2Algae() {
 }
 
 frc2::CommandPtr Coordinator::GoToL3Coral() {
-  return frc2::cmd::Sequence(
+  return frc2::cmd::Parallel(
       elev.GoToHeightCmd([] { return presets::elev::coral::l3; }),
-      piv.GoToAngleCmd([] { return presets::wrist::coral::l3; }));
+      frc2::cmd::Sequence(
+          frc2::cmd::WaitUntil([this] { return elev.GetHeight() > 30_in; }),
+          piv.GoToAngleCmd([] { return presets::wrist::coral::l3; })));
 }
 
 frc2::CommandPtr Coordinator::GoToL3Algae() {
@@ -130,9 +134,11 @@ frc2::CommandPtr Coordinator::GoToL3Algae() {
 }
 
 frc2::CommandPtr Coordinator::GoToL4Coral() {
-  return frc2::cmd::Sequence(
+  return frc2::cmd::Parallel(
       elev.GoToHeightCmd([] { return presets::elev::coral::l4; }),
-      piv.GoToAngleCmd([] { return presets::wrist::coral::l4; }));
+      frc2::cmd::Sequence(
+          frc2::cmd::WaitUntil([this] { return elev.GetHeight() > 30_in; }),
+          piv.GoToAngleCmd([] { return presets::wrist::coral::l4; })));
 }
 
 frc2::CommandPtr Coordinator::GoToNet() {
