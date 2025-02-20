@@ -36,6 +36,9 @@ Elevator::Elevator(str::SuperstructureDisplay& display) : display{display} {
   ConfigureControlSignals();
 
   OptimizeBusSignals();
+
+  frontMotor.SetPosition(0_tr);
+  backMotor.SetPosition(0_tr);
 }
 
 void Elevator::Periodic() {

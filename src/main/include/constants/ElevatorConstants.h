@@ -46,7 +46,7 @@ inline constexpr units::meter_t EXTENDED_HEIGHT = 26_in;
 
 namespace gains {
 
-inline constexpr units::meter_t HEIGHT_TOLERANCE = .25_in;
+inline constexpr units::meter_t HEIGHT_TOLERANCE = .5_in;
 
 inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
     ((consts::elevator::physical::MOTOR.freeSpeed /
@@ -55,15 +55,15 @@ inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
         (consts::elevator::physical::PULLEY_DIAM / 2.0),
     str::gains::linear::meter_volt_ka_unit_t{0},
     str::gains::linear::meter_volt_kv_unit_t{0},
-    str::gains::linear::meter_volt_ka_unit_t{0.1},
-    str::gains::linear::meter_volt_kv_unit_t{2.2133},
-    0_V,
-    str::gains::linear::meter_volt_kp_unit_t{30.368},
+    str::gains::linear::meter_volt_ka_unit_t{0.036699},
+    str::gains::linear::meter_volt_kv_unit_t{2.3775},
+    0.047698_V,
+    str::gains::linear::meter_volt_kp_unit_t{18},
     str::gains::linear::meter_volt_ki_unit_t{0},
-    str::gains::linear::meter_volt_kd_unit_t{0.21709},
+    str::gains::linear::meter_volt_kd_unit_t{.1},
 };
 
-inline constexpr units::volt_t kG = 1.0619_V;
+inline constexpr units::volt_t kG = 0.40627_V;
 
 }  // namespace gains
 }  // namespace consts::elevator

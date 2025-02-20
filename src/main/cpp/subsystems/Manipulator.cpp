@@ -42,7 +42,7 @@ frc2::CommandPtr Manipulator::PoopPiece(
 frc2::CommandPtr Manipulator::SuckUntilAlgae() {
   return frc2::cmd::Run([this] { Suck(); })
       .Until([this] { return HasAlgae(); })
-      .AndThen(StopCmd());
+      .AndThen(HoldCmd());
 }
 
 frc2::CommandPtr Manipulator::SuckUntilCoral() {

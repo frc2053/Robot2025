@@ -12,33 +12,34 @@ namespace wrist {
 namespace coral {
 inline constexpr units::radian_t loading = 90_deg;
 inline constexpr units::radian_t l1 = -56_deg;
-inline constexpr units::radian_t l2 = -91_deg;
-inline constexpr units::radian_t l3 = -91_deg;
-inline constexpr units::radian_t l4 = -101_deg;
+inline constexpr units::radian_t l2 = -83_deg;
+inline constexpr units::radian_t l3 = -83_deg;
+inline constexpr units::radian_t l4 = -85_deg;
 }  // namespace coral
 
 inline constexpr units::radian_t algaeHold = 10_deg;
 inline constexpr units::radian_t algaeProcess = -30_deg;
-inline constexpr units::radian_t algaeGrab = 45_deg;
+inline constexpr units::radian_t algaeGrab = 0_deg;
 inline constexpr units::radian_t algaeNet = 80_deg;
 inline constexpr units::radian_t primed = 45_deg;
-inline constexpr units::radian_t outofstarting = 45_deg;
+
+inline constexpr units::radian_t outofstarting = 5_deg;
 }  // namespace wrist
 
 namespace elev {
 namespace algae {
 inline constexpr units::meter_t hold = 12_in;
 inline constexpr units::meter_t processor = 12_in;
-inline constexpr units::meter_t l2 = 12_in;
-inline constexpr units::meter_t l3 = 24_in;
+inline constexpr units::meter_t l2 = 20_in;
+inline constexpr units::meter_t l3 = 35_in;
 inline constexpr units::meter_t net = 80_in;
 }  // namespace algae
 
 namespace coral {
 inline constexpr units::meter_t loading = 7_in;
 inline constexpr units::meter_t l1 = 12_in;
-inline constexpr units::meter_t l2 = 29_in;
-inline constexpr units::meter_t l3 = 44_in;
+inline constexpr units::meter_t l2 = 34_in;
+inline constexpr units::meter_t l3 = 50_in;
 inline constexpr units::meter_t l4 = 75_in;
 }  // namespace coral
 

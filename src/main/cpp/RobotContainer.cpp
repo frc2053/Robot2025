@@ -41,8 +41,8 @@ void RobotContainer::ConfigureBindings() {
                consts::swerve::physical::MAX_ROT_SPEED;
       }));
 
-  //   frc2::RobotModeTriggers::Teleop().OnTrue(
-  //       coordinator.GetOutOfStartingConfig());
+  frc2::RobotModeTriggers::Teleop().OnTrue(
+      coordinator.GetOutOfStartingConfig());
 
   driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
 
@@ -50,13 +50,13 @@ void RobotContainer::ConfigureBindings() {
 
   // driverJoystick.Start().OnTrue(coordinator.GoToLoading());
 
-  //   driverJoystick.A().OnTrue(coordinator.GoToL1());
-  //   driverJoystick.B().OnTrue(coordinator.GoToL2());
+  driverJoystick.A().OnTrue(coordinator.GoToL1());
+  driverJoystick.B().OnTrue(coordinator.GoToL2());
 
-  //   driverJoystick.X().OnTrue(coordinator.GoToL3());
-  //   driverJoystick.Y().OnTrue(coordinator.GoToL4());
+  driverJoystick.X().OnTrue(coordinator.GoToL3());
+  driverJoystick.Y().OnTrue(coordinator.GoToL4());
 
-  //   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
+  NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
   //   driverJoystick.Back().OnTrue(algaeintakeSub.Poop());
   //   driverJoystick.Start().OnTrue(algaeintakeSub.Intake());
