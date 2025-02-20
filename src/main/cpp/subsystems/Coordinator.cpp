@@ -93,10 +93,8 @@ frc2::CommandPtr Coordinator::PrimeCoral(
 
 frc2::CommandPtr Coordinator::GoToL1Coral() {
   return frc2::cmd::Sequence(
-      frc2::cmd::Print("L1 Coral Seq"),
-      PrimeCoral([] { return presets::wrist::coral::l1; }),
-      frc2::cmd::Print("L1 Coral Elevator Height"),
-      elev.GoToHeightCmd([] { return presets::elev::coral::l1; }));
+      elev.GoToHeightCmd([] { return presets::elev::coral::l1; }),
+      piv.GoToAngleCmd([] { return presets::wrist::coral::l1; }));
 }
 
 frc2::CommandPtr Coordinator::GoToAlgaeProcess() {
@@ -107,10 +105,8 @@ frc2::CommandPtr Coordinator::GoToAlgaeProcess() {
 
 frc2::CommandPtr Coordinator::GoToL2Coral() {
   return frc2::cmd::Sequence(
-      frc2::cmd::Print("L2 Coral Seq"),
-      PrimeCoral([] { return presets::wrist::coral::l2; }),
-      frc2::cmd::Print("L2 Coral Elevator Height"),
-      elev.GoToHeightCmd([] { return presets::elev::coral::l2; }));
+      elev.GoToHeightCmd([] { return presets::elev::coral::l2; }),
+      piv.GoToAngleCmd([] { return presets::wrist::coral::l2; }));
 }
 
 frc2::CommandPtr Coordinator::GoToL2Algae() {
@@ -122,10 +118,8 @@ frc2::CommandPtr Coordinator::GoToL2Algae() {
 
 frc2::CommandPtr Coordinator::GoToL3Coral() {
   return frc2::cmd::Sequence(
-      frc2::cmd::Print("L3 Coral Seq"),
-      PrimeCoral([] { return presets::wrist::coral::l3; }),
-      frc2::cmd::Print("L3 Coral Elevator Height"),
-      elev.GoToHeightCmd([] { return presets::elev::coral::l3; }));
+      elev.GoToHeightCmd([] { return presets::elev::coral::l3; }),
+      piv.GoToAngleCmd([] { return presets::wrist::coral::l3; }));
 }
 
 frc2::CommandPtr Coordinator::GoToL3Algae() {
@@ -137,10 +131,8 @@ frc2::CommandPtr Coordinator::GoToL3Algae() {
 
 frc2::CommandPtr Coordinator::GoToL4Coral() {
   return frc2::cmd::Sequence(
-      frc2::cmd::Print("L4 Coral Seq"),
-      PrimeCoral([] { return presets::wrist::coral::l4; }),
-      frc2::cmd::Print("L4 Coral Elevator Height"),
-      elev.GoToHeightCmd([] { return presets::elev::coral::l4; }));
+      elev.GoToHeightCmd([] { return presets::elev::coral::l4; }),
+      piv.GoToAngleCmd([] { return presets::wrist::coral::l4; }));
 }
 
 frc2::CommandPtr Coordinator::GoToNet() {

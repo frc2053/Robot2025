@@ -48,6 +48,7 @@ namespace gains {
 
 inline constexpr units::meter_t HEIGHT_TOLERANCE = .5_in;
 
+#ifdef __FRC_ROBORIO__
 inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
     ((consts::elevator::physical::MOTOR.freeSpeed /
       consts::elevator::physical::GEARING) /
@@ -64,6 +65,24 @@ inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
 };
 
 inline constexpr units::volt_t kG = 0.40627_V;
+#else
+inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
+    ((consts::elevator::physical::MOTOR.freeSpeed /
+      consts::elevator::physical::GEARING) /
+     1_rad) *
+        (consts::elevator::physical::PULLEY_DIAM / 2.0),
+    str::gains::linear::meter_volt_ka_unit_t{0},
+    str::gains::linear::meter_volt_kv_unit_t{0},
+    str::gains::linear::meter_volt_ka_unit_t{0.1},
+    str::gains::linear::meter_volt_kv_unit_t{2.2133},
+    0_V,
+    str::gains::linear::meter_volt_kp_unit_t{30.368},
+    str::gains::linear::meter_volt_ki_unit_t{0},
+    str::gains::linear::meter_volt_kd_unit_t{0.21709},
+};
+
+inline constexpr units::volt_t kG = 1.0619_V;
+#endif
 
 }  // namespace gains
 }  // namespace consts::elevator
