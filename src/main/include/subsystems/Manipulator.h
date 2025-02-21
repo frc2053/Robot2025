@@ -46,6 +46,7 @@ class Manipulator : public frc2::SubsystemBase {
   void Poop();
   void Suck();
   void Stop();
+  void SetTryingForCoral(bool newValue);
 
   frc2::CommandPtr PoopPiece();
   // TODO: Might be able to detect wheel speed increase to get rid of time
@@ -67,6 +68,7 @@ class Manipulator : public frc2::SubsystemBase {
   bool previouslyHadCoral{false};
   bool fakeCoralDrop{false};
   bool fakeCoralSuck{false};
+  bool tryingForCoral{false};
 
   units::volt_t currentVoltage{0_V};
   units::volt_t commandedVoltage{0_V};
@@ -128,6 +130,8 @@ class Manipulator : public frc2::SubsystemBase {
   nt::BooleanPublisher hasCoralPub{nt->GetBooleanTopic("HasCoral").Publish()};
   nt::BooleanPublisher gotAlgaePub{nt->GetBooleanTopic("GotAlgae").Publish()};
   nt::BooleanPublisher gotCoralPub{nt->GetBooleanTopic("GotCoral").Publish()};
+  nt::BooleanPublisher tryingForCoralPub{
+      nt->GetBooleanTopic("TryingForCoral").Publish()};
   nt::BooleanPublisher droppedCoralPub{
       nt->GetBooleanTopic("DroppedCoral").Publish()};
 

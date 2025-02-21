@@ -140,9 +140,16 @@ frc2::Trigger Manipulator::GotCoral() {
   return frc2::Trigger{[this] {
            return (filteredCurrent <
                    consts::manip::gains::GOT_GAME_PIECE_CURRENT) &&
-                  (previouslyHadCoral == false);
+                  (previouslyHadCoral == false) &&
+                  (currentVelocity <
+                   consts::manip::gains::GOT_CORAL_THRESHOLD) &&
+                  tryingForCoral;
          }}
       .Debounce(consts::manip::gains::CORAL_DEBOUNCE_TIME);
+}
+
+void Manipulator::SetTryingForCoral(bool newValue) {
+  tryingForCoral = newValue;
 }
 
 bool Manipulator::HasCoral() {
@@ -163,6 +170,7 @@ void Manipulator::UpdateNTEntries() {
   commandedVoltagePub.Set(commandedVoltage.value());
   filteredCurrentPub.Set(filteredCurrent.value());
   droppedCoralPub.Set(droppedCoral.Get());
+  tryingForCoralPub.Set(tryingForCoral);
   display.GamePieceSet(hasCoral, hasAlgae);
 }
 

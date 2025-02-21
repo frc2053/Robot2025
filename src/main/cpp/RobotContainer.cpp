@@ -46,17 +46,14 @@ void RobotContainer::ConfigureBindings() {
 
   manipSub.GotCoral().OnTrue(coordinator.GoToLoading());
 
-  driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
-
+  driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilCoral());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
 
-  // driverJoystick.Start().OnTrue(coordinator.GoToLoading());
+  operatorJoystick.A().OnTrue(coordinator.GoToL1());
+  operatorJoystick.B().OnTrue(coordinator.GoToL2());
 
-  driverJoystick.A().OnTrue(coordinator.GoToL1());
-  driverJoystick.B().OnTrue(coordinator.GoToL2());
-
-  driverJoystick.X().OnTrue(coordinator.GoToL3());
-  driverJoystick.Y().OnTrue(coordinator.GoToL4());
+  operatorJoystick.X().OnTrue(coordinator.GoToL3());
+  operatorJoystick.Y().OnTrue(coordinator.GoToL4());
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
@@ -290,7 +287,7 @@ frc2::CommandPtr RobotContainer::HandleReturnToNeutralPosition() {
 
 frc2::Trigger RobotContainer::NoButtonsPressed() {
   return frc2::Trigger{[this] {
-    return !driverJoystick.A().Get() && !driverJoystick.B().Get() &&
-           !driverJoystick.X().Get() && !driverJoystick.Y().Get();
+    return !operatorJoystick.A().Get() && !operatorJoystick.B().Get() &&
+           !operatorJoystick.X().Get() && !operatorJoystick.Y().Get();
   }};
 }
