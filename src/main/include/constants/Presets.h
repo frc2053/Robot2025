@@ -23,7 +23,7 @@ inline constexpr units::radian_t algaeGrab = 0_deg;
 inline constexpr units::radian_t algaeNet = 80_deg;
 inline constexpr units::radian_t primed = 45_deg;
 
-inline constexpr units::radian_t outofstarting = 5_deg;
+inline constexpr units::radian_t outofstarting = 20_deg;
 }  // namespace wrist
 
 namespace elev {

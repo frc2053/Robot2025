@@ -44,7 +44,7 @@ void RobotContainer::ConfigureBindings() {
   frc2::RobotModeTriggers::Teleop().OnTrue(
       coordinator.GetOutOfStartingConfig());
 
-  manipSub.GotCoral().OnTrue(coordinator.GoToLoading());
+  manipSub.GotCoralFR().OnTrue(coordinator.GoToCoralPrime());
 
   driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilCoral());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
@@ -60,12 +60,12 @@ void RobotContainer::ConfigureBindings() {
   //   driverJoystick.Back().OnTrue(algaeintakeSub.Poop());
   //   driverJoystick.Start().OnTrue(algaeintakeSub.Intake());
 
-  //   driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
-  //       driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
-  //       [this] { return !manipSub.HasCoral(); }));
-  //   driverJoystick.RightTrigger().WhileTrue(frc2::cmd::Either(
-  //       driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false;
-  //       }), [this] { return manipSub.HasAlgae(); }));
+  driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
+      driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
+      [this] { return !manipSub.HasCoral(); }));
+  driverJoystick.RightTrigger().WhileTrue(frc2::cmd::Either(
+      driveSub.AlignToProcessor(), driveSub.AlignToReef([] { return false; }),
+      [this] { return manipSub.HasAlgae(); }));
 
   //   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {

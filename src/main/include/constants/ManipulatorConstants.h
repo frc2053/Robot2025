@@ -25,7 +25,7 @@ inline constexpr int ROLLER_MOTOR = 19;
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_LIMIT = 40_A;
-inline constexpr units::ampere_t STATOR_LIMIT = 40_A;
+inline constexpr units::ampere_t STATOR_LIMIT = 100_A;
 }  // namespace current_limits
 
 namespace physical {
@@ -40,8 +40,8 @@ namespace gains {
 inline constexpr units::volt_t POOP_VOLTS = 6_V;
 inline constexpr units::volt_t SUCK_VOLTS = 6_V;
 
-inline constexpr units::turns_per_second_t GOT_CORAL_THRESHOLD = 3_tps;
-inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = -110_A;
+inline constexpr units::turns_per_second_t GOT_CORAL_THRESHOLD = 100_rpm;
+inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = -90_A;
 inline constexpr units::ampere_t DROPPED_GAME_PIECE_CURRENT = 20_A;
 inline constexpr units::second_t CORAL_DEBOUNCE_TIME = 100_ms;
 }  // namespace gains

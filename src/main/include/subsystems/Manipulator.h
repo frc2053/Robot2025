@@ -55,6 +55,7 @@ class Manipulator : public frc2::SubsystemBase {
   frc2::CommandPtr SuckUntilCoral();
   frc2::CommandPtr StopCmd();
   frc2::CommandPtr HoldCmd();
+  frc2::Trigger GotCoralFR();
 
  private:
   void ConfigureMotors();
@@ -68,7 +69,7 @@ class Manipulator : public frc2::SubsystemBase {
   bool previouslyHadCoral{false};
   bool fakeCoralDrop{false};
   bool fakeCoralSuck{false};
-  bool tryingForCoral{false};
+  bool tryingForCoral{true};
 
   units::volt_t currentVoltage{0_V};
   units::volt_t commandedVoltage{0_V};

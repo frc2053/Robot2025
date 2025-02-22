@@ -22,6 +22,7 @@ class Coordinator {
   frc2::CommandPtr GetOutOfStartingConfig();
   frc2::CommandPtr PrimeCoral(std::function<units::radian_t()> finalAngle);
   frc2::CommandPtr WaitForPriming();
+  frc2::CommandPtr GoToCoralPrime();
 
  private:
   frc2::CommandPtr GoToL1Coral();

@@ -358,7 +358,7 @@ void Pivot::ConfigureMotors() {
 
   config.Feedback.FeedbackRemoteSensorID = pivotEncoder.GetDeviceID();
   config.Feedback.FeedbackSensorSource =
-      ctre::phoenix6::signals::FeedbackSensorSourceValue::FusedCANcoder;
+      ctre::phoenix6::signals::FeedbackSensorSourceValue::RemoteCANcoder;
   config.Feedback.SensorToMechanismRatio = 1.0;
   config.Feedback.RotorToSensorRatio = consts::pivot::physical::GEARING;
 

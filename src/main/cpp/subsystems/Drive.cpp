@@ -263,8 +263,9 @@ int Drive::WhatReefZoneAmIIn() {
     rotationAmount = 180_deg;
   }
 
-  units::radian_t angle = units::math::atan2(
-      GetRobotPose().Y() - reefCenter.Y(), GetRobotPose().X() - reefCenter.X());
+  units::radian_t angle =
+      units::math::atan2(swerveDrive.GetSingleTagPose().Y() - reefCenter.Y(),
+                         swerveDrive.GetSingleTagPose().X() - reefCenter.X());
 
   units::radian_t normalizedAngle =
       units::math::fmod(angle + units::radian_t{2 * std::numbers::pi},

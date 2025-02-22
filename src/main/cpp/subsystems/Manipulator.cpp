@@ -52,11 +52,11 @@ frc2::CommandPtr Manipulator::SuckUntilCoral() {
 }
 
 frc2::CommandPtr Manipulator::StopCmd() {
-  return frc2::cmd::RunOnce([this] { Stop(); });
+  return frc2::cmd::RunOnce([this] { Stop(); }, {this});
 }
 
 frc2::CommandPtr Manipulator::HoldCmd() {
-  return frc2::cmd::RunOnce([this] { SetVoltage(-2_V); });
+  return frc2::cmd::RunOnce([this] { SetVoltage(-2_V); }, {this});
 }
 
 // This method will be called once per scheduler run
@@ -136,14 +136,15 @@ frc2::Trigger Manipulator::DroppedCoral() {
       .Debounce(consts::manip::gains::CORAL_DEBOUNCE_TIME);
 }
 
+frc2::Trigger Manipulator::GotCoralFR() {
+  return frc2::Trigger{[this] { return hasCoral; }};
+}
+
 frc2::Trigger Manipulator::GotCoral() {
   return frc2::Trigger{[this] {
            return (filteredCurrent <
                    consts::manip::gains::GOT_GAME_PIECE_CURRENT) &&
-                  (previouslyHadCoral == false) &&
-                  (currentVelocity <
-                   consts::manip::gains::GOT_CORAL_THRESHOLD) &&
-                  tryingForCoral;
+                  (previouslyHadCoral == false) && tryingForCoral;
          }}
       .Debounce(consts::manip::gains::CORAL_DEBOUNCE_TIME);
 }
@@ -220,6 +221,13 @@ void Manipulator::ConfigureMotors() {
   config.CurrentLimits.SupplyCurrentLimit =
       consts::manip::current_limits::SUPPLY_LIMIT;
 
+  config.CurrentLimits.StatorCurrentLimitEnable = true;
+  config.CurrentLimits.StatorCurrentLimit =
+      consts::manip::current_limits::STATOR_LIMIT;
+
+  config.HardwareLimitSwitch.ForwardLimitEnable = false;
+  config.HardwareLimitSwitch.ReverseLimitEnable = false;
+
   if (frc::RobotBase::IsSimulation()) {
     config.MotorOutput.Inverted =
         ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
@@ -236,5 +244,5 @@ void Manipulator::ConfigureMotors() {
 }
 
 void Manipulator::ConfigureControlSignals() {
-  rollerVoltageSetter.UpdateFreqHz = 0_Hz;
+  rollerVoltageSetter.UpdateFreqHz = 100_Hz;
 }

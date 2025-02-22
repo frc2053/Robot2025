@@ -31,6 +31,7 @@ Robot::Robot() {
                                       frc::filesystem::GetDeployDirectory());
   m_container.GetSuperStructureDisplay().Draw();
   pdp.ClearStickyFaults();
+  m_container.GetManipulator().OverrideHasCoral(true);
 }
 
 void Robot::RobotPeriodic() {
@@ -74,7 +75,6 @@ void Robot::DisabledPeriodic() {
 void Robot::DisabledExit() {}
 
 void Robot::AutonomousInit() {
-  m_container.GetManipulator().OverrideHasCoral(true);
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand != nullptr) {

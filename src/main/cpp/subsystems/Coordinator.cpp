@@ -42,18 +42,28 @@ frc2::CommandPtr Coordinator::GetOutOfStartingConfig() {
 
 frc2::CommandPtr Coordinator::GoToAlgaeHold() {
   return frc2::cmd::Parallel(
+      manip.HoldCmd(),
       frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
       elev.GoToHeightCmd([] { return presets::elev::algae::hold; }),
       piv.GoToAngleCmd([] { return presets::wrist::algaeHold; }));
 }
 
+frc2::CommandPtr Coordinator::GoToCoralPrime() {
+  return frc2::cmd::Parallel(
+      frc2::cmd::Print("I have a coral, going to primed position"),
+      piv.GoToAngleCmd([] { return presets::wrist::primed; }),
+      elev.GoToHeightCmd([] { return presets::elev::coral::loading; }));
+}
+
 frc2::CommandPtr Coordinator::GoToLoading() {
   return frc2::cmd::Either(
       frc2::cmd::Parallel(
+          manip.StopCmd(),
           frc2::cmd::Print("I have a coral, going to primed position"),
           piv.GoToAngleCmd([] { return presets::wrist::primed; }),
           elev.GoToHeightCmd([] { return presets::elev::coral::loading; })),
       frc2::cmd::Parallel(
+          manip.StopCmd(),
           frc2::cmd::Print("I dont have a coral, going to loading position"),
           frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(true); }),
           piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }),
