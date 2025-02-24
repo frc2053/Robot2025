@@ -38,7 +38,7 @@ void RobotContainer::ConfigureBindings() {
       },
       [this] {
         return frc::ApplyDeadband<double>(-driverJoystick.GetRightX(), .1) *
-               consts::swerve::physical::MAX_ROT_SPEED;
+               360_deg_per_s;
       }));
 
   frc2::RobotModeTriggers::Teleop().OnTrue(

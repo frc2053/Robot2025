@@ -55,6 +55,7 @@ class Manipulator : public frc2::SubsystemBase {
   frc2::CommandPtr SuckUntilCoral();
   frc2::CommandPtr StopCmd();
   frc2::CommandPtr HoldCmd();
+  frc2::CommandPtr HoldCoralCmd();
   frc2::Trigger GotCoralFR();
 
  private:

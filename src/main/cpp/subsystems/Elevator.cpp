@@ -334,6 +334,9 @@ void Elevator::ConfigureMotors() {
   config.CurrentLimits.SupplyCurrentLimit =
       consts::elevator::current_limits::SUPPLY_LIMIT;
 
+  config.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
+  config.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = 0_tr;
+
   if (frc::RobotBase::IsSimulation()) {
     config.MotorOutput.Inverted =
         ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;

@@ -48,11 +48,15 @@ frc2::CommandPtr Manipulator::SuckUntilAlgae() {
 frc2::CommandPtr Manipulator::SuckUntilCoral() {
   return frc2::cmd::Run([this] { Suck(); })
       .Until([this] { return HasCoral(); })
-      .AndThen(StopCmd());
+      .AndThen(HoldCoralCmd());
 }
 
 frc2::CommandPtr Manipulator::StopCmd() {
   return frc2::cmd::RunOnce([this] { Stop(); }, {this});
+}
+
+frc2::CommandPtr Manipulator::HoldCoralCmd() {
+  return frc2::cmd::RunOnce([this] { SetVoltage(-.5_V); }, {this});
 }
 
 frc2::CommandPtr Manipulator::HoldCmd() {

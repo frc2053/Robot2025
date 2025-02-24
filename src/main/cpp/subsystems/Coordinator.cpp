@@ -14,7 +14,7 @@ Coordinator::Coordinator(Elevator& elevator, Pivot& pivot,
     : elev{elevator}, piv{pivot}, manip{manipulator} {}
 
 frc2::CommandPtr Coordinator::GoToL1() {
-  return frc2::cmd::Either(GoToL1Coral(), GoToAlgaeProcess(),
+  return frc2::cmd::Either(frc2::cmd::Idle(), GoToAlgaeProcess(),
                            [this] { return manip.HasCoral(); });
 }
 
