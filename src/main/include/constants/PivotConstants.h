@@ -58,6 +58,7 @@ inline constexpr units::radian_t ANGLE_TOLERANCE = 1.5_deg;
 inline constexpr units::turns_per_second_t INTERMEDIATE_STATE_MAX_VEL =
     180_deg_per_s;
 
+#ifdef __FRC_ROBORIO__
 inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
     str::gains::radial::turn_volt_ka_unit_t{0},
@@ -69,8 +70,20 @@ inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     str::gains::radial::turn_volt_ki_unit_t{0},
     str::gains::radial::turn_volt_kd_unit_t{2},
 };
-
 inline constexpr units::volt_t kG = .38_V;
-
+#else
+inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
+    consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
+    str::gains::radial::turn_volt_ka_unit_t{1},
+    str::gains::radial::turn_volt_kv_unit_t{10},
+    str::gains::radial::turn_volt_ka_unit_t{0},
+    str::gains::radial::turn_volt_kv_unit_t{0},
+    0_V,
+    str::gains::radial::turn_volt_kp_unit_t{10},
+    str::gains::radial::turn_volt_ki_unit_t{0},
+    str::gains::radial::turn_volt_kd_unit_t{0},
+};
+inline constexpr units::volt_t kG = 1.553_V;
+#endif
 }  // namespace gains
 }  // namespace consts::pivot
