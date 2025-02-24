@@ -32,7 +32,7 @@ inline constexpr units::meter_t hold = 12_in;
 inline constexpr units::meter_t processor = 12_in;
 inline constexpr units::meter_t l2 = 20_in;
 inline constexpr units::meter_t l3 = 35_in;
-inline constexpr units::meter_t net = 80_in;
+inline constexpr units::meter_t net = 79_in;
 }  // namespace algae
 
 namespace coral {
