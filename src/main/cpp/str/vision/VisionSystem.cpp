@@ -7,6 +7,7 @@
 #include <frc/geometry/Pose2d.h>
 
 #include <vector>
+
 #include "constants/VisionConstants.h"
 
 using namespace str::vision;

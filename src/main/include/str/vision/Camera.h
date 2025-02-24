@@ -87,7 +87,7 @@ class Camera {
     frc::Rotation2d yaw{fx, xOffset};
     frc::Rotation2d pitch{fy / std::cos(std::atan(xOffset / fx)), -yOffset};
     return frc::Rotation3d{0_rad, pitch.Radians(), yaw.Radians()};
-  };
+  }
 
   Eigen::Matrix<double, 3, 1> singleTagDevs;
   Eigen::Matrix<double, 3, 1> multiTagDevs;

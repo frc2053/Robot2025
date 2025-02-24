@@ -9,9 +9,9 @@
 #include <str/swerve/SwerveDrive.h>
 
 #include <optional>
-#include "frc/PowerDistribution.h"
 
 #include "RobotContainer.h"
+#include "frc/PowerDistribution.h"
 
 class Robot : public frc::TimedRobot {
  public:
