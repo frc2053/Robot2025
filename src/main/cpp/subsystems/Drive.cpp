@@ -283,6 +283,8 @@ int Drive::WhatReefZoneAmIIn() {
 }
 
 void Drive::SetupPathplanner() {
+  consts::swerve::pathplanning::config =
+      pathplanner::RobotConfig::fromGUISettings();
   ppControllers = std::make_shared<pathplanner::PPHolonomicDriveController>(
       pathplanner::PIDConstants{consts::swerve::pathplanning::POSE_P,
                                 consts::swerve::pathplanning::POSE_I,

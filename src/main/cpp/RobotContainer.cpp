@@ -61,8 +61,8 @@ void RobotContainer::ConfigureBindings() {
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
-  //   operatorJoystick.RightTrigger().OnTrue(algaeintakeSub.Poop());
-  //   operatorJoystick.LeftTrigger().OnTrue(algaeintakeSub.Intake());
+  operatorJoystick.RightTrigger().OnTrue(algaeintakeSub.Poop());
+  operatorJoystick.LeftTrigger().OnTrue(algaeintakeSub.Intake());
 
   driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
       driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
@@ -114,8 +114,8 @@ void RobotContainer::ConfigureSysIdBinds() {
       elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get(); }));
   pivotTuneBtn.OnTrue(
       pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
-  //   algaePivotTuneBtn.OnTrue(algaeintakeSub.TuneAlgaePivotPID(
-  //       [this] { return !algaePivotTuneBtn.Get(); }));
+  algaePivotTuneBtn.OnTrue(algaeintakeSub.TuneAlgaePivotPID(
+      [this] { return !algaePivotTuneBtn.Get(); }));
 
   steerSysIdVoltsBtn.WhileTrue(SteerVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
@@ -140,9 +140,9 @@ void RobotContainer::ConfigureSysIdBinds() {
       [this] { return tuningTable->GetBoolean("Forward", true); },
       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 
-  //   algaePivotSysIdVoltsBtn.WhileTrue(AlgaeIntakePivotVoltsSysIdCommands(
-  //       [this] { return tuningTable->GetBoolean("Forward", true); },
-  //       [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
+  algaePivotSysIdVoltsBtn.WhileTrue(AlgaeIntakePivotVoltsSysIdCommands(
+      [this] { return tuningTable->GetBoolean("Forward", true); },
+      [this] { return tuningTable->GetBoolean("Quasistatic", true); }));
 
   coastElevatorBtn.WhileTrue(elevatorSub.Coast());
   coastPivotBtn.WhileTrue(pivotSub.Coast());
@@ -212,21 +212,21 @@ frc2::CommandPtr RobotContainer::PivotVoltsSysIdCommands(
       fwd);
 }
 
-// frc2::CommandPtr RobotContainer::AlgaeIntakePivotVoltsSysIdCommands(
-//     std::function<bool()> fwd, std::function<bool()> quasistatic) {
-//   return frc2::cmd::Either(
-//       frc2::cmd::Either(algaeintakeSub.SysIdAlgaePivotQuasistaticVoltage(
-//                             frc2::sysid::Direction::kForward),
-//                         algaeintakeSub.SysIdAlgaePivotDynamicVoltage(
-//                             frc2::sysid::Direction::kForward),
-//                         quasistatic),
-//       frc2::cmd::Either(algaeintakeSub.SysIdAlgaePivotQuasistaticVoltage(
-//                             frc2::sysid::Direction::kReverse),
-//                         algaeintakeSub.SysIdAlgaePivotDynamicVoltage(
-//                             frc2::sysid::Direction::kReverse),
-//                         quasistatic),
-//       fwd);
-// }
+frc2::CommandPtr RobotContainer::AlgaeIntakePivotVoltsSysIdCommands(
+    std::function<bool()> fwd, std::function<bool()> quasistatic) {
+  return frc2::cmd::Either(
+      frc2::cmd::Either(algaeintakeSub.SysIdAlgaePivotQuasistaticVoltage(
+                            frc2::sysid::Direction::kForward),
+                        algaeintakeSub.SysIdAlgaePivotDynamicVoltage(
+                            frc2::sysid::Direction::kForward),
+                        quasistatic),
+      frc2::cmd::Either(algaeintakeSub.SysIdAlgaePivotQuasistaticVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        algaeintakeSub.SysIdAlgaePivotDynamicVoltage(
+                            frc2::sysid::Direction::kReverse),
+                        quasistatic),
+      fwd);
+}
 
 frc2::CommandPtr RobotContainer::DriveSysIdCommands(
     std::function<bool()> fwd, std::function<bool()> quasistatic) {
@@ -271,9 +271,9 @@ Manipulator& RobotContainer::GetManipulator() {
   return manipSub;
 }
 
-// AlgaeIntake& RobotContainer::GetAlgaeIntake() {
-//   return algaeintakeSub;
-// }
+AlgaeIntake& RobotContainer::GetAlgaeIntake() {
+  return algaeintakeSub;
+}
 
 str::vision::VisionSystem& RobotContainer::GetVision() {
   return vision;
