@@ -33,7 +33,6 @@ Drive::Drive() {
 
 void Drive::Periodic() {
   swerveDrive.UpdateNTEntries();
-  WhatReefZoneAmIIn();
 }
 
 void Drive::SimulationPeriodic() {
