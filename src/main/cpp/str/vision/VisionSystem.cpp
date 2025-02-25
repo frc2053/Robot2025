@@ -32,13 +32,11 @@ VisionSystem::VisionSystem(
           Camera{consts::vision::BL_CAM_NAME, consts::vision::BL_ROBOT_TO_CAM,
                  consts::vision::SINGLE_TAG_STD_DEV,
                  consts::vision::MULTI_TAG_STD_DEV, true, visionConsumer,
-                 [](const frc::Pose2d&, units::second_t,
-                    const Eigen::Vector3d& stdDevs) {}},
+                 singleTagConsumer},
           Camera{consts::vision::BR_CAM_NAME, consts::vision::BR_ROBOT_TO_CAM,
                  consts::vision::SINGLE_TAG_STD_DEV,
                  consts::vision::MULTI_TAG_STD_DEV, true, visionConsumer,
-                 [](const frc::Pose2d&, units::second_t,
-                    const Eigen::Vector3d& stdDevs) {}}} {}
+                 singleTagConsumer}} {}
 
 void VisionSystem::UpdateCameraPositionVis(frc::Pose3d robotPose) {
   cameraLocations[0] = robotPose.TransformBy(consts::vision::FL_ROBOT_TO_CAM);

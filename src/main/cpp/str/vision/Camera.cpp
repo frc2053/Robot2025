@@ -129,14 +129,20 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
       if (singleTagPose->strategy ==
           photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT) {
         if (singleTagPose.has_value()) {
-          singleTagPosePub.Set(singleTagPose->estimatedPose.ToPose2d());
-          singleTagConsumer(
-              singleTagPose->estimatedPose.ToPose2d(), singleTagPose->timestamp,
-              GetEstimationStdDevs(singleTagPose->estimatedPose.ToPose2d()));
+          if (result.GetTargets()[0].GetPoseAmbiguity() < .1) {
+            singleTagPosePub.Set(singleTagPose->estimatedPose.ToPose2d());
+            singleTagConsumer(
+                singleTagPose->estimatedPose.ToPose2d(),
+                singleTagPose->timestamp,
+                GetEstimationStdDevs(singleTagPose->estimatedPose.ToPose2d()));
+          }
         }
       }
     } else {
       if (visionEst.has_value()) {
+        singleTagConsumer(
+            visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
+            GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
         consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
                  GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
       }

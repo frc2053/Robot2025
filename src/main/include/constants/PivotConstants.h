@@ -53,7 +53,7 @@ inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 75_deg;
 
 namespace gains {
 
-inline constexpr units::radian_t ANGLE_TOLERANCE = 1.5_deg;
+inline constexpr units::radian_t ANGLE_TOLERANCE = 2.5_deg;
 
 inline constexpr units::turns_per_second_t INTERMEDIATE_STATE_MAX_VEL =
     180_deg_per_s;
@@ -66,7 +66,7 @@ inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     str::gains::radial::turn_volt_ka_unit_t{0.03},
     str::gains::radial::turn_volt_kv_unit_t{2.53},
     .1_V,
-    str::gains::radial::turn_volt_kp_unit_t{20},
+    str::gains::radial::turn_volt_kp_unit_t{55},
     str::gains::radial::turn_volt_ki_unit_t{0},
     str::gains::radial::turn_volt_kd_unit_t{2},
 };
