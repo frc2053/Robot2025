@@ -130,11 +130,15 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
           photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT) {
         if (singleTagPose.has_value()) {
           if (result.GetTargets()[0].GetPoseAmbiguity() < .1) {
-            singleTagPosePub.Set(singleTagPose->estimatedPose.ToPose2d());
-            singleTagConsumer(
-                singleTagPose->estimatedPose.ToPose2d(),
-                singleTagPose->timestamp,
-                GetEstimationStdDevs(singleTagPose->estimatedPose.ToPose2d()));
+            if ((std::find(reefTags.begin(), reefTags.end(),
+                           result.GetTargets()[0].GetFiducialId()) !=
+                 reefTags.end())) {
+              singleTagPosePub.Set(singleTagPose->estimatedPose.ToPose2d());
+              singleTagConsumer(singleTagPose->estimatedPose.ToPose2d(),
+                                singleTagPose->timestamp,
+                                GetEstimationStdDevs(
+                                    singleTagPose->estimatedPose.ToPose2d()));
+            }
           }
         }
       }
