@@ -48,10 +48,12 @@ class Autos {
   void BindCommandsAndTriggers() {
     pathplanner::NamedCommands::registerCommand(
         "GetOutOfStarting", m_coordinator.GetOutOfStartingConfig());
+    pathplanner::NamedCommands::registerCommand("Prime",
+                                                m_coordinator.GoToCoralPrime());
     pathplanner::NamedCommands::registerCommand("L1", m_coordinator.GoToL1());
     pathplanner::NamedCommands::registerCommand("L2", m_coordinator.GoToL2());
     pathplanner::NamedCommands::registerCommand("L4Coral",
-                                                m_coordinator.GoToL4());
+                                                m_coordinator.GoToL4Coral());
     pathplanner::NamedCommands::registerCommand("Loading",
                                                 m_coordinator.GoToLoading());
     pathplanner::NamedCommands::registerCommand("WaitForCoral",

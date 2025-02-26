@@ -23,6 +23,7 @@ class Coordinator {
   frc2::CommandPtr PrimeCoral(std::function<units::radian_t()> finalAngle);
   frc2::CommandPtr WaitForPriming();
   frc2::CommandPtr GoToCoralPrime();
+  frc2::CommandPtr GoToL4Coral();
 
  private:
   frc2::CommandPtr GoToL1Coral();
@@ -31,7 +32,6 @@ class Coordinator {
   frc2::CommandPtr GoToL2Algae();
   frc2::CommandPtr GoToL3Coral();
   frc2::CommandPtr GoToL3Algae();
-  frc2::CommandPtr GoToL4Coral();
   frc2::CommandPtr GoToNet();
 
   Elevator& elev;

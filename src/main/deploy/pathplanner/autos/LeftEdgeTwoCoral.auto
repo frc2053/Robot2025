@@ -80,9 +80,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "LSBToApproach.0"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LSBToApproach.0"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Prime"
+                }
+              }
+            ]
           }
         },
         {
@@ -102,6 +115,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
           }
         }
       ]
