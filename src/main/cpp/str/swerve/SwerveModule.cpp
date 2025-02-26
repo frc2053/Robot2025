@@ -363,8 +363,9 @@ void SwerveModule::SetSteerToAmps(units::ampere_t ampsToSend) {
   steerMotor.SetControl(steerTorqueCurrentSetter.WithOutput(ampsToSend));
 }
 
-void SwerveModule::SetDriveToAmps(units::ampere_t ampsToSend) {
-  driveMotor.SetControl(driveTorqueCurrentSetter.WithOutput(ampsToSend));
+void SwerveModule::SetDriveToVolts(units::volt_t voltsToSend) {
+  steerMotor.SetControl(steerAngleSetter.WithPosition(0_rad));
+  driveMotor.SetControl(driveVoltageSetter.WithOutput(voltsToSend));
 }
 
 void SwerveModule::ConfigureControlSignals() {
@@ -382,7 +383,7 @@ void SwerveModule::ConfigureControlSignals() {
   driveTorqueCurrentSetter.UseTimesync = true;
   steerTorqueCurrentSetter.OverrideCoastDurNeutral = true;
   driveTorqueCurrentSetter.OverrideCoastDurNeutral = true;
-  driveVelocitySetter.OverrideCoastDurNeutral = true;
+  driveVelocitySetter.OverrideCoastDurNeutral = false;
 }
 
 units::radian_t SwerveModule::ConvertDriveMotorRotationsToWheelRotations(

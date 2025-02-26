@@ -48,7 +48,7 @@ class SwerveModule {
   units::ampere_t GetSimulatedCurrentDraw() const;
   void SetSteerToAmps(units::ampere_t ampsToSend);
   void SetSteerToVoltage(units::volt_t voltsToSend);
-  void SetDriveToAmps(units::ampere_t ampsToSend);
+  void SetDriveToVolts(units::volt_t voltsToSend);
 
  private:
   void ConfigureSteerEncoder(units::turn_t encoderOffset);

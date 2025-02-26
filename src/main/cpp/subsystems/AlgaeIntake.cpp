@@ -31,6 +31,7 @@ AlgaeIntake::AlgaeIntake(str::SuperstructureDisplay& display)
   OptimizeBusSignals();
 
   nt->SetDefaultBoolean("SimGrabbingAlgae", false);
+  algaePivotMotor.SetPosition(-90_deg);
 }
 
 void AlgaeIntake::Periodic() {
@@ -142,22 +143,16 @@ frc2::CommandPtr AlgaeIntake::Hold() {
 }
 
 frc2::CommandPtr AlgaeIntake::Intake() {
-  return Roller().FinallyDo([this] {
-    frc2::CommandScheduler::GetInstance().Schedule(
-        frc2::cmd::Either(Hold(), Stow(), [this] { return hasAlgae; }));
-  });
+  return Roller();
 }
 
 frc2::CommandPtr AlgaeIntake::Roller() {
-  return frc2::cmd::Sequence(
-      frc2::cmd::RunOnce(
-          [this] {
-            GoToAngle(consts::algae::physical::ALGAE_INTAKE_ANGLE);
-            algaeRollerMotor.Set(1.0);
-          },
-          {this}),
-      frc2::cmd::WaitUntil([this] { return hasAlgae; }),
-      frc2::cmd::RunOnce([this] { algaeRollerMotor.Set(0); }, {this}));
+  return frc2::cmd::Sequence(frc2::cmd::RunOnce(
+      [this] {
+        GoToAngle(consts::algae::physical::ALGAE_INTAKE_ANGLE);
+        algaeRollerMotor.Set(1.0);
+      },
+      {this}));
 }
 
 frc2::CommandPtr AlgaeIntake::GoToAngleCmd(

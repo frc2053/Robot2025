@@ -400,11 +400,11 @@ void SwerveDrive::SetCharacterizationAmpsSteer(units::ampere_t amps) {
   modules[0].SetSteerToAmps(amps);
 }
 
-void SwerveDrive::SetCharacterizationAmpsDrive(units::ampere_t amps) {
-  modules[0].SetDriveToAmps(amps);
-  modules[1].SetDriveToAmps(amps);
-  modules[2].SetDriveToAmps(amps);
-  modules[3].SetDriveToAmps(amps);
+void SwerveDrive::SetCharacterizationVoltsDrive(units::volt_t volts) {
+  modules[0].SetDriveToVolts(volts);
+  modules[1].SetDriveToVolts(volts);
+  modules[2].SetDriveToVolts(volts);
+  modules[3].SetDriveToVolts(volts);
 }
 
 void SwerveDrive::LogSteerVolts(frc::sysid::SysIdRoutineLog* log) {
@@ -421,9 +421,9 @@ void SwerveDrive::LogSteerTorqueCurrent(frc::sysid::SysIdRoutineLog* log) {
       .velocity(units::turns_per_second_t{allSignals[3]->GetValueAsDouble()});
 }
 
-void SwerveDrive::LogDriveTorqueCurrent(frc::sysid::SysIdRoutineLog* log) {
+void SwerveDrive::LogDriveVolts(frc::sysid::SysIdRoutineLog* log) {
   log->Motor("swerve-drive")
-      .voltage(units::volt_t{allSignals[4]->GetValueAsDouble()})
+      .voltage(units::volt_t{allSignals[6]->GetValueAsDouble()})
       .position(units::turn_t{allSignals[0]->GetValueAsDouble()})
       .velocity(units::turns_per_second_t{allSignals[1]->GetValueAsDouble()});
 }

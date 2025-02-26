@@ -134,7 +134,7 @@ class AlgaeIntake : public frc2::SubsystemBase {
 
   frc2::sysid::SysIdRoutine algaePivotSysIdVoltage{
       frc2::sysid::Config{
-          std::nullopt, 10_V, std::nullopt,
+          std::nullopt, 4_V, std::nullopt,
           [](frc::sysid::State state) {
             ctre::phoenix6::SignalLogger().WriteString(
                 "SysIdAlgae_State",

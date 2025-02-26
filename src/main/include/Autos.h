@@ -23,6 +23,7 @@ class Autos {
     selectCommand = frc2::cmd::Select<AutoSelector>(
         [this] { return autoChooser.GetSelected(); },
         std::pair{NOTHING, frc2::cmd::None()},
+        std::pair{TEST, pathplanner::PathPlannerAuto("Test").ToPtr()},
         std::pair{LEFT_EDGE_TWO_CORAL,
                   pathplanner::PathPlannerAuto("LeftEdgeTwoCoral").ToPtr()},
         std::pair{
@@ -32,6 +33,7 @@ class Autos {
                   pathplanner::PathPlannerAuto("MiddleCoralProc").ToPtr()});
 
     autoChooser.SetDefaultOption("Do Nothing", AutoSelector::NOTHING);
+    autoChooser.AddOption("Test", AutoSelector::TEST);
     autoChooser.AddOption("Left Edge Two Coral",
                           AutoSelector::LEFT_EDGE_TWO_CORAL);
     autoChooser.AddOption("Right Edge Two Coral",
@@ -69,6 +71,7 @@ class Autos {
 
   enum AutoSelector {
     NOTHING,
+    TEST,
     LEFT_EDGE_TWO_CORAL,
     RIGHT_EDGE_TWO_CORAL,
     MIDDLE_CORAL_PROC

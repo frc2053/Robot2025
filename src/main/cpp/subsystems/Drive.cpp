@@ -439,17 +439,17 @@ frc2::CommandPtr Drive::TuneDrivePID(std::function<bool()> isDone) {
       frc2::cmd::Run(
           [this, tablePrefix] {
             str::swerve::DriveGains newGains{
-                str::gains::radial::turn_amp_ka_unit_t{
+                str::gains::radial::turn_volt_ka_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kA", 0)},
-                str::gains::radial::turn_amp_kv_unit_t{
+                str::gains::radial::turn_volt_kv_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kV", 0)},
-                units::ampere_t{
+                units::volt_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kS", 0)},
-                str::gains::radial::turn_amp_kp_unit_t{
+                str::gains::radial::turn_volt_kp_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kP", 0)},
-                str::gains::radial::turn_amp_ki_unit_t{
+                str::gains::radial::turn_volt_ki_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kI", 0)},
-                str::gains::radial::turn_amp_kd_unit_t{
+                str::gains::radial::turn_volt_kd_unit_t{
                     frc::SmartDashboard::GetNumber(tablePrefix + "kD", 0)}};
 
             if (newGains != swerveDrive.GetDriveGains()) {

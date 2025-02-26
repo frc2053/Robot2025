@@ -61,8 +61,10 @@ void RobotContainer::ConfigureBindings() {
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
-  operatorJoystick.RightTrigger().OnTrue(algaeintakeSub.Poop());
-  operatorJoystick.LeftTrigger().OnTrue(algaeintakeSub.Intake());
+  operatorJoystick.RightTrigger().WhileTrue(algaeintakeSub.Poop());
+  operatorJoystick.LeftTrigger().WhileTrue(algaeintakeSub.Intake());
+  operatorJoystick.LeftTrigger().OnFalse(algaeintakeSub.Stow());
+  operatorJoystick.RightTrigger().OnFalse(algaeintakeSub.Stow());
 
   driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
       driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),

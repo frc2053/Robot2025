@@ -69,10 +69,10 @@ class SwerveDrive {
 
   void SetCharacterizationVoltsSteer(units::volt_t volts);
   void SetCharacterizationAmpsSteer(units::ampere_t amps);
-  void SetCharacterizationAmpsDrive(units::ampere_t amps);
+  void SetCharacterizationVoltsDrive(units::volt_t volts);
   void LogSteerVolts(frc::sysid::SysIdRoutineLog* log);
   void LogSteerTorqueCurrent(frc::sysid::SysIdRoutineLog* log);
-  void LogDriveTorqueCurrent(frc::sysid::SysIdRoutineLog* log);
+  void LogDriveVolts(frc::sysid::SysIdRoutineLog* log);
   void SetModuleStates(
       const std::array<frc::SwerveModuleState, 4>& desiredStates, bool optimize,
       bool openLoop,

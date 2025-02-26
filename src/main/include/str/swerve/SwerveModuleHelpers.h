@@ -82,12 +82,12 @@ struct ModulePhysicalCharacteristics {
 };
 
 struct DriveGains {
-  str::gains::radial::turn_amp_ka_unit_t kA;
-  str::gains::radial::turn_amp_kv_unit_t kV;
-  units::ampere_t kS;
-  str::gains::radial::turn_amp_kp_unit_t kP;
-  str::gains::radial::turn_amp_ki_unit_t kI;
-  str::gains::radial::turn_amp_kd_unit_t kD;
+  str::gains::radial::turn_volt_ka_unit_t kA;
+  str::gains::radial::turn_volt_kv_unit_t kV;
+  units::volt_t kS;
+  str::gains::radial::turn_volt_kp_unit_t kP;
+  str::gains::radial::turn_volt_ki_unit_t kI;
+  str::gains::radial::turn_volt_kd_unit_t kD;
 
   DriveGains& operator=(const DriveGains& other) = default;
   DriveGains(const DriveGains& other)
@@ -97,11 +97,11 @@ struct DriveGains {
         kP{other.kP},
         kI{other.kI},
         kD{other.kD} {}
-  DriveGains(str::gains::radial::turn_amp_ka_unit_t ka,
-             str::gains::radial::turn_amp_kv_unit_t kv, units::ampere_t ks,
-             str::gains::radial::turn_amp_kp_unit_t kp,
-             str::gains::radial::turn_amp_ki_unit_t ki,
-             str::gains::radial::turn_amp_kd_unit_t kd)
+  DriveGains(str::gains::radial::turn_volt_ka_unit_t ka,
+             str::gains::radial::turn_volt_kv_unit_t kv, units::volt_t ks,
+             str::gains::radial::turn_volt_kp_unit_t kp,
+             str::gains::radial::turn_volt_ki_unit_t ki,
+             str::gains::radial::turn_volt_kd_unit_t kd)
       : kA{ka}, kV{kv}, kS{ks}, kP{kp}, kI{ki}, kD{kd} {}
 
   bool operator==(const DriveGains& rhs) const {

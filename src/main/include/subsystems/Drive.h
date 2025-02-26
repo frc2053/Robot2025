@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -152,18 +153,18 @@ class Drive : public frc2::SubsystemBase {
 
   frc2::sysid::SysIdRoutine driveSysid{
       frc2::sysid::Config{
-          (6_V / 1_s), 27_V, std::nullopt,
+          std::nullopt, std::nullopt, std::nullopt,
           [](frc::sysid::State state) {
             ctre::phoenix6::SignalLogger().WriteString(
                 "SysIdDrive_State",
                 frc::sysid::SysIdRoutineLog::StateEnumToString(state));
           }},
-      frc2::sysid::Mechanism{[this](units::volt_t ampsToSend) {
-                               swerveDrive.SetCharacterizationAmpsDrive(
-                                   units::ampere_t{ampsToSend.value()});
+      frc2::sysid::Mechanism{[this](units::volt_t voltsToSend) {
+                               swerveDrive.SetCharacterizationVoltsDrive(
+                                   voltsToSend);
                              },
                              [this](frc::sysid::SysIdRoutineLog* log) {
-                               swerveDrive.LogDriveTorqueCurrent(log);
+                               swerveDrive.LogDriveVolts(log);
                              },
                              this, "swerve-drive"}};
 };

@@ -54,7 +54,7 @@ inline constexpr units::scalar_t STEER_GEARING = (50.0 / 14.0) * (60.0 / 10.0);
 inline constexpr units::scalar_t DRIVE_GEARING =
     (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 inline constexpr units::scalar_t COUPLING_RATIO = (50.0 / 14.0);
-inline constexpr units::meter_t WHEEL_RADIUS = 1.9154_in;
+inline constexpr units::meter_t WHEEL_RADIUS = 1.9443_in;
 
 inline constexpr units::meter_t WHEELBASE_WIDTH = 22.75_in;
 inline constexpr units::meter_t WHEELBASE_LENGTH = 22.75_in;
@@ -160,23 +160,23 @@ namespace gains {
 inline const str::gains::radial::VoltRadialGainsHolder STEER{
     consts::swerve::physical::STEER_MOTOR.freeSpeed /
         consts::swerve::physical::STEER_GEARING,
-    str::gains::radial::turn_volt_ka_unit_t{0.085024},
-    str::gains::radial::turn_volt_kv_unit_t{2.5028},
-    str::gains::radial::turn_volt_ka_unit_t{0.085024},
-    str::gains::radial::turn_volt_kv_unit_t{2.5028},
-    0.21176_V,
-    str::gains::radial::turn_volt_kp_unit_t{45.01},
+    str::gains::radial::turn_volt_ka_unit_t{0.095481},
+    str::gains::radial::turn_volt_kv_unit_t{2.606},
+    str::gains::radial::turn_volt_ka_unit_t{0.095481},
+    str::gains::radial::turn_volt_kv_unit_t{2.606},
+    0.24038_V,
+    str::gains::radial::turn_volt_kp_unit_t{176},
     str::gains::radial::turn_volt_ki_unit_t{0},
-    str::gains::radial::turn_volt_kd_unit_t{2.6793},
+    str::gains::radial::turn_volt_kd_unit_t{.2},
 };
 
 inline const str::swerve::DriveGains DRIVE{
-    str::gains::radial::turn_amp_ka_unit_t{0.070827},
-    str::gains::radial::turn_amp_kv_unit_t{0},
-    10.051_A,
-    str::gains::radial::turn_amp_kp_unit_t{3.596},
-    str::gains::radial::turn_amp_ki_unit_t{0},
-    str::gains::radial::turn_amp_kd_unit_t{0},
+    str::gains::radial::turn_volt_ka_unit_t{0.0031508},
+    str::gains::radial::turn_volt_kv_unit_t{.11982},
+    .29943_V,
+    str::gains::radial::turn_volt_kp_unit_t{7},
+    str::gains::radial::turn_volt_ki_unit_t{0},
+    str::gains::radial::turn_volt_kd_unit_t{0},
 };
 }  // namespace gains
 
