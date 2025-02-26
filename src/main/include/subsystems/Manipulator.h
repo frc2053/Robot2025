@@ -76,7 +76,6 @@ class Manipulator : public frc2::SubsystemBase {
   units::volt_t commandedVoltage{0_V};
   units::ampere_t torqueCurrent{0_A};
   units::revolutions_per_minute_t currentVelocity{0_rpm};
-  units::ampere_t filteredCurrent{0_A};
 
   ctre::phoenix6::hardware::TalonFX rollerMotor{
       consts::manip::can_ids::ROLLER_MOTOR};
@@ -120,8 +119,6 @@ class Manipulator : public frc2::SubsystemBase {
   nt::DoublePublisher velocityPub{nt->GetDoubleTopic("Velocity").Publish()};
   nt::DoublePublisher torqueCurrentPub{
       nt->GetDoubleTopic("TorqueCurrent").Publish()};
-  nt::DoublePublisher filteredCurrentPub{
-      nt->GetDoubleTopic("Filtered Current").Publish()};
   nt::BooleanSubscriber bumpSwitchSub{
       nt->GetBooleanTopic("SimBumpSwitch").Subscribe(false)};
   nt::BooleanSubscriber gotCorralSub{

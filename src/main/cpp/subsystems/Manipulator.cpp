@@ -93,8 +93,6 @@ void Manipulator::Periodic() {
     }
   }
 
-  filteredCurrent = currentFilter.Calculate(torqueCurrent);
-
   hasCoral = (gotCoral.Get() || previouslyHadCoral) && !droppedCoral.Get();
 
   UpdateNTEntries();
@@ -133,7 +131,7 @@ frc2::Trigger Manipulator::GotAlgae() {
 
 frc2::Trigger Manipulator::DroppedCoral() {
   return frc2::Trigger{[this] {
-           return (filteredCurrent >
+           return (torqueCurrent >
                    consts::manip::gains::DROPPED_GAME_PIECE_CURRENT) &&
                   (previouslyHadCoral == true);
          }}
@@ -146,7 +144,7 @@ frc2::Trigger Manipulator::GotCoralFR() {
 
 frc2::Trigger Manipulator::GotCoral() {
   return frc2::Trigger{[this] {
-           return (filteredCurrent <
+           return (torqueCurrent <
                    consts::manip::gains::GOT_GAME_PIECE_CURRENT) &&
                   (previouslyHadCoral == false) && tryingForCoral;
          }}
@@ -173,7 +171,6 @@ void Manipulator::UpdateNTEntries() {
   velocityPub.Set(currentVelocity.value());
   torqueCurrentPub.Set(torqueCurrent.value());
   commandedVoltagePub.Set(commandedVoltage.value());
-  filteredCurrentPub.Set(filteredCurrent.value());
   droppedCoralPub.Set(droppedCoral.Get());
   tryingForCoralPub.Set(tryingForCoral);
   display.GamePieceSet(hasCoral, hasAlgae);
@@ -228,6 +225,8 @@ void Manipulator::ConfigureMotors() {
   config.CurrentLimits.StatorCurrentLimitEnable = true;
   config.CurrentLimits.StatorCurrentLimit =
       consts::manip::current_limits::STATOR_LIMIT;
+
+  config.OpenLoopRamps.VoltageOpenLoopRampPeriod = .25_s;
 
   config.HardwareLimitSwitch.ForwardLimitEnable = false;
   config.HardwareLimitSwitch.ReverseLimitEnable = false;
