@@ -54,6 +54,7 @@ class Drive : public frc2::SubsystemBase {
       std::function<units::meters_per_second_t()> yVel,
       std::function<units::radians_per_second_t()> omega);
 
+  frc2::CommandPtr AlignToReefSegment(std::function<bool()> leftSide, int zone);
   frc2::CommandPtr AlignToReef(std::function<bool()> leftSide);
   frc2::CommandPtr AlignToAlgae();
   frc2::CommandPtr AlignToProcessor();

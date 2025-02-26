@@ -144,9 +144,6 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
       }
     } else {
       if (visionEst.has_value()) {
-        singleTagConsumer(
-            visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
-            GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
         consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
                  GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
       }

@@ -208,6 +208,22 @@ frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
       true);
 }
 
+frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
+                                           int zone) {
+  return DriveToPose(
+      [this, leftSide, zone] {
+        if (str::IsOnRed()) {
+          return pathplanner::FlippingUtil::flipFieldPose(
+              importantPoses[WhatPoleToGoTo(zone, leftSide())]);
+
+        } else {
+          return importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(),
+                                               leftSide())];
+        }
+      },
+      true);
+}
+
 std::string Drive::WhatPoleToGoTo(int zone, bool leftOrRight) {
   if (zone == 0) {
     return leftOrRight ? "H" : "G";
