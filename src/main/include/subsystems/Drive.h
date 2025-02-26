@@ -35,7 +35,9 @@ class Drive : public frc2::SubsystemBase {
   void UpdateOdom();
   frc::Pose2d GetRobotPose() const;
   frc::Pose2d GetOdomPose() const;
-  units::radian_t GetGyroYaw() const { return swerveDrive.GetYawFromImu(); }
+  units::radian_t GetGyroYaw() const {
+    return swerveDrive.GetOdomPose().Rotation().Radians();
+  }
   void SetupPathplanner();
   void AddVisionMeasurement(const frc::Pose2d& measurement,
                             units::second_t timestamp,
