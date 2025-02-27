@@ -40,15 +40,15 @@ frc2::CommandPtr Manipulator::PoopPiece(
 }
 
 frc2::CommandPtr Manipulator::SuckUntilAlgae() {
-  return frc2::cmd::Run([this] { Suck(); })
+  return frc2::cmd::Run([this] { Suck(); }, {this})
       .Until([this] { return HasAlgae(); })
       .AndThen(HoldCmd());
 }
 
 frc2::CommandPtr Manipulator::SuckUntilCoral() {
-  return frc2::cmd::Run([this] { Suck(); })
-      .Until([this] { return HasCoral(); })
-      .AndThen(HoldCoralCmd());
+  return frc2::cmd::Run([this] { Suck(); }, {this}).Until([this] {
+    return HasCoral();
+  });
 }
 
 frc2::CommandPtr Manipulator::StopCmd() {
@@ -56,11 +56,11 @@ frc2::CommandPtr Manipulator::StopCmd() {
 }
 
 frc2::CommandPtr Manipulator::HoldCoralCmd() {
-  return frc2::cmd::RunOnce([this] { SetVoltage(-.5_V); }, {this});
+  return frc2::cmd::Run([this] { SetVoltage(-.5_V); }, {this});
 }
 
 frc2::CommandPtr Manipulator::HoldCmd() {
-  return frc2::cmd::RunOnce([this] { SetVoltage(-2_V); }, {this});
+  return frc2::cmd::Run([this] { SetVoltage(-2_V); }, {this});
 }
 
 // This method will be called once per scheduler run
@@ -180,7 +180,7 @@ void Manipulator::SetVoltage(units::volt_t volts) {
   commandedVoltage = volts;
   rollerMotor.SetControl(rollerVoltageSetter.WithEnableFOC(true)
                              .WithIgnoreHardwareLimits(true)
-                             .WithOutput(volts));
+                             .WithOutput(commandedVoltage));
 }
 
 void Manipulator::OptimizeBusSignals() {
