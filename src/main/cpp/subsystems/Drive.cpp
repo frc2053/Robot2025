@@ -13,9 +13,12 @@
 #include <numbers>
 #include <string>
 
+#include "constants/Constants.h"
 #include "constants/SwerveConstants.h"
 #include "frc/MathUtil.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
+#include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
@@ -176,7 +179,7 @@ frc2::CommandPtr Drive::AlignToAlgae() {
           return importantPoses[WhatAlgaeToGoTo(WhatReefZoneAmIIn())];
         }
       },
-      true);
+      false);
 }
 
 frc2::CommandPtr Drive::AlignToProcessor() {
@@ -196,32 +199,50 @@ frc2::CommandPtr Drive::AlignToProcessor() {
 frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
   return DriveToPose(
       [this, leftSide] {
-        if (str::IsOnRed()) {
-          return pathplanner::FlippingUtil::flipFieldPose(
-              importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(), leftSide())]);
+        frc::Pose2d centerOfPole =
+            importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(), leftSide())];
 
+        frc::Pose2d clawOnPole = centerOfPole;
+        if (leftSide()) {
+          clawOnPole =
+              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
         } else {
-          return importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(),
-                                               leftSide())];
+          clawOnPole =
+              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+        }
+
+        if (str::IsOnRed()) {
+          return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
+        } else {
+          return clawOnPole;
         }
       },
-      true);
+      false);
 }
 
 frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
                                            int zone) {
   return DriveToPose(
       [this, leftSide, zone] {
-        if (str::IsOnRed()) {
-          return pathplanner::FlippingUtil::flipFieldPose(
-              importantPoses[WhatPoleToGoTo(zone, leftSide())]);
+        frc::Pose2d centerOfPole =
+            importantPoses[WhatPoleToGoTo(zone, leftSide())];
 
+        frc::Pose2d clawOnPole = centerOfPole;
+        if (leftSide()) {
+          clawOnPole =
+              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
         } else {
-          return importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(),
-                                               leftSide())];
+          clawOnPole =
+              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+        }
+
+        if (str::IsOnRed()) {
+          return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
+        } else {
+          return clawOnPole;
         }
       },
-      true);
+      false);
 }
 
 std::string Drive::WhatPoleToGoTo(int zone, bool leftOrRight) {
