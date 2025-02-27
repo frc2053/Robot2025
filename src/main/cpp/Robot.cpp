@@ -16,7 +16,7 @@
 #include "constants/SwerveConstants.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
-#include "photon/PhotonPoseEstimator.h"
+#include "str/vision/StrPoseEstimator.h"
 
 Robot::Robot() {
   // DANGEROUS MAKE SURE CODE DOESN'T BLOCK!!!

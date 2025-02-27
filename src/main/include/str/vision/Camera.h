@@ -9,7 +9,7 @@
 #include <networktables/StructArrayTopic.h>
 #include <networktables/StructTopic.h>
 #include <photon/PhotonCamera.h>
-#include <photon/PhotonPoseEstimator.h>
+#include <str/vision/StrPoseEstimator.h>
 #include <photon/estimation/VisionEstimation.h>
 #include <photon/simulation/VisionSystemSim.h>
 #include <photon/simulation/VisionTargetSim.h>
@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "frc/geometry/Pose3d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
@@ -42,12 +43,13 @@ class Camera {
              singleTagCon);
   void SimPeriodic(frc::Pose2d robotSimPose);
   void UpdatePoseEstimator(frc::Pose3d robotPose);
-  std::optional<photon::EstimatedRobotPose> ImuTagOnRio(
+  std::optional<str::EstimatedRobotPose> ImuTagOnRio(
       photon::PhotonPipelineResult result);
   void AddYaw(units::radian_t yaw, units::second_t time) {
     yawBuffer.AddSample(time, yaw);
+    photonEstimator->AddHeadingData(time, frc::Rotation2d{yaw});
   }
-  std::optional<photon::EstimatedRobotPose> LatestSingleTagPose() {
+  std::optional<str::EstimatedRobotPose> LatestSingleTagPose() {
     return singleTagPose;
   }
 
@@ -62,12 +64,12 @@ class Camera {
   std::function<void(const frc::Pose2d&, units::second_t,
                      const Eigen::Vector3d& stdDevs)>
       singleTagConsumer;
-  std::unique_ptr<photon::PhotonPoseEstimator> photonEstimator;
+  std::unique_ptr<str::StrPoseEstimator> photonEstimator;
   std::unique_ptr<photon::PhotonCamera> camera;
   std::unique_ptr<photon::VisionSystemSim> visionSim;
   std::unique_ptr<photon::SimCameraProperties> cameraProps;
   std::shared_ptr<photon::PhotonCameraSim> cameraSim;
-  std::optional<photon::EstimatedRobotPose> singleTagPose;
+  std::optional<str::EstimatedRobotPose> singleTagPose;
   frc::Transform3d robotToCam{};
   frc::TimeInterpolatableBuffer<units::radian_t> yawBuffer{1.0_s};
 

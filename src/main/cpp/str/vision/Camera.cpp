@@ -23,11 +23,12 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
 #include "opencv2/core/types.hpp"
-#include "photon/PhotonPoseEstimator.h"
+#include "str/vision/StrPoseEstimator.h"
 #include "photon/targeting/PhotonTrackedTarget.h"
 #include "photon/targeting/TargetCorner.h"
 #include "units/angle.h"
 #include "units/length.h"
+#include "str/vision/ConstrainedSolve.h"
 
 using namespace str::vision;
 
@@ -60,13 +61,13 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
       cornersPub(nt->GetStructArrayTopic<frc::Translation2d>(cameraName +
                                                              "targetCorners")
                      .Publish()) {
-  photonEstimator = std::make_unique<photon::PhotonPoseEstimator>(
-      consts::yearspecific::TAG_LAYOUT,
-      photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
+  photonEstimator = std::make_unique<str::StrPoseEstimator>(
+      consts::yearspecific::TAG_LAYOUT, PoseStrategy::CONSTRAINED_SOLVEPNP,
+      robotToCamera);
   camera = std::make_unique<photon::PhotonCamera>(cameraName);
   camera->SetVersionCheckEnabled(false);
   photonEstimator->SetMultiTagFallbackStrategy(
-      photon::PoseStrategy::LOWEST_AMBIGUITY);
+      PoseStrategy::PNP_DISTANCE_TRIG_SOLVE);
 
   if (simulate) {
     if (frc::RobotBase::IsSimulation()) {
@@ -91,13 +92,14 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
 }
 
 void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
-  std::optional<photon::EstimatedRobotPose> visionEst;
+  std::optional<str::EstimatedRobotPose> visionEst;
 
   auto allUnread = camera->GetAllUnreadResults();
 
   for (const auto& result : allUnread) {
-    visionEst = photonEstimator->Update(result);
-    singleTagPose = ImuTagOnRio(result);
+    visionEst = photonEstimator->Update(result, camera->GetCameraMatrix(),
+                                        camera->GetDistCoeffs(),
+                                        ConstrainedSolvepnpParams{true, 0.0});
 
     if (visionEst.has_value()) {
       posePub.Set(visionEst.value().estimatedPose.ToPose2d());
@@ -123,102 +125,10 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
     targetPosesPub.Set(targetPoses);
     cornersPub.Set(cornerPxs);
 
-    // TRICKING PHOTON STRATS
-    // WE ONLY WANT SINGLE TAG RESULTS TO BE ADDED IF THEY ARE OUR TRIG
-    if (result.targets.size() == 1) {
-      if (singleTagPose->strategy ==
-          photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT) {
-        if (singleTagPose.has_value()) {
-          if (result.GetTargets()[0].GetPoseAmbiguity() < .1) {
-            if ((std::find(reefTags.begin(), reefTags.end(),
-                           result.GetTargets()[0].GetFiducialId()) !=
-                 reefTags.end())) {
-              singleTagPosePub.Set(singleTagPose->estimatedPose.ToPose2d());
-              singleTagConsumer(singleTagPose->estimatedPose.ToPose2d(),
-                                singleTagPose->timestamp,
-                                GetEstimationStdDevs(
-                                    singleTagPose->estimatedPose.ToPose2d()));
-            }
-          }
-        }
-      }
-    } else {
-      if (visionEst.has_value()) {
-        consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
-                 GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
-      }
+    if (visionEst.has_value()) {
+      consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
+               GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
     }
-  }
-}
-
-std::optional<photon::EstimatedRobotPose> Camera::ImuTagOnRio(
-    photon::PhotonPipelineResult result) {
-  if (result.HasTargets() && result.GetTargets().size() == 1 &&
-      camera->GetCameraMatrix().has_value()) {
-    photon::PhotonTrackedTarget target = result.GetBestTarget();
-    int tagId = target.GetFiducialId();
-    std::optional<frc::Pose3d> tagPose =
-        consts::yearspecific::TAG_LAYOUT.GetTagPose(tagId);
-    if (!tagPose.has_value()) {
-      return {};
-    }
-
-    std::vector<photon::TargetCorner> targetCorners =
-        target.GetDetectedCorners();
-    double sumX = 0.0;
-    double sumY = 0.0;
-    for (const auto& t : targetCorners) {
-      sumX = sumX + t.x;
-      sumY = sumY + t.y;
-    }
-
-    cv::Point2d tagCenter{sumX / 4.0, sumY / 4.0};
-    frc::Rotation3d tagAngle =
-        GetCorrectedPixelRot(tagCenter, camera->GetCameraMatrix().value());
-
-    frc::Transform3d best = target.GetBestCameraToTarget();
-
-    units::meter_t distance = best.Translation().Norm();
-
-    units::meter_t distance2d =
-        distance * units::math::cos(-robotToCam.Rotation().Y() - tagAngle.Y());
-
-    std::optional<units::radian_t> headingState =
-        yawBuffer.Sample(result.GetTimestamp());
-    if (!headingState.has_value()) {
-      return {};
-    }
-
-    frc::Rotation2d robotHeading{headingState.value()};
-
-    frc::Rotation2d camToTagRotation =
-        (robotHeading + robotToCam.Rotation().ToRotation2d()) +
-        frc::Rotation2d{tagAngle.Z()};
-
-    frc::Pose2d fieldToCameraPose =
-        frc::Pose2d{tagPose->ToPose2d().Translation(),
-                    camToTagRotation +
-                        frc::Rotation2d{units::radian_t{std::numbers::pi}}}
-            .TransformBy(frc::Transform2d{distance2d, 0_m, frc::Rotation2d{}});
-
-    frc::Translation2d fieldToCameraTranslation =
-        fieldToCameraPose.Translation();
-
-    frc::Pose2d robotPose =
-        frc::Pose2d{fieldToCameraTranslation,
-                    robotHeading + robotToCam.Rotation().ToRotation2d()}
-            .TransformBy(frc::Transform2d{
-                frc::Pose2d{robotToCam.X(), robotToCam.Y(),
-                            robotToCam.Rotation().ToRotation2d()},
-                frc::Pose2d{}});
-
-    robotPose = frc::Pose2d{robotPose.Translation(), robotHeading};
-
-    return photon::EstimatedRobotPose{
-        frc::Pose3d{robotPose}, result.GetTimestamp(), result.GetTargets(),
-        photon::PoseStrategy::CLOSEST_TO_CAMERA_HEIGHT};
-  } else {
-    return {};
   }
 }
 
