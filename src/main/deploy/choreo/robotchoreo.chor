@@ -4,6 +4,20 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "PoleOffset":{
+    "dimension":"Length",
+    "var":{
+     "exp":"6.469 in",
+     "val":0.1643126
+    }
+   },
+   "RWidth":{
+    "dimension":"Length",
+    "var":{
+     "exp":"0.446913 m",
+     "val":0.446913
+    }
+   },
    "Width":{
     "dimension":"Length",
     "var":{
@@ -15,29 +29,29 @@
   "poses":{
    "A":{
     "x":{
-     "exp":"3.192117929458618 m",
-     "val":3.192117929458618
+     "exp":"Tag18.x - RWidth",
+     "val":3.2105870000000003
     },
     "y":{
-     "exp":"4.305543899536133 m",
-     "val":4.305543899536133
+     "exp":"Tag18.y + PoleOffset",
+     "val":4.1902126
     },
     "heading":{
-     "exp":"0 rad",
+     "exp":"Tag18.heading",
      "val":0.0
     }
    },
    "ABAlgae":{
     "x":{
-     "exp":"3.1790151596069336 m",
-     "val":3.1790151596069336
+     "exp":"Tag18.x - (RWidth * cos(Tag18.heading))",
+     "val":3.2105870000000003
     },
     "y":{
-     "exp":"4.131117820739746 m",
-     "val":4.131117820739746
+     "exp":"Tag18.y - (RWidth * sin(Tag18.heading))",
+     "val":4.0259
     },
     "heading":{
-     "exp":"0 rad",
+     "exp":"Tag18.heading",
      "val":0.0
     }
    },
@@ -57,226 +71,226 @@
    },
    "B":{
     "x":{
-     "exp":"3.187319755554199 m",
-     "val":3.187319755554199
+     "exp":"Tag18.x - RWidth",
+     "val":3.2105870000000003
     },
     "y":{
-     "exp":"3.9831182956695557 m",
-     "val":3.983118295669556
+     "exp":"Tag18.y - PoleOffset",
+     "val":3.8615874
     },
     "heading":{
-     "exp":"0 rad",
+     "exp":"Tag18.heading",
      "val":0.0
     }
    },
    "C":{
     "x":{
-     "exp":"3.604741334915161 m",
-     "val":3.604741334915161
+     "exp":"Tag17.x - (PoleOffset * sin(Tag17.heading)) - (RWidth * cos(Tag17.heading))",
+     "val":3.708150614138129
     },
     "y":{
-     "exp":"3.0332601070404053 m",
-     "val":3.0332601070404053
+     "exp":"Tag17.y + (PoleOffset * cos(Tag17.heading)) - (RWidth * sin(Tag17.heading))",
+     "val":3.001436288618485
     },
     "heading":{
-     "exp":"1.0378791422371114 rad",
-     "val":1.0378791422371114
+     "exp":"Tag17.heading",
+     "val":1.0471975511965976
     }
    },
    "CDAlgae":{
     "x":{
-     "exp":"3.7379703521728516 m",
-     "val":3.737970352172851
+     "exp":"Tag17.x - (RWidth * cos(Tag17.heading))",
+     "val":3.8504494999
     },
     "y":{
-     "exp":"2.9474480152130127 m",
-     "val":2.9474480152130127
+     "exp":"Tag17.y - (RWidth * sin(Tag17.heading))",
+     "val":2.9192799886184853
     },
     "heading":{
-     "exp":"1.0358411675594918 rad",
-     "val":1.0358411675594918
+     "exp":"Tag17.heading",
+     "val":1.0471975511965976
     }
    },
    "D":{
     "x":{
-     "exp":"3.871502637863159 m",
-     "val":3.871502637863159
+     "exp":"Tag17.x + (PoleOffset * sin(Tag17.heading)) - (RWidth * cos(Tag17.heading))",
+     "val":3.992748385661871
     },
     "y":{
-     "exp":"2.8758132457733154 m",
-     "val":2.875813245773315
+     "exp":"Tag17.y - (PoleOffset * cos(Tag17.heading)) - (RWidth * sin(Tag17.heading))",
+     "val":2.8371236886184854
     },
     "heading":{
-     "exp":"1.034107827197541 rad",
-     "val":1.034107827197541
+     "exp":"Tag17.heading",
+     "val":1.0471975511965976
     }
    },
    "E":{
     "x":{
-     "exp":"4.896701335906982 m",
-     "val":4.896701335906982
+     "exp":"Tag22.x - (PoleOffset * sin(Tag22.heading)) - (RWidth * cos(Tag22.heading))",
+     "val":4.985897613238129
     },
     "y":{
-     "exp":"2.75484037399292 m",
-     "val":2.75484037399292
+     "exp":"Tag22.y + (PoleOffset * cos(Tag22.heading)) - (RWidth * sin(Tag22.heading))",
+     "val":2.8371236886184854
     },
     "heading":{
-     "exp":"2.1110763445690153 rad",
-     "val":2.1110763445690153
+     "exp":"Tag22.heading",
+     "val":2.0943951023931953
     }
    },
    "EFAlgae":{
     "x":{
-     "exp":"5.020279407501221 m",
-     "val":5.020279407501221
+     "exp":"Tag22.x - (RWidth * cos(Tag22.heading))",
+     "val":5.128196499
     },
     "y":{
-     "exp":"2.822504997253418 m",
-     "val":2.822504997253418
+     "exp":"Tag22.y - (RWidth * sin(Tag22.heading))",
+     "val":2.9192799886184853
     },
     "heading":{
-     "exp":"2.09794206031252 rad",
-     "val":2.09794206031252
+     "exp":"Tag22.heading",
+     "val":2.0943951023931953
     }
    },
    "F":{
     "x":{
-     "exp":"5.185044288635254 m",
-     "val":5.185044288635254
+     "exp":"Tag22.x + (PoleOffset * sin(Tag22.heading)) - (RWidth * cos(Tag22.heading))",
+     "val":5.270495384761872
     },
     "y":{
-     "exp":"2.91848087310791 m",
-     "val":2.91848087310791
+     "exp":"Tag22.y - (PoleOffset * cos(Tag22.heading)) - (RWidth * sin(Tag22.heading))",
+     "val":3.001436288618485
     },
     "heading":{
-     "exp":"2.1110763445690153 rad",
-     "val":2.1110763445690153
+     "exp":"Tag22.heading",
+     "val":2.0943951023931953
     }
    },
    "G":{
     "x":{
-     "exp":"5.785209655761719 m",
-     "val":5.785209655761719
+     "exp":"Tag21.x - (PoleOffset * sin(Tag21.heading)) - (RWidth * cos(Tag21.heading))",
+     "val":5.767959
     },
     "y":{
-     "exp":"3.7344064712524414 m",
-     "val":3.7344064712524414
+     "exp":"Tag21.y + (PoleOffset * cos(Tag21.heading)) - (RWidth * sin(Tag21.heading))",
+     "val":3.8615874
     },
     "heading":{
-     "exp":"180 deg",
+     "exp":"Tag21.heading",
      "val":3.141592653589793
     }
    },
    "GHAlgae":{
     "x":{
-     "exp":"5.79624080657959 m",
-     "val":5.79624080657959
+     "exp":"Tag21.x - (RWidth * cos(Tag21.heading))",
+     "val":5.767959
     },
     "y":{
-     "exp":"3.9075357913970947 m",
-     "val":3.9075357913970943
+     "exp":"Tag21.y - (RWidth * sin(Tag21.heading))",
+     "val":4.0259
     },
     "heading":{
-     "exp":"3.141592653589794 rad",
-     "val":3.141592653589794
+     "exp":"Tag21.heading",
+     "val":3.141592653589793
     }
    },
    "H":{
     "x":{
-     "exp":"5.789431095123291 m",
-     "val":5.789431095123291
+     "exp":"Tag21.x + (PoleOffset * sin(Tag21.heading)) - (RWidth * cos(Tag21.heading))",
+     "val":5.767959
     },
     "y":{
-     "exp":"4.070087928771973 m",
-     "val":4.070087928771973
+     "exp":"Tag21.y - (PoleOffset * cos(Tag21.heading)) - (RWidth * sin(Tag21.heading))",
+     "val":4.1902126
     },
     "heading":{
-     "exp":"180 deg",
+     "exp":"Tag21.heading",
      "val":3.141592653589793
     }
    },
    "I":{
     "x":{
-     "exp":"5.3902177810668945 m",
-     "val":5.3902177810668945
+     "exp":"Tag20.x - (PoleOffset * sin(Tag20.heading)) - (RWidth * cos(Tag20.heading))",
+     "val":5.270495384761872
     },
     "y":{
-     "exp":"5.008383274078369 m",
-     "val":5.008383274078369
+     "exp":"Tag20.y + (PoleOffset * cos(Tag20.heading)) - (RWidth * sin(Tag20.heading))",
+     "val":5.0503637112815145
     },
     "heading":{
-     "exp":"-2.094481156827512 rad",
-     "val":-2.094481156827512
+     "exp":"Tag20.heading",
+     "val":-2.0943951023931953
     }
    },
    "IJAlgae":{
     "x":{
-     "exp":"5.243861198425293 m",
-     "val":5.243861198425293
+     "exp":"Tag20.x - (RWidth * cos(Tag20.heading))",
+     "val":5.128196499
     },
     "y":{
-     "exp":"5.084629535675049 m",
-     "val":5.084629535675049
+     "exp":"Tag20.y - (RWidth * sin(Tag20.heading))",
+     "val":5.132520011281515
     },
     "heading":{
-     "exp":"-2.1216534423042708 rad",
-     "val":-2.1216534423042708
+     "exp":"Tag20.heading",
+     "val":-2.0943951023931953
     }
    },
    "J":{
     "x":{
-     "exp":"5.093659400939941 m",
-     "val":5.093659400939941
+     "exp":"Tag20.x + (PoleOffset * sin(Tag20.heading)) - (RWidth * cos(Tag20.heading))",
+     "val":4.985897613238129
     },
     "y":{
-     "exp":"5.185166835784912 m",
-     "val":5.185166835784912
+     "exp":"Tag20.y - (PoleOffset * cos(Tag20.heading)) - (RWidth * sin(Tag20.heading))",
+     "val":5.214676311281515
     },
     "heading":{
-     "exp":"-2.094481156827512 rad",
-     "val":-2.094481156827512
+     "exp":"Tag20.heading",
+     "val":-2.0943951023931953
     }
    },
    "K":{
     "x":{
-     "exp":"4.100561141967773 m",
-     "val":4.100561141967773
+     "exp":"Tag19.x - (PoleOffset * sin(Tag19.heading)) - (RWidth * cos(Tag19.heading))",
+     "val":3.992748385661871
     },
     "y":{
-     "exp":"5.290059566497803 m",
-     "val":5.290059566497803
+     "exp":"Tag19.y + (PoleOffset * cos(Tag19.heading)) - (RWidth * sin(Tag19.heading))",
+     "val":5.214676311281515
     },
     "heading":{
-     "exp":"-1.02624482246792 rad",
-     "val":-1.02624482246792
+     "exp":"Tag19.heading",
+     "val":-1.0471975511965976
     }
    },
    "KLAlgae":{
     "x":{
-     "exp":"3.876065254211426 m",
-     "val":3.876065254211426
+     "exp":"Tag19.x - (RWidth * cos(Tag19.heading))",
+     "val":3.8504494999
     },
     "y":{
-     "exp":"5.189844608306885 m",
-     "val":5.189844608306885
+     "exp":"Tag19.y - (RWidth * sin(Tag19.heading))",
+     "val":5.132520011281515
     },
     "heading":{
-     "exp":"-1.020943404658117 rad",
-     "val":-1.020943404658117
+     "exp":"Tag19.heading",
+     "val":-1.0471975511965976
     }
    },
    "L":{
     "x":{
-     "exp":"3.803807258605957 m",
-     "val":3.803807258605957
+     "exp":"Tag19.x + (PoleOffset * sin(Tag19.heading)) - (RWidth * cos(Tag19.heading))",
+     "val":3.708150614138129
     },
     "y":{
-     "exp":"5.133873462677002 m",
-     "val":5.133873462677002
+     "exp":"Tag19.y - (PoleOffset * cos(Tag19.heading)) - (RWidth * sin(Tag19.heading))",
+     "val":5.0503637112815145
     },
     "heading":{
-     "exp":"-1.0438534238317514 rad",
-     "val":-1.0438534238317514
+     "exp":"Tag19.heading",
+     "val":-1.0471975511965976
     }
    },
    "LSB":{
@@ -305,6 +319,90 @@
     "heading":{
      "exp":"4.712388980384692 rad",
      "val":4.712388980384692
+    }
+   },
+   "Tag17":{
+    "x":{
+     "exp":"4.0739059999 m",
+     "val":4.0739059999
+    },
+    "y":{
+     "exp":"3.3063179999 m",
+     "val":3.3063179999
+    },
+    "heading":{
+     "exp":"60 deg",
+     "val":1.0471975511965976
+    }
+   },
+   "Tag18":{
+    "x":{
+     "exp":"3.6575 m",
+     "val":3.6575
+    },
+    "y":{
+     "exp":"4.0259 m",
+     "val":4.0259
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "Tag19":{
+    "x":{
+     "exp":"4.0739059999 m",
+     "val":4.0739059999
+    },
+    "y":{
+     "exp":"4.745482 m",
+     "val":4.745482
+    },
+    "heading":{
+     "exp":"-60 deg",
+     "val":-1.0471975511965976
+    }
+   },
+   "Tag20":{
+    "x":{
+     "exp":"4.904739999 m",
+     "val":4.904739999
+    },
+    "y":{
+     "exp":"4.745482 m",
+     "val":4.745482
+    },
+    "heading":{
+     "exp":"-120 deg",
+     "val":-2.0943951023931953
+    }
+   },
+   "Tag21":{
+    "x":{
+     "exp":"5.321046 m",
+     "val":5.321046
+    },
+    "y":{
+     "exp":"4.0259 m",
+     "val":4.0259
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
+    }
+   },
+   "Tag22":{
+    "x":{
+     "exp":"4.904739999 m",
+     "val":4.904739999
+    },
+    "y":{
+     "exp":"3.3063179999 m",
+     "val":3.3063179999
+    },
+    "heading":{
+     "exp":"120 deg",
+     "val":2.0943951023931953
     }
    }
   }
