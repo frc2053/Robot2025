@@ -171,12 +171,16 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
 frc2::CommandPtr Drive::AlignToAlgae() {
   return DriveToPose(
       [this] {
-        if (str::IsOnRed()) {
-          return pathplanner::FlippingUtil::flipFieldPose(
-              importantPoses[WhatAlgaeToGoTo(WhatReefZoneAmIIn())]);
+        frc::Pose2d centerOfAlgae =
+            importantPoses[WhatAlgaeToGoTo(WhatReefZoneAmIIn())];
 
+        frc::Pose2d clawPos = centerOfAlgae;
+        clawPos = clawPos.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+
+        if (str::IsOnRed()) {
+          return pathplanner::FlippingUtil::flipFieldPose(clawPos);
         } else {
-          return importantPoses[WhatAlgaeToGoTo(WhatReefZoneAmIIn())];
+          return clawPos;
         }
       },
       false);
@@ -203,17 +207,24 @@ frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
             importantPoses[WhatPoleToGoTo(WhatReefZoneAmIIn(), leftSide())];
 
         frc::Pose2d clawOnPole = centerOfPole;
-        if (leftSide()) {
-          clawOnPole =
-              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
-        } else {
-          clawOnPole =
-              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
-        }
 
         if (str::IsOnRed()) {
+          if (leftSide()) {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+          } else {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+          }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
+          if (leftSide()) {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+          } else {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+          }
           return clawOnPole;
         }
       },
@@ -228,17 +239,24 @@ frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
             importantPoses[WhatPoleToGoTo(zone, leftSide())];
 
         frc::Pose2d clawOnPole = centerOfPole;
-        if (leftSide()) {
-          clawOnPole =
-              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
-        } else {
-          clawOnPole =
-              clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
-        }
 
         if (str::IsOnRed()) {
+          if (leftSide()) {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+          } else {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+          }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
+          if (leftSide()) {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+          } else {
+            clawOnPole =
+                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+          }
           return clawOnPole;
         }
       },
