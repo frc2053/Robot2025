@@ -16,7 +16,7 @@ inline const frc::Transform3d FL_ROBOT_TO_CAM{
 
 inline const std::string FR_CAM_NAME{"str_fr_cam"};
 inline const frc::Transform3d FR_ROBOT_TO_CAM{
-    frc::Translation3d{0.265256_m, -0.2770_m, 0.209751_m},
+    frc::Translation3d{0.262526_m, -0.287850_m, 0.2141_m},
     frc::Rotation3d{0_rad, -20_deg, 20_deg}};
 
 inline const std::string BL_CAM_NAME{"str_bl_cam"};
