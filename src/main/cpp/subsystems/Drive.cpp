@@ -27,15 +27,22 @@
 #include "str/DriverstationUtils.h"
 #include "str/swerve/SwerveModuleHelpers.h"
 #include "units/angle.h"
+#include "units/length.h"
 #include "util/choreovariables.h"
 
 Drive::Drive() {
   importantPoses = strchoreo::LoadPoses();
   SetupPathplanner();
+  frc::SmartDashboard::PutNumber("L OFFSET",
+                                 lOffset.convert<units::inches>().value());
+  frc::SmartDashboard::PutNumber("R OFFSET",
+                                 rOffset.convert<units::inches>().value());
 }
 
 void Drive::Periodic() {
   swerveDrive.UpdateNTEntries();
+  lOffset = units::inch_t{frc::SmartDashboard::GetNumber("L OFFSET", 0)};
+  rOffset = units::inch_t{frc::SmartDashboard::GetNumber("R OFFSET", 0)};
 }
 
 void Drive::SimulationPeriodic() {
@@ -175,7 +182,8 @@ frc2::CommandPtr Drive::AlignToAlgae() {
             importantPoses[WhatAlgaeToGoTo(WhatReefZoneAmIIn())];
 
         frc::Pose2d clawPos = centerOfAlgae;
-        clawPos = clawPos.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+        clawPos = clawPos.TransformBy(
+            frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
 
         if (str::IsOnRed()) {
           return pathplanner::FlippingUtil::flipFieldPose(clawPos);
@@ -210,20 +218,20 @@ frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
 
         if (str::IsOnRed()) {
           if (leftSide()) {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
           } else {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
           }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
           if (leftSide()) {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
           } else {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
           }
           return clawOnPole;
         }
@@ -242,20 +250,20 @@ frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
 
         if (str::IsOnRed()) {
           if (leftSide()) {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
           } else {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
           }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
           if (leftSide()) {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_L);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
           } else {
-            clawOnPole =
-                clawOnPole.TransformBy(consts::yearspecific::CLAW_TRANS_R);
+            clawOnPole = clawOnPole.TransformBy(
+                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
           }
           return clawOnPole;
         }
@@ -318,8 +326,8 @@ int Drive::WhatReefZoneAmIIn() {
   }
 
   units::radian_t angle =
-      units::math::atan2(swerveDrive.GetSingleTagPose().Y() - reefCenter.Y(),
-                         swerveDrive.GetSingleTagPose().X() - reefCenter.X());
+      units::math::atan2(swerveDrive.GetPose().Y() - reefCenter.Y(),
+                         swerveDrive.GetPose().X() - reefCenter.X());
 
   units::radian_t normalizedAngle =
       units::math::fmod(angle + units::radian_t{2 * std::numbers::pi},

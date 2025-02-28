@@ -14,6 +14,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "constants/Constants.h"
 #include "constants/SwerveConstants.h"
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "frc/geometry/Pose2d.h"
@@ -24,6 +25,7 @@
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
+#include "units/length.h"
 #include "units/time.h"
 #include "units/velocity.h"
 
@@ -170,4 +172,7 @@ class Drive : public frc2::SubsystemBase {
                                swerveDrive.LogDriveVolts(log);
                              },
                              this, "swerve-drive"}};
+
+  units::meter_t lOffset{consts::yearspecific::CLAW_OFFSET_L};
+  units::meter_t rOffset{consts::yearspecific::CLAW_OFFSET_R};
 };

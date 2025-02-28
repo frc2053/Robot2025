@@ -12,8 +12,8 @@ namespace wrist {
 namespace coral {
 inline constexpr units::radian_t loading = 90_deg;
 inline constexpr units::radian_t l1 = -56_deg;
-inline constexpr units::radian_t l2 = -83_deg;
-inline constexpr units::radian_t l3 = -83_deg;
+inline constexpr units::radian_t l2 = -85_deg;
+inline constexpr units::radian_t l3 = -85_deg;
 inline constexpr units::radian_t l4 = -85_deg;
 }  // namespace coral
 
