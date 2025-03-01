@@ -62,12 +62,14 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
                                                              "targetCorners")
                      .Publish()) {
   photonEstimator = std::make_unique<str::StrPoseEstimator>(
-      consts::yearspecific::TAG_LAYOUT, PoseStrategy::CONSTRAINED_SOLVEPNP,
+      consts::yearspecific::TAG_LAYOUT,
+      PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
+  singleTagEstimator = std::make_unique<str::StrPoseEstimator>(
+      consts::yearspecific::TAG_LAYOUT, PoseStrategy::PNP_DISTANCE_TRIG_SOLVE,
       robotToCamera);
   camera = std::make_unique<photon::PhotonCamera>(cameraName);
   camera->SetVersionCheckEnabled(false);
-  photonEstimator->SetMultiTagFallbackStrategy(
-      PoseStrategy::PNP_DISTANCE_TRIG_SOLVE);
+  photonEstimator->SetMultiTagFallbackStrategy(PoseStrategy::LOWEST_AMBIGUITY);
 
   if (simulate) {
     if (frc::RobotBase::IsSimulation()) {
@@ -93,13 +95,25 @@ Camera::Camera(std::string cameraName, frc::Transform3d robotToCamera,
 
 void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
   std::optional<str::EstimatedRobotPose> visionEst;
+  std::optional<str::EstimatedRobotPose> singleTagEst;
 
   auto allUnread = camera->GetAllUnreadResults();
 
   for (const auto& result : allUnread) {
-    visionEst = photonEstimator->Update(result, camera->GetCameraMatrix(),
-                                        camera->GetDistCoeffs(),
-                                        ConstrainedSolvepnpParams{true, 0.0});
+    if (result.GetTargets().size() == 1) {
+      singleTagEst = singleTagEstimator->Update(
+          result, camera->GetCameraMatrix(), camera->GetDistCoeffs());
+    } else {
+      visionEst = photonEstimator->Update(result, camera->GetCameraMatrix(),
+                                          camera->GetDistCoeffs(),
+                                          ConstrainedSolvepnpParams{true, 0.0});
+    }
+
+    if (singleTagEst.has_value()) {
+      singleTagPosePub.Set(singleTagEst.value().estimatedPose.ToPose2d());
+    } else {
+      singleTagPosePub.Set({});
+    }
 
     if (visionEst.has_value()) {
       posePub.Set(visionEst.value().estimatedPose.ToPose2d());
@@ -128,6 +142,12 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
     if (visionEst.has_value()) {
       consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
                GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
+    }
+
+    if (singleTagEst.has_value()) {
+      singleTagConsumer(
+          singleTagEst->estimatedPose.ToPose2d(), singleTagEst->timestamp,
+          GetEstimationStdDevs(singleTagEst->estimatedPose.ToPose2d()));
     }
   }
 }

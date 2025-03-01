@@ -158,16 +158,16 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                            currentPose.Rotation().Radians())};
 
                    swerveDrive.DriveFieldRelative(xSpeed, ySpeed, thetaSpeed,
-                                                  true);
+                                                  false);
                  },
                  {this})
-                 //  .Until([this] {
-                 //    bool isAtGoal = xPoseController.AtGoal() &&
-                 //                    yPoseController.AtGoal() &&
-                 //                    thetaController.AtGoal();
-                 //    isAtGoalPosePub.Set(isAtGoal);
-                 //    return isAtGoal;
-                 //  })
+                 .Until([this] {
+                   bool isAtGoal = xPoseController.AtGoal() &&
+                                   yPoseController.AtGoal() &&
+                                   thetaController.AtGoal();
+                   isAtGoalPosePub.Set(isAtGoal);
+                   return isAtGoal;
+                 })
                  .WithName("PIDToPose Run"),
              frc2::cmd::RunOnce([this] {
                swerveDrive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
@@ -191,7 +191,7 @@ frc2::CommandPtr Drive::AlignToAlgae() {
           return clawPos;
         }
       },
-      false);
+      true);
 }
 
 frc2::CommandPtr Drive::AlignToProcessor() {
@@ -236,7 +236,7 @@ frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
           return clawOnPole;
         }
       },
-      false);
+      true);
 }
 
 frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
@@ -268,7 +268,7 @@ frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
           return clawOnPole;
         }
       },
-      false);
+      true);
 }
 
 std::string Drive::WhatPoleToGoTo(int zone, bool leftOrRight) {

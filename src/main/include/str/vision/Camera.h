@@ -47,6 +47,7 @@ class Camera {
       photon::PhotonPipelineResult result);
   void AddYaw(units::radian_t yaw, units::second_t time) {
     yawBuffer.AddSample(time, yaw);
+    singleTagEstimator->AddHeadingData(time, frc::Rotation2d{yaw});
     photonEstimator->AddHeadingData(time, frc::Rotation2d{yaw});
   }
   std::optional<str::EstimatedRobotPose> LatestSingleTagPose() {
@@ -65,6 +66,7 @@ class Camera {
                      const Eigen::Vector3d& stdDevs)>
       singleTagConsumer;
   std::unique_ptr<str::StrPoseEstimator> photonEstimator;
+  std::unique_ptr<str::StrPoseEstimator> singleTagEstimator;
   std::unique_ptr<photon::PhotonCamera> camera;
   std::unique_ptr<photon::VisionSystemSim> visionSim;
   std::unique_ptr<photon::SimCameraProperties> cameraProps;

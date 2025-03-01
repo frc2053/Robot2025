@@ -29,6 +29,6 @@ inline const frc::Transform3d BR_ROBOT_TO_CAM{
     frc::Translation3d{-0.265256_m, -0.2770_m, 0.209751_m},
     frc::Rotation3d{0_rad, -20_deg, -160_deg}};
 
-inline const Eigen::Matrix<double, 3, 1> SINGLE_TAG_STD_DEV{4, 4, 8};
-inline const Eigen::Matrix<double, 3, 1> MULTI_TAG_STD_DEV{0.5, 0.5, 1};
+inline const Eigen::Matrix<double, 3, 1> SINGLE_TAG_STD_DEV{.2, .2, 999999};
+inline const Eigen::Matrix<double, 3, 1> MULTI_TAG_STD_DEV{0.1, 0.1, 1};
 }  // namespace consts::vision
