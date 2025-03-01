@@ -198,10 +198,10 @@ inline constexpr units::meter_t DYNAMIC_REPLAN_THRESHOLD_SPIKE = 1_ft;
 
 inline pathplanner::RobotConfig config;
 
-inline constexpr units::meter_t translationalPIDTolerance = 1_in;
+inline constexpr units::meter_t translationalPIDTolerance = 0_in;
 inline constexpr units::meters_per_second_t translationalVelPIDTolerance =
     .25_fps;
-inline constexpr units::radian_t rotationalPIDTolerance = 3_deg;
+inline constexpr units::radian_t rotationalPIDTolerance = 0_deg;
 inline constexpr units::radians_per_second_t rotationalVelPIDTolerance =
     1_deg_per_s;
 inline constexpr units::meters_per_second_t translationalVelPIDDeadband =

@@ -161,13 +161,13 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                                                   true);
                  },
                  {this})
-                 .Until([this] {
-                   bool isAtGoal = xPoseController.AtGoal() &&
-                                   yPoseController.AtGoal() &&
-                                   thetaController.AtGoal();
-                   isAtGoalPosePub.Set(isAtGoal);
-                   return isAtGoal;
-                 })
+                 //  .Until([this] {
+                 //    bool isAtGoal = xPoseController.AtGoal() &&
+                 //                    yPoseController.AtGoal() &&
+                 //                    thetaController.AtGoal();
+                 //    isAtGoalPosePub.Set(isAtGoal);
+                 //    return isAtGoal;
+                 //  })
                  .WithName("PIDToPose Run"),
              frc2::cmd::RunOnce([this] {
                swerveDrive.Drive(0_mps, 0_mps, 0_deg_per_s, false);

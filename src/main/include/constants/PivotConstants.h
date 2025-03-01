@@ -48,7 +48,7 @@ inline constexpr units::turn_t ENCODER_OFFSET = -0.295654_tr;
 inline constexpr units::turn_t SOFT_LIMIT_REV = -150_deg;
 inline constexpr units::turn_t SOFT_LIMIT_FWD = 180_deg;
 
-inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 75_deg;
+inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 45_deg;
 }  // namespace physical
 
 namespace gains {
