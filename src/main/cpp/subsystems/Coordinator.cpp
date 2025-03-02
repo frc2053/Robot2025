@@ -37,7 +37,10 @@ frc2::CommandPtr Coordinator::GetOutOfStartingConfig() {
   return frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
       piv.GoToAngleCmd([] { return presets::wrist::outofstarting; }),
-      elev.GoToHeightCmd([] { return presets::elev::outofstarting; }));
+      frc2::cmd::Print("Done with pivot!\n"),
+      elev.GoToHeightCmd([] { return presets::elev::outofstarting; }),
+      frc2::cmd::Print("Done with elevator!\n"),
+      frc2::cmd::Print("Done with Out of starting!\n"));
 }
 
 frc2::CommandPtr Coordinator::GoToAlgaeHold() {

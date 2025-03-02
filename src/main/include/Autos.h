@@ -47,28 +47,39 @@ class Autos {
  private:
   void BindCommandsAndTriggers() {
     pathplanner::NamedCommands::registerCommand(
-        "GetOutOfStarting", m_coordinator.GetOutOfStartingConfig());
+        "GetOutOfStarting",
+        m_coordinator.GetOutOfStartingConfig().WithTimeout(.3_s));
     pathplanner::NamedCommands::registerCommand("Prime",
                                                 m_coordinator.GoToCoralPrime());
     pathplanner::NamedCommands::registerCommand("L1", m_coordinator.GoToL1());
     pathplanner::NamedCommands::registerCommand("L2", m_coordinator.GoToL2());
+    pathplanner::NamedCommands::registerCommand("L3", m_coordinator.GoToL3());
     pathplanner::NamedCommands::registerCommand("L4Coral",
                                                 m_coordinator.GoToL4Coral());
     pathplanner::NamedCommands::registerCommand("Loading",
                                                 m_coordinator.GoToLoading());
-    pathplanner::NamedCommands::registerCommand("WaitForCoral",
-                                                m_manipSub.SuckUntilCoral());
+    pathplanner::NamedCommands::registerCommand(
+        "Suck", frc2::cmd::RunOnce([this] { m_manipSub.Suck(); }));
+    pathplanner::NamedCommands::registerCommand(
+        "WaitForCoral", frc2::cmd::WaitUntil([this] {
+          bool test = m_manipSub.GotCoralFR().Get();
+          fmt::print("test: {}\n", test);
+          return test;
+        }));
+
     pathplanner::NamedCommands::registerCommand("SuckUntilAlgae",
                                                 m_manipSub.SuckUntilAlgae());
     pathplanner::NamedCommands::registerCommand(
         "Score", m_manipSub.PoopPiece([] { return 1_s; }));
 
     pathplanner::NamedCommands::registerCommand(
-        "DriveToLeftReef", m_driveSub.AlignToReef([] { return true; }));
+        "DriveToLeftReef",
+        m_driveSub.AlignToReef([] { return true; }).WithTimeout(1.5_s));
     pathplanner::NamedCommands::registerCommand("DriveToClosestAlgae",
                                                 m_driveSub.AlignToAlgae());
     pathplanner::NamedCommands::registerCommand(
-        "DriveToRightReef", m_driveSub.AlignToReef([] { return false; }));
+        "DriveToRightReef",
+        m_driveSub.AlignToReef([] { return false; }).WithTimeout(1.5_s));
   }
 
   enum AutoSelector {

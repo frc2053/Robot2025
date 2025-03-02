@@ -46,9 +46,13 @@ frc2::CommandPtr Manipulator::SuckUntilAlgae() {
 }
 
 frc2::CommandPtr Manipulator::SuckUntilCoral() {
-  return frc2::cmd::Run([this] { Suck(); }, {this}).Until([this] {
-    return HasCoral();
-  });
+  return frc2::cmd::Run(
+             [this] {
+               Suck();
+               fmt::print("Sucking coral!\n");
+             },
+             {this})
+      .Until([this] { return HasCoral(); });
 }
 
 frc2::CommandPtr Manipulator::StopCmd() {

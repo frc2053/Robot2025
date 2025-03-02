@@ -48,7 +48,8 @@ void RobotContainer::ConfigureBindings() {
   (manipSub.GotCoralFR() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(coordinator.GoToCoralPrime());
 
-  manipSub.GotCoralFR().OnTrue(manipSub.HoldCoralCmd());
+  (manipSub.GotCoralFR() && frc2::RobotModeTriggers::Teleop())
+      .OnTrue(manipSub.HoldCoralCmd());
 
   driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilCoral());
   driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());

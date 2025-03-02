@@ -15,9 +15,16 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "GetOutOfStarting"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "L3"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -43,15 +50,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
           "type": "wait",
           "data": {
             "waitTime": 0.1
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
           }
         },
         {
@@ -69,6 +76,12 @@
                 "data": {
                   "name": "Loading"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Suck"
+                }
               }
             ]
           }
@@ -77,6 +90,12 @@
           "type": "named",
           "data": {
             "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prime"
           }
         },
         {
@@ -92,7 +111,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Prime"
+                  "name": "L3"
                 }
               }
             ]
@@ -115,6 +134,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
           }
         },
         {

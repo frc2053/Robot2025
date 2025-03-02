@@ -370,6 +370,7 @@ void Drive::SetupPathplanner() {
   pathplanner::PathPlannerLogging::setLogActivePathCallback(
       [this](std::vector<frc::Pose2d> poses) {
         swerveDrive.SetActivePath(poses);
+        fmt::print("Active path changed!:\n");
       });
 }
 
