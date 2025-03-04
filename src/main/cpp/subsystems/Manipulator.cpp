@@ -45,6 +45,10 @@ frc2::CommandPtr Manipulator::SuckUntilAlgae() {
       .AndThen(HoldCmd());
 }
 
+frc2::CommandPtr Manipulator::AlgaeAuto() {
+  return frc2::cmd::RunOnce([this] { Suck(); }, {this});
+}
+
 frc2::CommandPtr Manipulator::SuckUntilCoral() {
   return frc2::cmd::Run(
              [this] {

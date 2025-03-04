@@ -24,6 +24,7 @@ class Coordinator {
   frc2::CommandPtr WaitForPriming();
   frc2::CommandPtr GoToCoralPrime();
   frc2::CommandPtr GoToL4Coral();
+  frc2::CommandPtr GoToL2AlgaeAUTO();
 
  private:
   frc2::CommandPtr GoToL1Coral();

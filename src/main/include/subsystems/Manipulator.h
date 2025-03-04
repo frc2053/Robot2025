@@ -57,6 +57,7 @@ class Manipulator : public frc2::SubsystemBase {
   frc2::CommandPtr HoldCmd();
   frc2::CommandPtr HoldCoralCmd();
   frc2::Trigger GotCoralFR();
+  frc2::CommandPtr AlgaeAuto();
 
  private:
   void ConfigureMotors();

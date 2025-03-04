@@ -41,8 +41,8 @@ inline constexpr units::volt_t POOP_VOLTS = 6_V;
 inline constexpr units::volt_t SUCK_VOLTS = 6_V;
 
 inline constexpr units::turns_per_second_t GOT_CORAL_THRESHOLD = 100_rpm;
-inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = -80_A;
+inline constexpr units::ampere_t GOT_GAME_PIECE_CURRENT = -95_A;
 inline constexpr units::ampere_t DROPPED_GAME_PIECE_CURRENT = 20_A;
-inline constexpr units::second_t CORAL_DEBOUNCE_TIME = .25_s;
+inline constexpr units::second_t CORAL_DEBOUNCE_TIME = .15_s;
 }  // namespace gains
 }  // namespace consts::manip

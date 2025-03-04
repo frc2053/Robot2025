@@ -143,6 +143,15 @@ frc2::CommandPtr Coordinator::GoToL2Algae() {
       piv.GoToAngleCmd([] { return presets::wrist::algaeGrab; }));
 }
 
+frc2::CommandPtr Coordinator::GoToL2AlgaeAUTO() {
+  return frc2::cmd::Parallel(
+      frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
+      frc2::cmd::Sequence(
+          frc2::cmd::WaitUntil([this] { return piv.IsClearOfFunnel().Get(); }),
+          elev.GoToHeightCmd([] { return presets::elev::algae::l2; })),
+      piv.GoToAngleCmd([] { return presets::wrist::algaeGrab; }));
+}
+
 frc2::CommandPtr Coordinator::GoToL3Coral() {
   return frc2::cmd::Parallel(
       frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
@@ -176,10 +185,13 @@ frc2::CommandPtr Coordinator::GoToL4Coral() {
 }
 
 frc2::CommandPtr Coordinator::GoToNet() {
-  return frc2::cmd::Parallel(
-      frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
-      frc2::cmd::Sequence(
-          frc2::cmd::WaitUntil([this] { return piv.IsClearOfFunnel().Get(); }),
-          elev.GoToHeightCmd([] { return presets::elev::algae::net; })),
-      piv.GoToAngleCmd([] { return presets::wrist::algaeNet; }));
+  return frc2::cmd::Sequence(
+      piv.GoToAngleCmd([] { return presets::wrist::algaeHold; }),
+      frc2::cmd::Parallel(
+          frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
+          frc2::cmd::Sequence(
+              frc2::cmd::WaitUntil(
+                  [this] { return piv.IsClearOfFunnel().Get(); }),
+              elev.GoToHeightCmd([] { return presets::elev::algae::net; })),
+          piv.GoToAngleCmd([] { return presets::wrist::algaeNet; })));
 }
