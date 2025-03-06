@@ -399,6 +399,10 @@ void AlgaeIntake::ConfigureMotors() {
   rollerConfig.TorqueCurrent.PeakReverseTorqueCurrent =
       -consts::algae::current_limits::STATOR_LIMIT;
 
+  rollerConfig.CurrentLimits.StatorCurrentLimit =
+      consts::algae::current_limits::STATOR_LIMIT;
+  rollerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
   rollerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
   rollerConfig.CurrentLimits.SupplyCurrentLimit =
       consts::algae::current_limits::SUPPLY_LIMIT;

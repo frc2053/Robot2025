@@ -153,25 +153,6 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "LToKLAlgae.0"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2Algae"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
                 "type": "named",
                 "data": {
                   "name": "DriveToClosestAlgae"
@@ -181,6 +162,12 @@
                 "type": "named",
                 "data": {
                   "name": "Suck"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L2Algae"
                 }
               }
             ]

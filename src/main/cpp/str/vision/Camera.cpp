@@ -101,12 +101,27 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
 
   for (const auto& result : allUnread) {
     if (result.GetTargets().size() == 1) {
-      singleTagEst = singleTagEstimator->Update(
-          result, camera->GetCameraMatrix(), camera->GetDistCoeffs());
+      for (const auto& targ : result.GetTargets()) {
+        int id = targ.GetFiducialId();
+        bool isBarge = id == 4 || id == 5 || id == 14 || id == 15;
+        bool isReef =
+            id == 6 || id == 7 || id == 8 || id == 9 || id == 10 || id == 11;
+        if (!isBarge && isReef) {
+          singleTagEst = singleTagEstimator->Update(
+              result, camera->GetCameraMatrix(), camera->GetDistCoeffs());
+        }
+      }
     } else {
-      visionEst = photonEstimator->Update(result, camera->GetCameraMatrix(),
-                                          camera->GetDistCoeffs(),
-                                          ConstrainedSolvepnpParams{true, 0.0});
+      if (result.MultiTagResult().has_value()) {
+        for (int id : result.MultiTagResult()->fiducialIDsUsed) {
+          bool isBarge = id == 4 || id == 5 || id == 14 || id == 15;
+          if (!isBarge) {
+            visionEst = photonEstimator->Update(
+                result, camera->GetCameraMatrix(), camera->GetDistCoeffs(),
+                ConstrainedSolvepnpParams{true, 0.0});
+          }
+        }
+      }
     }
 
     if (singleTagEst.has_value()) {

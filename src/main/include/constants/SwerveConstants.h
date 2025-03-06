@@ -54,7 +54,7 @@ inline constexpr units::scalar_t STEER_GEARING = (50.0 / 14.0) * (60.0 / 10.0);
 inline constexpr units::scalar_t DRIVE_GEARING =
     (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 inline constexpr units::scalar_t COUPLING_RATIO = (50.0 / 14.0);
-inline constexpr units::meter_t WHEEL_RADIUS = 1.9443_in;
+inline constexpr units::meter_t WHEEL_RADIUS = 1.9345_in;
 
 inline constexpr units::meter_t WHEELBASE_WIDTH = 22.75_in;
 inline constexpr units::meter_t WHEELBASE_LENGTH = 22.75_in;
