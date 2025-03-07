@@ -104,8 +104,9 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
       for (const auto& targ : result.GetTargets()) {
         int id = targ.GetFiducialId();
         bool isBarge = id == 4 || id == 5 || id == 14 || id == 15;
-        bool isReef =
-            id == 6 || id == 7 || id == 8 || id == 9 || id == 10 || id == 11;
+        bool isReef = id == 6 || id == 7 || id == 8 || id == 9 || id == 10 ||
+                      id == 11 || id == 17 || id == 18 || id == 19 ||
+                      id == 20 || id == 21 || id == 22;
         if (!isBarge && isReef) {
           singleTagEst = singleTagEstimator->Update(
               result, camera->GetCameraMatrix(), camera->GetDistCoeffs());
@@ -113,15 +114,22 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
       }
     } else {
       if (result.MultiTagResult().has_value()) {
-        for (int id : result.MultiTagResult()->fiducialIDsUsed) {
-          bool isBarge = id == 4 || id == 5 || id == 14 || id == 15;
-          if (!isBarge) {
-            visionEst = photonEstimator->Update(
-                result, camera->GetCameraMatrix(), camera->GetDistCoeffs(),
-                ConstrainedSolvepnpParams{true, 0.0});
-          }
-        }
+        visionEst = photonEstimator->Update(
+            result, camera->GetCameraMatrix(), camera->GetDistCoeffs(),
+            ConstrainedSolvepnpParams{true, 0.0});
       }
+    }
+
+    bool multiTagHadBarge = false;
+    if (visionEst.has_value()) {
+      for (const auto& tagUsed : visionEst->targetsUsed) {
+        int id = tagUsed.GetFiducialId();
+        multiTagHadBarge = id == 4 || id == 5 || id == 14 || id == 15;
+      }
+    }
+
+    if (multiTagHadBarge) {
+      continue;
     }
 
     if (singleTagEst.has_value()) {
