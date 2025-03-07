@@ -128,10 +128,6 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
       }
     }
 
-    if (multiTagHadBarge) {
-      continue;
-    }
-
     if (singleTagEst.has_value()) {
       singleTagPosePub.Set(singleTagEst.value().estimatedPose.ToPose2d());
     } else {
@@ -163,8 +159,10 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
     cornersPub.Set(cornerPxs);
 
     if (visionEst.has_value()) {
-      consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
-               GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
+      if (!multiTagHadBarge) {
+        consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
+                 GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
+      }
     }
 
     if (singleTagEst.has_value()) {
