@@ -114,17 +114,15 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
       }
     } else {
       if (result.MultiTagResult().has_value()) {
-        visionEst = photonEstimator->Update(
-            result, camera->GetCameraMatrix(), camera->GetDistCoeffs(),
-            ConstrainedSolvepnpParams{true, 0.0});
-      }
-    }
-
-    bool multiTagHadBarge = false;
-    if (visionEst.has_value()) {
-      for (const auto& tagUsed : visionEst->targetsUsed) {
-        int id = tagUsed.GetFiducialId();
-        multiTagHadBarge = id == 4 || id == 5 || id == 14 || id == 15;
+        bool isBarge = false;
+        for (const auto& id : result.MultiTagResult()->fiducialIDsUsed) {
+          isBarge = id == 4 || id == 5 || id == 14 || id == 15;
+        }
+        if (!isBarge) {
+          visionEst = photonEstimator->Update(
+              result, camera->GetCameraMatrix(), camera->GetDistCoeffs(),
+              ConstrainedSolvepnpParams{true, 0.0});
+        }
       }
     }
 
@@ -159,10 +157,8 @@ void Camera::UpdatePoseEstimator(frc::Pose3d robotPose) {
     cornersPub.Set(cornerPxs);
 
     if (visionEst.has_value()) {
-      if (!multiTagHadBarge) {
-        consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
-                 GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
-      }
+      consumer(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp,
+               GetEstimationStdDevs(visionEst->estimatedPose.ToPose2d()));
     }
 
     if (singleTagEst.has_value()) {
