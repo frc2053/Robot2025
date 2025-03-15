@@ -15,8 +15,10 @@
 #include "frc/RobotBase.h"
 #include "str/GainTypes.h"
 #include "str/swerve/SwerveModuleSim.h"
+#include "units/acceleration.h"
 #include "units/angle.h"
 #include "units/current.h"
+#include "units/velocity.h"
 
 using namespace str::swerve;
 
@@ -108,10 +110,15 @@ frc::SwerveModuleState SwerveModule::GoToState(frc::SwerveModuleState desired,
   return desired;
 }
 
-std::array<ctre::phoenix6::BaseStatusSignal*, 8> SwerveModule::GetSignals() {
+std::array<ctre::phoenix6::BaseStatusSignal*, 9> SwerveModule::GetSignals() {
   return {&drivePositionSig, &driveVelocitySig,      &steerPositionSig,
           &steerVelocitySig, &driveTorqueCurrentSig, &steerTorqueCurrentSig,
-          &driveVoltageSig,  &steerVoltageSig};
+          &driveVoltageSig,  &steerVoltageSig,       &driveAccelSig};
+}
+
+units::meters_per_second_squared_t SwerveModule::GetWheelAccel() {
+  return ((driveAccelSig.GetValue() / physicalChar.driveGearing) / 1_rad) *
+         physicalChar.wheelRadius;
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {

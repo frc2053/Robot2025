@@ -37,7 +37,7 @@ inline constexpr units::moment_of_inertia::kilogram_square_meter_t MOI =
 }  // namespace physical
 
 namespace gains {
-inline constexpr units::volt_t POOP_VOLTS = 6_V;
+inline constexpr units::volt_t POOP_VOLTS = 10_V;
 inline constexpr units::volt_t SUCK_VOLTS = 6_V;
 
 inline constexpr units::turns_per_second_t GOT_CORAL_THRESHOLD = 100_rpm;

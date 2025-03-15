@@ -19,6 +19,9 @@
 #include "frc/kinematics/SwerveModuleState.h"
 #include "str/swerve/SwerveModuleHelpers.h"
 #include "str/swerve/SwerveModuleSim.h"
+#include "units/acceleration.h"
+#include "units/angular_acceleration.h"
+#include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/dimensionless.h"
 #include "units/velocity.h"
@@ -36,7 +39,7 @@ class SwerveModule {
   frc::SwerveModuleState GoToState(frc::SwerveModuleState desired,
                                    bool optimize, bool openLoop,
                                    units::ampere_t arbFF);
-  std::array<ctre::phoenix6::BaseStatusSignal*, 8> GetSignals();
+  std::array<ctre::phoenix6::BaseStatusSignal*, 9> GetSignals();
   frc::SwerveModulePosition GetPosition();
   frc::SwerveModuleState GetState();
   units::radian_t GetOutputShaftTurns();
@@ -46,6 +49,7 @@ class SwerveModule {
   str::gains::radial::VoltRadialGainsHolder GetSteerGains() const;
   str::swerve::DriveGains GetDriveGains() const;
   units::ampere_t GetSimulatedCurrentDraw() const;
+  units::meters_per_second_squared_t GetWheelAccel();
   void SetSteerToAmps(units::ampere_t ampsToSend);
   void SetSteerToVoltage(units::volt_t voltsToSend);
   void SetDriveToVolts(units::volt_t voltsToSend);
@@ -108,6 +112,8 @@ class SwerveModule {
       driveMotor.GetTorqueCurrent();
   ctre::phoenix6::StatusSignal<units::volt_t> driveVoltageSig =
       driveMotor.GetMotorVoltage();
+  ctre::phoenix6::StatusSignal<units::turns_per_second_squared_t>
+      driveAccelSig = driveMotor.GetAcceleration();
 
   ctre::phoenix6::controls::MotionMagicExpoVoltage steerAngleSetter{0_rad};
   ctre::phoenix6::controls::VelocityTorqueCurrentFOC driveVelocitySetter{

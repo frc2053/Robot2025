@@ -18,7 +18,7 @@ class Coordinator {
   frc2::CommandPtr GoToL3();
   frc2::CommandPtr GoToL4();
   frc2::CommandPtr GoToAlgaeHold();
-  frc2::CommandPtr GoToLoading();
+  frc2::CommandPtr GoToLoading(bool override = false);
   frc2::CommandPtr GetOutOfStartingConfig();
   frc2::CommandPtr PrimeCoral(std::function<units::radian_t()> finalAngle);
   frc2::CommandPtr WaitForPriming();

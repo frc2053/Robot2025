@@ -37,10 +37,19 @@ Drive::Drive() {
                                  lOffset.convert<units::inches>().value());
   frc::SmartDashboard::PutNumber("R OFFSET",
                                  rOffset.convert<units::inches>().value());
+  frc::SmartDashboard::PutNumber("GOTOPOSETRANSP",
+                                 consts::swerve::pathplanning::RAW_POSE_P);
+  frc::SmartDashboard::PutNumber("GOTOPOSETRANSD",
+                                 consts::swerve::pathplanning::RAW_POSE_D);
+  frc::SmartDashboard::PutNumber("GOTOPOSEROTP",
+                                 consts::swerve::pathplanning::RAW_ROTATION_P);
+  frc::SmartDashboard::PutNumber("GOTOPOSEROTD",
+                                 consts::swerve::pathplanning::RAW_ROTATION_D);
 }
 
 void Drive::Periodic() {
   swerveDrive.UpdateNTEntries();
+  SetPosePids();
   lOffset = units::inch_t{frc::SmartDashboard::GetNumber("L OFFSET", 0)};
   rOffset = units::inch_t{frc::SmartDashboard::GetNumber("R OFFSET", 0)};
 }
@@ -95,6 +104,20 @@ frc2::CommandPtr Drive::DriveRobotRel(
              },
              {this})
       .WithName("DriveRobotRel");
+}
+
+void Drive::SetPosePids() {
+  double newTP = frc::SmartDashboard::GetNumber(
+      "GOTOPOSETRANSP", consts::swerve::pathplanning::RAW_POSE_P);
+  double newTD = frc::SmartDashboard::GetNumber(
+      "GOTOPOSETRANSD", consts::swerve::pathplanning::RAW_POSE_D);
+  double newRotP = frc::SmartDashboard::GetNumber(
+      "GOTOPOSEROTP", consts::swerve::pathplanning::RAW_ROTATION_P);
+  double newRotD = frc::SmartDashboard::GetNumber(
+      "GOTOPOSEROTD", consts::swerve::pathplanning::RAW_ROTATION_D);
+  xPoseController.SetPID(newTP, 0, newTD);
+  yPoseController.SetPID(newTP, 0, newTD);
+  thetaController.SetPID(newRotP, 0, newRotD);
 }
 
 frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
@@ -183,7 +206,7 @@ frc2::CommandPtr Drive::AlignToAlgae() {
 
         frc::Pose2d clawPos = centerOfAlgae;
         clawPos = clawPos.TransformBy(
-            frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
+            frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
 
         if (str::IsOnRed()) {
           return pathplanner::FlippingUtil::flipFieldPose(clawPos);
@@ -219,19 +242,19 @@ frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
         if (str::IsOnRed()) {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
           }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
           }
           return clawOnPole;
         }
@@ -251,19 +274,19 @@ frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
         if (str::IsOnRed()) {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
           }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
           }
           return clawOnPole;
         }

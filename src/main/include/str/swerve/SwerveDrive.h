@@ -168,5 +168,6 @@ class SwerveDrive {
       nt->GetStructTopic<frc::Pose2d>("SingleTagPoseEstimatorPose").Publish()};
   nt::DoublePublisher odomUpdateRatePub{
       nt->GetDoubleTopic("OdomUpdateRate").Publish()};
+  nt::DoublePublisher accelPub{nt->GetDoubleTopic("AccelPub").Publish()};
 };
 }  // namespace str::swerve

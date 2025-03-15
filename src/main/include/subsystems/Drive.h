@@ -76,6 +76,7 @@ class Drive : public frc2::SubsystemBase {
   frc2::CommandPtr TuneSteerPID(std::function<bool()> isDone);
   frc2::CommandPtr TuneDrivePID(std::function<bool()> isDone);
   frc2::CommandPtr WheelRadius(frc2::sysid::Direction dir);
+  void SetPosePids();
 
  private:
   str::swerve::SwerveDrive swerveDrive{};
@@ -83,28 +84,28 @@ class Drive : public frc2::SubsystemBase {
 
   frc::TrapezoidProfile<units::meters>::Constraints translationConstraints{
       consts::swerve::physical::DRIVE_MAX_SPEED,
-      consts::swerve::physical::MAX_ACCEL,
+      consts::swerve::physical::MAX_ACCEL * .5,
   };
 
   frc::TrapezoidProfile<units::radians>::Constraints rotationConstraints{
       consts::swerve::physical::MAX_ROT_SPEED,
-      consts::swerve::physical::MAX_ROT_ACCEL,
+      consts::swerve::physical::MAX_ROT_ACCEL * .5,
   };
 
   frc::ProfiledPIDController<units::meters> xPoseController{
-      consts::swerve::pathplanning::POSE_P,
-      consts::swerve::pathplanning::POSE_I,
-      consts::swerve::pathplanning::POSE_D, translationConstraints};
+      consts::swerve::pathplanning::RAW_POSE_P,
+      consts::swerve::pathplanning::RAW_POSE_I,
+      consts::swerve::pathplanning::RAW_POSE_D, translationConstraints};
 
   frc::ProfiledPIDController<units::meters> yPoseController{
-      consts::swerve::pathplanning::POSE_P,
-      consts::swerve::pathplanning::POSE_I,
-      consts::swerve::pathplanning::POSE_D, translationConstraints};
+      consts::swerve::pathplanning::RAW_POSE_P,
+      consts::swerve::pathplanning::RAW_POSE_I,
+      consts::swerve::pathplanning::RAW_POSE_D, translationConstraints};
 
   frc::ProfiledPIDController<units::radians> thetaController{
-      consts::swerve::pathplanning::ROTATION_P,
-      consts::swerve::pathplanning::ROTATION_I,
-      consts::swerve::pathplanning::ROTATION_D, rotationConstraints};
+      consts::swerve::pathplanning::RAW_ROTATION_P,
+      consts::swerve::pathplanning::RAW_ROTATION_I,
+      consts::swerve::pathplanning::RAW_ROTATION_D, rotationConstraints};
 
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Swerve")};

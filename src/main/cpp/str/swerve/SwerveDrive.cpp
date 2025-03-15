@@ -101,6 +101,8 @@ void SwerveDrive::UpdateOdom() {
   units::second_t now = frc::Timer::GetFPGATimestamp();
   odomUpdateRate = 1.0 / (now - lastOdomUpdateTime);
   lastOdomUpdateTime = now;
+
+  accelPub.Set(modules[0].GetWheelAccel().value());
 }
 
 void SwerveDrive::AddVisionMeasurement(const frc::Pose2d& measurement,
@@ -194,14 +196,15 @@ void SwerveDrive::SetupSignals() {
   // If you are changing this you're prob cooked ngl
   for (size_t i = 0; i < modules.size(); i++) {
     const auto& modSigs = modules[i].GetSignals();
-    allSignals[(i * 8) + 0] = modSigs[0];
-    allSignals[(i * 8) + 1] = modSigs[1];
-    allSignals[(i * 8) + 2] = modSigs[2];
-    allSignals[(i * 8) + 3] = modSigs[3];
-    allSignals[(i * 8) + 4] = modSigs[4];
-    allSignals[(i * 8) + 5] = modSigs[5];
-    allSignals[(i * 8) + 6] = modSigs[6];
-    allSignals[(i * 8) + 7] = modSigs[7];
+    allSignals[(i * 9) + 0] = modSigs[0];
+    allSignals[(i * 9) + 1] = modSigs[1];
+    allSignals[(i * 9) + 2] = modSigs[2];
+    allSignals[(i * 9) + 3] = modSigs[3];
+    allSignals[(i * 9) + 4] = modSigs[4];
+    allSignals[(i * 9) + 5] = modSigs[5];
+    allSignals[(i * 9) + 6] = modSigs[6];
+    allSignals[(i * 9) + 7] = modSigs[7];
+    allSignals[(i * 9) + 8] = modSigs[8];
   }
 
   allSignals[allSignals.size() - 2] = &imu.GetYaw();

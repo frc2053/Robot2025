@@ -190,6 +190,14 @@ inline constexpr units::scalar_t ROTATION_P = 5;
 inline constexpr units::scalar_t ROTATION_I = 0;
 inline constexpr units::scalar_t ROTATION_D = 0;
 
+inline constexpr units::scalar_t RAW_POSE_P = 10;
+inline constexpr units::scalar_t RAW_POSE_I = 0;
+inline constexpr units::scalar_t RAW_POSE_D = 0;
+
+inline constexpr units::scalar_t RAW_ROTATION_P = 10;
+inline constexpr units::scalar_t RAW_ROTATION_I = 0;
+inline constexpr units::scalar_t RAW_ROTATION_D = 0;
+
 // Choreo paths don't support replanning, so just disable me
 inline constexpr bool INITIAL_REPLAN = false;
 inline constexpr bool DYNAMIC_REPLAN = false;

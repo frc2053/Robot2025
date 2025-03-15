@@ -4,6 +4,13 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "ClawOffset":{
+    "dimension":"Length",
+    "var":{
+     "exp":"6.5 in",
+     "val":0.1651
+    }
+   },
    "PoleOffset":{
     "dimension":"Length",
     "var":{
@@ -14,8 +21,8 @@
    "RWidth":{
     "dimension":"Length",
     "var":{
-     "exp":"0.446913 m",
-     "val":0.446913
+     "exp":"0.52 m",
+     "val":0.52
     }
    },
    "Width":{
@@ -30,11 +37,11 @@
    "A":{
     "x":{
      "exp":"Tag18.x - RWidth",
-     "val":3.2105870000000003
+     "val":3.1375
     },
     "y":{
-     "exp":"Tag18.y + PoleOffset",
-     "val":4.1902126
+     "exp":"Tag18.y + PoleOffset + ClawOffset",
+     "val":4.3553125999999995
     },
     "heading":{
      "exp":"Tag18.heading",
@@ -44,7 +51,7 @@
    "ABAlgae":{
     "x":{
      "exp":"Tag18.x - (RWidth * cos(Tag18.heading))",
-     "val":3.2105870000000003
+     "val":3.1375
     },
     "y":{
      "exp":"Tag18.y - (RWidth * sin(Tag18.heading))",
@@ -72,11 +79,11 @@
    "B":{
     "x":{
      "exp":"Tag18.x - RWidth",
-     "val":3.2105870000000003
+     "val":3.1375
     },
     "y":{
-     "exp":"Tag18.y - PoleOffset",
-     "val":3.8615874
+     "exp":"Tag18.y - PoleOffset + ClawOffset",
+     "val":4.0266874
     },
     "heading":{
      "exp":"Tag18.heading",
@@ -86,11 +93,11 @@
    "C":{
     "x":{
      "exp":"Tag17.x - (PoleOffset * sin(Tag17.heading)) - (RWidth * cos(Tag17.heading))",
-     "val":3.708150614138129
+     "val":3.671607114138129
     },
     "y":{
      "exp":"Tag17.y + (PoleOffset * cos(Tag17.heading)) - (RWidth * sin(Tag17.heading))",
-     "val":3.001436288618485
+     "val":2.938141089932092
     },
     "heading":{
      "exp":"Tag17.heading",
@@ -100,11 +107,11 @@
    "CDAlgae":{
     "x":{
      "exp":"Tag17.x - (RWidth * cos(Tag17.heading))",
-     "val":3.8504494999
+     "val":3.8139059999
     },
     "y":{
      "exp":"Tag17.y - (RWidth * sin(Tag17.heading))",
-     "val":2.9192799886184853
+     "val":2.855984789932092
     },
     "heading":{
      "exp":"Tag17.heading",
@@ -114,11 +121,11 @@
    "D":{
     "x":{
      "exp":"Tag17.x + (PoleOffset * sin(Tag17.heading)) - (RWidth * cos(Tag17.heading))",
-     "val":3.992748385661871
+     "val":3.956204885661871
     },
     "y":{
      "exp":"Tag17.y - (PoleOffset * cos(Tag17.heading)) - (RWidth * sin(Tag17.heading))",
-     "val":2.8371236886184854
+     "val":2.773828489932092
     },
     "heading":{
      "exp":"Tag17.heading",
@@ -128,11 +135,11 @@
    "E":{
     "x":{
      "exp":"Tag22.x - (PoleOffset * sin(Tag22.heading)) - (RWidth * cos(Tag22.heading))",
-     "val":4.985897613238129
+     "val":5.022441113238129
     },
     "y":{
      "exp":"Tag22.y + (PoleOffset * cos(Tag22.heading)) - (RWidth * sin(Tag22.heading))",
-     "val":2.8371236886184854
+     "val":2.773828489932092
     },
     "heading":{
      "exp":"Tag22.heading",
@@ -142,11 +149,11 @@
    "EFAlgae":{
     "x":{
      "exp":"Tag22.x - (RWidth * cos(Tag22.heading))",
-     "val":5.128196499
+     "val":5.164739999
     },
     "y":{
      "exp":"Tag22.y - (RWidth * sin(Tag22.heading))",
-     "val":2.9192799886184853
+     "val":2.855984789932092
     },
     "heading":{
      "exp":"Tag22.heading",
@@ -156,11 +163,11 @@
    "F":{
     "x":{
      "exp":"Tag22.x + (PoleOffset * sin(Tag22.heading)) - (RWidth * cos(Tag22.heading))",
-     "val":5.270495384761872
+     "val":5.307038884761871
     },
     "y":{
      "exp":"Tag22.y - (PoleOffset * cos(Tag22.heading)) - (RWidth * sin(Tag22.heading))",
-     "val":3.001436288618485
+     "val":2.938141089932092
     },
     "heading":{
      "exp":"Tag22.heading",
@@ -170,7 +177,7 @@
    "G":{
     "x":{
      "exp":"Tag21.x - (PoleOffset * sin(Tag21.heading)) - (RWidth * cos(Tag21.heading))",
-     "val":5.767959
+     "val":5.841046
     },
     "y":{
      "exp":"Tag21.y + (PoleOffset * cos(Tag21.heading)) - (RWidth * sin(Tag21.heading))",
@@ -184,7 +191,7 @@
    "GHAlgae":{
     "x":{
      "exp":"Tag21.x - (RWidth * cos(Tag21.heading))",
-     "val":5.767959
+     "val":5.841046
     },
     "y":{
      "exp":"Tag21.y - (RWidth * sin(Tag21.heading))",
@@ -198,7 +205,7 @@
    "H":{
     "x":{
      "exp":"Tag21.x + (PoleOffset * sin(Tag21.heading)) - (RWidth * cos(Tag21.heading))",
-     "val":5.767959
+     "val":5.841046
     },
     "y":{
      "exp":"Tag21.y - (PoleOffset * cos(Tag21.heading)) - (RWidth * sin(Tag21.heading))",
@@ -212,11 +219,11 @@
    "I":{
     "x":{
      "exp":"Tag20.x - (PoleOffset * sin(Tag20.heading)) - (RWidth * cos(Tag20.heading))",
-     "val":5.270495384761872
+     "val":5.307038884761871
     },
     "y":{
      "exp":"Tag20.y + (PoleOffset * cos(Tag20.heading)) - (RWidth * sin(Tag20.heading))",
-     "val":5.0503637112815145
+     "val":5.113658909967908
     },
     "heading":{
      "exp":"Tag20.heading",
@@ -226,11 +233,11 @@
    "IJAlgae":{
     "x":{
      "exp":"Tag20.x - (RWidth * cos(Tag20.heading))",
-     "val":5.128196499
+     "val":5.164739999
     },
     "y":{
      "exp":"Tag20.y - (RWidth * sin(Tag20.heading))",
-     "val":5.132520011281515
+     "val":5.1958152099679085
     },
     "heading":{
      "exp":"Tag20.heading",
@@ -240,11 +247,11 @@
    "J":{
     "x":{
      "exp":"Tag20.x + (PoleOffset * sin(Tag20.heading)) - (RWidth * cos(Tag20.heading))",
-     "val":4.985897613238129
+     "val":5.022441113238129
     },
     "y":{
      "exp":"Tag20.y - (PoleOffset * cos(Tag20.heading)) - (RWidth * sin(Tag20.heading))",
-     "val":5.214676311281515
+     "val":5.277971509967909
     },
     "heading":{
      "exp":"Tag20.heading",
@@ -254,11 +261,11 @@
    "K":{
     "x":{
      "exp":"Tag19.x - (PoleOffset * sin(Tag19.heading)) - (RWidth * cos(Tag19.heading))",
-     "val":3.992748385661871
+     "val":3.956204885661871
     },
     "y":{
      "exp":"Tag19.y + (PoleOffset * cos(Tag19.heading)) - (RWidth * sin(Tag19.heading))",
-     "val":5.214676311281515
+     "val":5.277971509967909
     },
     "heading":{
      "exp":"Tag19.heading",
@@ -268,11 +275,11 @@
    "KLAlgae":{
     "x":{
      "exp":"Tag19.x - (RWidth * cos(Tag19.heading))",
-     "val":3.8504494999
+     "val":3.8139059999
     },
     "y":{
      "exp":"Tag19.y - (RWidth * sin(Tag19.heading))",
-     "val":5.132520011281515
+     "val":5.1958152099679085
     },
     "heading":{
      "exp":"Tag19.heading",
@@ -282,11 +289,11 @@
    "L":{
     "x":{
      "exp":"Tag19.x + (PoleOffset * sin(Tag19.heading)) - (RWidth * cos(Tag19.heading))",
-     "val":3.708150614138129
+     "val":3.671607114138129
     },
     "y":{
      "exp":"Tag19.y - (PoleOffset * cos(Tag19.heading)) - (RWidth * sin(Tag19.heading))",
-     "val":5.0503637112815145
+     "val":5.113658909967908
     },
     "heading":{
      "exp":"Tag19.heading",
@@ -449,8 +456,8 @@
    "val":628.3185307179587
   },
   "tmax":{
-   "exp":"1.1 N * m",
-   "val":1.1
+   "exp":"0.6 N * m",
+   "val":0.6
   },
   "cof":{
    "exp":"1.2",

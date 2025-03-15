@@ -58,7 +58,7 @@ frc2::CommandPtr Coordinator::GoToCoralPrime() {
       elev.GoToHeightCmd([] { return presets::elev::coral::loading; }));
 }
 
-frc2::CommandPtr Coordinator::GoToLoading() {
+frc2::CommandPtr Coordinator::GoToLoading(bool override) {
   return frc2::cmd::Either(
       frc2::cmd::Parallel(
           manip.StopCmd(),
@@ -71,7 +71,10 @@ frc2::CommandPtr Coordinator::GoToLoading() {
           frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(true); }),
           piv.GoToAngleCmd([] { return presets::wrist::coral::loading; }),
           elev.GoToHeightCmd([] { return presets::elev::coral::loading; })),
-      [this] {
+      [this, override] {
+        if (override) {
+          return false;
+        }
         bool hasCoral = manip.HasCoral();
         fmt::print("Do I have a coral: {}\n", hasCoral);
         return hasCoral;

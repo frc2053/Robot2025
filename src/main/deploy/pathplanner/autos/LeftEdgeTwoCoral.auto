@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MiddleToKL.0"
+                  "pathName": "MiddleToJ"
                 }
               },
               {
@@ -21,7 +21,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "L3"
+                        "name": "L4Coral"
                       }
                     }
                   ]
@@ -50,9 +50,84 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0.1
+            "name": "Score"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "JToLSB"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Loading"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Suck"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Prime"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LSBToK"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4Coral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "DriveToLeftReef"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4Coral"
+                }
+              }
+            ]
           }
         },
         {
@@ -105,13 +180,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LSBToApproach.0"
+                  "pathName": "LSBToL.0"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L3"
+                  "name": "L4Coral"
                 }
               }
             ]
@@ -137,40 +212,9 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.75
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Score"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "DriveToClosestAlgae"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Suck"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2Algae"
-                }
-              }
-            ]
           }
         }
       ]

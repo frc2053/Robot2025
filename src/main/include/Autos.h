@@ -58,8 +58,8 @@ class Autos {
     pathplanner::NamedCommands::registerCommand("L3", m_coordinator.GoToL3());
     pathplanner::NamedCommands::registerCommand("L4Coral",
                                                 m_coordinator.GoToL4Coral());
-    pathplanner::NamedCommands::registerCommand("Loading",
-                                                m_coordinator.GoToLoading());
+    pathplanner::NamedCommands::registerCommand(
+        "Loading", m_coordinator.GoToLoading(true));
     pathplanner::NamedCommands::registerCommand(
         "Suck", frc2::cmd::RunOnce([this] { m_manipSub.Suck(); }));
     pathplanner::NamedCommands::registerCommand(
@@ -72,7 +72,7 @@ class Autos {
     pathplanner::NamedCommands::registerCommand("SuckUntilAlgae",
                                                 m_manipSub.SuckUntilAlgae());
     pathplanner::NamedCommands::registerCommand(
-        "Score", m_manipSub.PoopPiece([] { return 1_s; }));
+        "Score", m_manipSub.PoopPiece([] { return .2_s; }));
 
     pathplanner::NamedCommands::registerCommand(
         "DriveToLeftReef",
