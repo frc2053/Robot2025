@@ -31,25 +31,6 @@
           }
         },
         {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "DriveToLeftReef"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4Coral"
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Score"
@@ -112,25 +93,6 @@
           }
         },
         {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "DriveToLeftReef"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4Coral"
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Score"
@@ -181,25 +143,6 @@
                 "type": "path",
                 "data": {
                   "pathName": "LSBToL.0"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4Coral"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "DriveToRightReef"
                 }
               },
               {

@@ -72,16 +72,16 @@ class Autos {
     pathplanner::NamedCommands::registerCommand("SuckUntilAlgae",
                                                 m_manipSub.SuckUntilAlgae());
     pathplanner::NamedCommands::registerCommand(
-        "Score", m_manipSub.PoopPiece([] { return .2_s; }));
+        "Score", m_manipSub.PoopPiece([] { return .35_s; }));
 
     pathplanner::NamedCommands::registerCommand(
         "DriveToLeftReef",
-        m_driveSub.AlignToReef([] { return true; }).WithTimeout(1_s));
+        m_driveSub.AlignToReef([] { return true; }).WithTimeout(.5_s));
     pathplanner::NamedCommands::registerCommand(
         "DriveToClosestAlgae", m_driveSub.AlignToAlgae().WithTimeout(1.5_s));
     pathplanner::NamedCommands::registerCommand(
         "DriveToRightReef",
-        m_driveSub.AlignToReef([] { return false; }).WithTimeout(1_s));
+        m_driveSub.AlignToReef([] { return false; }).WithTimeout(.5_s));
   }
 
   enum AutoSelector {

@@ -124,7 +124,7 @@ class Elevator : public frc2::SubsystemBase {
                               currentGains.kA};
 
   units::meters_per_second_t maxProfVel = 10_fps;
-  units::meters_per_second_squared_t maxProfAccel = 30_fps_sq;
+  units::meters_per_second_squared_t maxProfAccel = 20_fps_sq;
 
   frc::TrapezoidProfile<units::meter> trapProf{{maxProfVel, maxProfAccel}};
   frc::TrapezoidProfile<units::meter>::State trapSetpoint{};

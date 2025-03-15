@@ -242,19 +242,19 @@ frc2::CommandPtr Drive::AlignToReef(std::function<bool()> leftSide) {
         if (str::IsOnRed()) {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, rOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, lOffset, frc::Rotation2d{}});
           }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, lOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, rOffset, frc::Rotation2d{}});
           }
           return clawOnPole;
         }
@@ -274,19 +274,19 @@ frc2::CommandPtr Drive::AlignToReefSegment(std::function<bool()> leftSide,
         if (str::IsOnRed()) {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, rOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, lOffset, frc::Rotation2d{}});
           }
           return pathplanner::FlippingUtil::flipFieldPose(clawOnPole);
         } else {
           if (leftSide()) {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, lOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, lOffset, frc::Rotation2d{}});
           } else {
             clawOnPole = clawOnPole.TransformBy(
-                frc::Transform2d{0.08_m, rOffset, frc::Rotation2d{}});
+                frc::Transform2d{0.153087_m, rOffset, frc::Rotation2d{}});
           }
           return clawOnPole;
         }
@@ -379,7 +379,7 @@ void Drive::SetupPathplanner() {
                                 consts::swerve::pathplanning::ROTATION_D});
 
   pathplanner::AutoBuilder::configure(
-      [this]() { return GetRobotPose(); },
+      [this]() { return swerveDrive.GetSingleTagPose(); },
       [this](frc::Pose2d pose) { swerveDrive.ResetPose(pose); },
       [this]() { return swerveDrive.GetRobotRelativeSpeeds(); },
       [this](frc::ChassisSpeeds speeds, pathplanner::DriveFeedforwards ff) {
