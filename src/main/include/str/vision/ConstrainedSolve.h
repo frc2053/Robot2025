@@ -1,11 +1,17 @@
+// Copyright (c) FRC 2053.
+// Open Source Software; you can modify and/or share it under the terms of
+// the MIT License file in the root of this project
+
 #pragma once
 
+#include <vector>
+
 #include "frc/apriltag/AprilTagFieldLayout.h"
+#include "photon/constrained_solvepnp/wrap/casadi_wrapper.h"
+#include "photon/estimation/OpenCVHelp.h"
 #include "photon/estimation/TargetModel.h"
 #include "photon/targeting/PhotonTrackedTarget.h"
 #include "photon/targeting/PnpResult.h"
-#include "photon/estimation/OpenCVHelp.h"
-#include "photon/constrained_solvepnp/wrap/casadi_wrapper.h"
 
 static std::optional<photon::PnpResult> EstimateRobotPoseConstrainedSolvePNP(
     const Eigen::Matrix<double, 3, 3>& cameraMatrix,

@@ -23,12 +23,12 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
 #include "opencv2/core/types.hpp"
-#include "str/vision/StrPoseEstimator.h"
 #include "photon/targeting/PhotonTrackedTarget.h"
 #include "photon/targeting/TargetCorner.h"
+#include "str/vision/ConstrainedSolve.h"
+#include "str/vision/StrPoseEstimator.h"
 #include "units/angle.h"
 #include "units/length.h"
-#include "str/vision/ConstrainedSolve.h"
 
 using namespace str::vision;
 

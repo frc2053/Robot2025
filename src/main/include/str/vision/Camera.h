@@ -9,11 +9,11 @@
 #include <networktables/StructArrayTopic.h>
 #include <networktables/StructTopic.h>
 #include <photon/PhotonCamera.h>
-#include <str/vision/StrPoseEstimator.h>
 #include <photon/estimation/VisionEstimation.h>
 #include <photon/simulation/VisionSystemSim.h>
 #include <photon/simulation/VisionTargetSim.h>
 #include <photon/targeting/PhotonPipelineResult.h>
+#include <str/vision/StrPoseEstimator.h>
 
 #include <memory>
 #include <optional>
