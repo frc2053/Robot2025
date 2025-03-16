@@ -8,10 +8,13 @@
       "state": {
         "sidebar": {
           "width": 304,
-          "expanded": []
+          "expanded": [
+            "/Swerve",
+            "/3DDisplay"
+          ]
         },
         "tabs": {
-          "selected": 3,
+          "selected": 5,
           "tabs": [
             {
               "type": 0,
@@ -421,7 +424,7 @@
                 "sources": [
                   {
                     "type": "robot",
-                    "logKey": "NT:/Swerve/PoseEstimatorPose",
+                    "logKey": "NT:/Swerve/SingleTagPoseEstimatorPose",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -463,16 +466,6 @@
                     "options": {
                       "color": "#ff8c00",
                       "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Swerve/SingleTagPoseEstimatorPose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "20532025",
-                      "color": "#00ff00"
                     }
                   },
                   {
@@ -557,14 +550,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  5.961396287465716,
-                  1.785413723971159,
-                  2.563393174383685
+                  5.1022040761002305,
+                  2.6684231482459158,
+                  -1.9701327577443886
                 ],
                 "cameraTarget": [
-                  4.831729347104771,
-                  0.6496396409519236,
-                  0.9295935128481861
+                  1.965192736027876,
+                  -4.798372350612351,
+                  4.253695364301992
                 ]
               },
               "controlsHeight": 535
