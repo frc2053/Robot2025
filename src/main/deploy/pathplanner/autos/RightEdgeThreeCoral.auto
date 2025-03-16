@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MiddleToJ"
+                  "pathName": "MiddleToE.0"
                 }
               },
               {
@@ -43,7 +43,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "JToLSB"
+                  "pathName": "EToLSM.0"
                 }
               },
               {
@@ -80,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LSBToK"
+                  "pathName": "LSMToD.0"
                 }
               },
               {
@@ -105,7 +105,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "KToLSB.0"
+                  "pathName": "DToLSM.0"
                 }
               },
               {
@@ -142,7 +142,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LSBToL.0"
+                  "pathName": "LSMToC.0"
                 }
               },
               {

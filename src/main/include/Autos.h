@@ -24,20 +24,19 @@ class Autos {
         [this] { return autoChooser.GetSelected(); },
         std::pair{NOTHING, frc2::cmd::None()},
         std::pair{TEST, pathplanner::PathPlannerAuto("Test").ToPtr()},
-        std::pair{LEFT_EDGE_TWO_CORAL,
-                  pathplanner::PathPlannerAuto("LeftEdgeTwoCoral").ToPtr()},
-        std::pair{
-            RIGHT_EDGE_TWO_CORAL,
-            pathplanner::PathPlannerAuto("LeftEdgeTwoCoral", true).ToPtr()},
+        std::pair{LEFT_EDGE_THREE_CORAL,
+                  pathplanner::PathPlannerAuto("LeftEdgeThreeCoral").ToPtr()},
+        std::pair{RIGHT_EDGE_THREE_CORAL,
+                  pathplanner::PathPlannerAuto("RightEdgeThreeCoral").ToPtr()},
         std::pair{MIDDLE_CORAL_PROC,
                   pathplanner::PathPlannerAuto("MiddleCoralProc").ToPtr()});
 
     autoChooser.SetDefaultOption("Do Nothing", AutoSelector::NOTHING);
     autoChooser.AddOption("Test", AutoSelector::TEST);
-    autoChooser.AddOption("Left Edge Two Coral",
-                          AutoSelector::LEFT_EDGE_TWO_CORAL);
-    autoChooser.AddOption("Right Edge Two Coral",
-                          AutoSelector::RIGHT_EDGE_TWO_CORAL);
+    autoChooser.AddOption("Left Edge Three Coral",
+                          AutoSelector::LEFT_EDGE_THREE_CORAL);
+    autoChooser.AddOption("Right Edge Three Coral",
+                          AutoSelector::RIGHT_EDGE_THREE_CORAL);
     autoChooser.AddOption("Middle Coral", AutoSelector::MIDDLE_CORAL_PROC);
     frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
   }
@@ -87,8 +86,8 @@ class Autos {
   enum AutoSelector {
     NOTHING,
     TEST,
-    LEFT_EDGE_TWO_CORAL,
-    RIGHT_EDGE_TWO_CORAL,
+    LEFT_EDGE_THREE_CORAL,
+    RIGHT_EDGE_THREE_CORAL,
     MIDDLE_CORAL_PROC
   };
 
