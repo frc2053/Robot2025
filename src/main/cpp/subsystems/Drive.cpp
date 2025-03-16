@@ -20,6 +20,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation2d.h"
+#include "frc/kinematics/ChassisSpeeds.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "pathplanner/lib/util/DriveFeedforwards.h"
@@ -28,6 +29,7 @@
 #include "str/swerve/SwerveModuleHelpers.h"
 #include "units/angle.h"
 #include "units/length.h"
+#include "units/velocity.h"
 #include "util/choreovariables.h"
 
 Drive::Drive() {
@@ -115,9 +117,21 @@ void Drive::SetPosePids() {
       "GOTOPOSEROTP", consts::swerve::pathplanning::RAW_ROTATION_P);
   double newRotD = frc::SmartDashboard::GetNumber(
       "GOTOPOSEROTD", consts::swerve::pathplanning::RAW_ROTATION_D);
-  xPoseController.SetPID(newTP, 0, newTD);
-  yPoseController.SetPID(newTP, 0, newTD);
+  translationController.SetPID(newTP, 0, newTD);
   thetaController.SetPID(newRotP, 0, newRotD);
+}
+
+units::meters_per_second_t Drive::CalculateSpeedAtGoal(
+    frc::Translation2d currentTrans, frc::Translation2d goalTrans) {
+  frc::ChassisSpeeds fieldVel = swerveDrive.GetFieldRelativeSpeeds();
+  frc::Translation2d linearFieldVelocity{units::meter_t{fieldVel.vx.value()},
+                                         units::meter_t{fieldVel.vy.value()}};
+  return units::math::min(
+      0.0_mps,
+      units::meters_per_second_t{
+          -linearFieldVelocity.RotateBy(-(goalTrans - currentTrans).Angle())
+               .X()
+               .value()});
 }
 
 frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
@@ -125,28 +139,27 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
   return frc2::cmd::Sequence(
              frc2::cmd::RunOnce(
                  [this, goalPose, useSingleTagEstimator] {
+                   // Which pose to use
                    frc::Pose2d currentPose =
                        useSingleTagEstimator ? swerveDrive.GetSingleTagPose()
                                              : GetRobotPose();
+
+                   // Reset pid controllers
                    frc::ChassisSpeeds currentSpeeds =
                        swerveDrive.GetFieldRelativeSpeeds();
-                   xPoseController.Reset(currentPose.Translation().X(),
-                                         currentSpeeds.vx);
-                   yPoseController.Reset(currentPose.Translation().Y(),
-                                         currentSpeeds.vy);
+                   translationController.Reset(
+                       currentPose.Translation().Distance(
+                           goalPose().Translation()),
+                       CalculateSpeedAtGoal(currentPose.Translation(),
+                                            goalPose().Translation()));
                    thetaController.Reset(currentPose.Rotation().Radians(),
                                          currentSpeeds.omega);
                    thetaController.EnableContinuousInput(
                        units::radian_t{-std::numbers::pi},
                        units::radian_t{std::numbers::pi});
-                   xPoseController.SetGoal(goalPose().X());
-                   yPoseController.SetGoal(goalPose().Y());
+                   translationController.SetGoal(0_m);
                    thetaController.SetGoal(goalPose().Rotation().Radians());
-                   xPoseController.SetTolerance(
-                       consts::swerve::pathplanning::translationalPIDTolerance,
-                       consts::swerve::pathplanning::
-                           translationalVelPIDTolerance);
-                   yPoseController.SetTolerance(
+                   translationController.SetTolerance(
                        consts::swerve::pathplanning::translationalPIDTolerance,
                        consts::swerve::pathplanning::
                            translationalVelPIDTolerance);
@@ -163,30 +176,71 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                        useSingleTagEstimator ? swerveDrive.GetSingleTagPose()
                                              : GetRobotPose();
 
-                   xPoseController.SetGoal(goalPose().X());
-                   yPoseController.SetGoal(goalPose().Y());
-                   thetaController.SetGoal(goalPose().Rotation().Radians());
-                   pidPoseGoalPub.Set(goalPose());
-                   pidPoseSetpointPub.Set(
-                       frc::Pose2d{xPoseController.GetSetpoint().position,
-                                   yPoseController.GetSetpoint().position,
-                                   thetaController.GetSetpoint().position});
+                   frc::Pose2d target = goalPose();
 
-                   units::meters_per_second_t xSpeed{xPoseController.Calculate(
-                       currentPose.Translation().X())};
-                   units::meters_per_second_t ySpeed{yPoseController.Calculate(
-                       currentPose.Translation().Y())};
+                   frc::Translation2d currentPosition =
+                       currentPose.Translation();
+                   frc::Translation2d goalPosition = target.Translation();
+                   frc::Translation2d vectorToTarget =
+                       goalPosition - currentPosition;
+
+                   units::meter_t distanceToTarget =
+                       currentPosition.Distance(goalPosition);
+
+                   double directionX = 0;
+                   double directionY = 0;
+
+                   if (distanceToTarget > 0.25_in) {
+                     directionX =
+                         vectorToTarget.X().value() / distanceToTarget.value();
+                     directionY =
+                         vectorToTarget.Y().value() / distanceToTarget.value();
+                   }
+
+                   units::meters_per_second_t translationSpeed{
+                       translationController.Calculate(distanceToTarget, 0_m)};
+
+                   translationSpeed = units::math::abs(translationSpeed);
+
+                   units::meters_per_second_t xSpeed =
+                       translationSpeed * directionX;
+                   units::meters_per_second_t ySpeed =
+                       translationSpeed * directionY;
+
                    units::radians_per_second_t thetaSpeed{
                        thetaController.Calculate(
-                           currentPose.Rotation().Radians())};
+                           currentPose.Rotation().Radians(),
+                           target.Rotation().Radians())};
+
+                   auto translationSetpoint =
+                       translationController.GetSetpoint();
+                   auto rotationSetpoint = thetaController.GetSetpoint();
+
+                   frc::Translation2d setpointTranslation = currentPosition;
+                   if (distanceToTarget > 0.01_m) {
+                     double setpointDistance =
+                         distanceToTarget.value() -
+                         translationSetpoint.position.value();
+                     setpointTranslation =
+                         currentPosition +
+                         frc::Translation2d{
+                             units::meter_t{directionX * setpointDistance},
+                             units::meter_t{directionY * setpointDistance}};
+                   }
+
+                   frc::Rotation2d setpointRotation{rotationSetpoint.position};
+                   frc::Pose2d setpointPose{setpointTranslation,
+                                            setpointRotation};
+
+                   pidPoseGoalPub.Set(target);
+                   pidPoseSetpointPub.Set(setpointPose);
 
                    swerveDrive.DriveFieldRelative(xSpeed, ySpeed, thetaSpeed,
                                                   false);
                  },
                  {this})
                  .Until([this] {
-                   bool isAtGoal = xPoseController.AtGoal() &&
-                                   yPoseController.AtGoal() &&
+                   bool isAtGoal = translationController.AtGoal() &&
                                    thetaController.AtGoal();
                    isAtGoalPosePub.Set(isAtGoal);
                    return isAtGoal;

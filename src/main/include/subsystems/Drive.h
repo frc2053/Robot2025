@@ -18,6 +18,7 @@
 #include "constants/SwerveConstants.h"
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Translation2d.h"
 #include "frc2/command/CommandPtr.h"
 #include "networktables/BooleanTopic.h"
 #include "str/swerve/SwerveDrive.h"
@@ -84,7 +85,7 @@ class Drive : public frc2::SubsystemBase {
 
   frc::TrapezoidProfile<units::meters>::Constraints translationConstraints{
       consts::swerve::physical::DRIVE_MAX_SPEED,
-      consts::swerve::physical::MAX_ACCEL * .5,
+      consts::swerve::physical::MAX_ACCEL,
   };
 
   frc::TrapezoidProfile<units::radians>::Constraints rotationConstraints{
@@ -92,12 +93,10 @@ class Drive : public frc2::SubsystemBase {
       consts::swerve::physical::MAX_ROT_ACCEL * .5,
   };
 
-  frc::ProfiledPIDController<units::meters> xPoseController{
-      consts::swerve::pathplanning::RAW_POSE_P,
-      consts::swerve::pathplanning::RAW_POSE_I,
-      consts::swerve::pathplanning::RAW_POSE_D, translationConstraints};
+  units::meters_per_second_t CalculateSpeedAtGoal(
+      frc::Translation2d currentTrans, frc::Translation2d goalTrans);
 
-  frc::ProfiledPIDController<units::meters> yPoseController{
+  frc::ProfiledPIDController<units::meters> translationController{
       consts::swerve::pathplanning::RAW_POSE_P,
       consts::swerve::pathplanning::RAW_POSE_I,
       consts::swerve::pathplanning::RAW_POSE_D, translationConstraints};
