@@ -50,12 +50,12 @@
    },
    "ABAlgae":{
     "x":{
-     "exp":"Tag18.x - (RWidth * cos(Tag18.heading))",
+     "exp":"Tag18.x - (RWidth * cos(Tag18.heading)) + (ClawOffset * sin(Tag18.heading))",
      "val":3.2105870000000003
     },
     "y":{
-     "exp":"Tag18.y - (RWidth * sin(Tag18.heading))",
-     "val":4.0259
+     "exp":"Tag18.y - (RWidth * sin(Tag18.heading)) + ClawOffset",
+     "val":4.1656
     },
     "heading":{
      "exp":"Tag18.heading",
@@ -106,12 +106,12 @@
    },
    "CDAlgae":{
     "x":{
-     "exp":"Tag17.x - (RWidth * cos(Tag17.heading))",
-     "val":3.8504494999
+     "exp":"Tag17.x - (RWidth * cos(Tag17.heading)) - (ClawOffset * sin(Tag17.heading))",
+     "val":3.729465750991314
     },
     "y":{
-     "exp":"Tag17.y - (RWidth * sin(Tag17.heading))",
-     "val":2.9192799886184853
+     "exp":"Tag17.y - (RWidth * sin(Tag17.heading)) + (ClawOffset * cos(Tag17.heading))",
+     "val":2.9891299886184854
     },
     "heading":{
      "exp":"Tag17.heading",
@@ -148,12 +148,12 @@
    },
    "EFAlgae":{
     "x":{
-     "exp":"Tag22.x - (RWidth * cos(Tag22.heading))",
-     "val":5.128196499
+     "exp":"Tag22.x - (RWidth * cos(Tag22.heading)) - (ClawOffset * sin(Tag22.heading))",
+     "val":5.007212750091314
     },
     "y":{
-     "exp":"Tag22.y - (RWidth * sin(Tag22.heading))",
-     "val":2.9192799886184853
+     "exp":"Tag22.y - (RWidth * sin(Tag22.heading)) + (ClawOffset * cos(Tag22.heading))",
+     "val":2.8494299886184855
     },
     "heading":{
      "exp":"Tag22.heading",
@@ -190,12 +190,12 @@
    },
    "GHAlgae":{
     "x":{
-     "exp":"Tag21.x - (RWidth * cos(Tag21.heading))",
+     "exp":"Tag21.x - (RWidth * cos(Tag21.heading)) - (ClawOffset * sin(Tag21.heading))",
      "val":5.767959
     },
     "y":{
-     "exp":"Tag21.y - (RWidth * sin(Tag21.heading))",
-     "val":4.0259
+     "exp":"Tag21.y - (RWidth * sin(Tag21.heading)) - ClawOffset",
+     "val":3.8862
     },
     "heading":{
      "exp":"Tag21.heading",
@@ -232,12 +232,12 @@
    },
    "IJAlgae":{
     "x":{
-     "exp":"Tag20.x - (RWidth * cos(Tag20.heading))",
-     "val":5.128196499
+     "exp":"Tag20.x - (RWidth * cos(Tag20.heading)) - (ClawOffset * sin(Tag20.heading))",
+     "val":5.249180247908686
     },
     "y":{
-     "exp":"Tag20.y - (RWidth * sin(Tag20.heading))",
-     "val":5.132520011281515
+     "exp":"Tag20.y - (RWidth * sin(Tag20.heading)) + (ClawOffset * cos(Tag20.heading))",
+     "val":5.062670011281515
     },
     "heading":{
      "exp":"Tag20.heading",
@@ -274,12 +274,12 @@
    },
    "KLAlgae":{
     "x":{
-     "exp":"Tag19.x - (RWidth * cos(Tag19.heading))",
-     "val":3.8504494999
+     "exp":"Tag19.x - (RWidth * cos(Tag19.heading)) - (ClawOffset * sin(Tag19.heading))",
+     "val":3.971433248808686
     },
     "y":{
-     "exp":"Tag19.y - (RWidth * sin(Tag19.heading))",
-     "val":5.132520011281515
+     "exp":"Tag19.y - (RWidth * sin(Tag19.heading)) + (ClawOffset * cos(Tag19.heading))",
+     "val":5.2023700112815146
     },
     "heading":{
      "exp":"Tag19.heading",
