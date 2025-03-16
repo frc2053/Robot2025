@@ -104,7 +104,7 @@ class SwerveDrive {
   ctre::phoenix6::hardware::Pigeon2 imu{consts::swerve::can_ids::IMU, "*"};
   ctre::phoenix6::sim::Pigeon2SimState& imuSimState = imu.GetSimState();
 
-  std::array<ctre::phoenix6::BaseStatusSignal*, 34> allSignals;
+  std::array<ctre::phoenix6::BaseStatusSignal*, 38> allSignals;
 
   std::array<frc::SwerveModulePosition, 4> modulePositions;
   std::array<frc::SwerveModuleState, 4> moduleStates;

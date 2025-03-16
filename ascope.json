@@ -7,313 +7,28 @@
       "height": 1408,
       "state": {
         "sidebar": {
-          "width": 300,
-          "expanded": [
-            "/3DDisplay",
-            "/SmartDashboard",
-            "/Swerve/Single Tag Pose",
-            "/Swerve/Single Tag Pose/rotation",
-            "/Swerve/Single Tag Pose/translation",
-            "/SmartDashboard/VisionSystemSim-str_fl_cam/Sim Field",
-            "/photonvision",
-            "/photonvision/str_fl_cam"
-          ]
+          "width": 304,
+          "expanded": []
         },
         "tabs": {
-          "selected": 2,
+          "selected": 3,
           "tabs": [
             {
               "type": 0,
               "title": "",
               "controller": null,
-              "controllerUUID": "i227mnns58iaztdf33xzkm35u9wahvc5",
+              "controllerUUID": "9n9w6gh09gtjzqbscysnial7rqi17a7b",
               "renderer": "#/",
               "controlsHeight": 0
             },
             {
-              "type": 2,
-              "title": "Odometry",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "robot",
-                    "logKey": "NT:/Swerve/PoseEstimatorPose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "swerveStates",
-                    "logKey": "NT:/Swerve/PathForcesPub",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff8c00",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "swerveStates",
-                    "logKey": "NT:/Swerve/CurrentStates",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff0000",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "swerveStates",
-                    "logKey": "NT:/Swerve/DesiredStates",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#0000ff",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "trajectory",
-                    "logKey": "NT:/Swerve/ActivePath",
-                    "logType": "Pose2d[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ffff",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/PathPlanner/targetPose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ffff"
-                    }
-                  }
-                ],
-                "game": "2025 Field",
-                "bumpers": "auto",
-                "origin": "blue",
-                "orientation": 0,
-                "size": 30
-              },
-              "controllerUUID": "qknx6l8v7b610d5n5igeoepf8hbxb3vi",
-              "renderer": null,
-              "controlsHeight": 200
-            },
-            {
-              "type": 3,
-              "title": "3D Field",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "robot",
-                    "logKey": "NT:/Swerve/PoseEstimatorPose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "20532025"
-                    }
-                  },
-                  {
-                    "type": "swerveStates",
-                    "logKey": "NT:/Swerve/SimStates",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "swerveStates",
-                    "logKey": "NT:/Swerve/CurrentStates",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff0000",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "swerveStates",
-                    "logKey": "NT:/Swerve/DesiredStates",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#0000ff",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "component",
-                    "logKey": "NT:/3DDisplay/Superstructure",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "vision",
-                    "logKey": "NT:/Vision/str_fl_camRobotTrans",
-                    "logType": "Translation2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "trajectory",
-                    "logKey": "NT:/Swerve/ActivePath",
-                    "logType": "Pose2d[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ffff",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/PathPlanner/targetPose",
-                    "logType": "Pose2d",
-                    "visible": false,
-                    "options": {
-                      "model": "20532025",
-                      "color": "#00ffff"
-                    }
-                  },
-                  {
-                    "type": "axes",
-                    "logKey": "NT:/Vision/CameraLocations",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Vision/str_fl_camPoseEstimation",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "20532025",
-                      "color": "#00ff00"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Vision/str_fr_camPoseEstimation",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "20532025",
-                      "color": "#ff0000"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Vision/str_bl_camPoseEstimation",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "20532025",
-                      "color": "#0000ff"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Vision/str_br_camPoseEstimation",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "20532025",
-                      "color": "#ff8c00"
-                    }
-                  },
-                  {
-                    "type": "gamePiece",
-                    "logKey": "NT:/3DDisplay/Algae",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "variant": "Algae"
-                    }
-                  },
-                  {
-                    "type": "gamePiece",
-                    "logKey": "NT:/3DDisplay/Coral",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "variant": "Coral"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Swerve/Single Tag Pose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "20532025",
-                      "color": "#ff00ff"
-                    }
-                  },
-                  {
-                    "type": "axes",
-                    "logKey": "NT:/Vision/str_fl_camTagPose",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {}
-                  },
-                  {
-                    "type": "cone",
-                    "logKey": "NT:/Vision/str_fl_camTransPose",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00",
-                      "position": "center"
-                    }
-                  }
-                ],
-                "game": "2025 Field",
-                "origin": "blue"
-              },
-              "controllerUUID": "987bqt8uyy95kylzdnynkpma8u744yj1",
-              "renderer": {
-                "cameraIndex": -1,
-                "orbitFov": 75,
-                "cameraPosition": [
-                  7.477547898013231,
-                  2.8636441181133763,
-                  -0.8847339393179329
-                ],
-                "cameraTarget": [
-                  5.574325568296608,
-                  -2.8294573057771006,
-                  0.2845160587667911
-                ]
-              },
-              "controlsHeight": 370
-            },
-            {
               "type": 1,
-              "title": "Line Graph",
+              "title": "Manipulator",
               "controller": {
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/SmartDashboard/FlatDistance",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#e5b31b",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "stepped",
-                    "logKey": "NT:/SmartDashboard/Distance2d",
+                    "logKey": "NT:/Manipulator/Commanded Voltage",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -323,17 +38,93 @@
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/SmartDashboard/Distance3d",
+                    "logKey": "NT:/Manipulator/Voltage",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#af2437",
+                      "color": "#d993aa",
                       "size": "normal"
                     }
                   }
                 ],
-                "rightSources": [],
-                "discreteSources": [],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Manipulator/TorqueCurrent",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#858584",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Manipulator/Velocity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#5f4528",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Manipulator/DroppedCoral",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Manipulator/GotAlgae",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Manipulator/GotCoral",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Manipulator/HasAlgae",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Manipulator/HasCoral",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#c0b487"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/Manipulator/TryingForCoral",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#3b875a"
+                    }
+                  }
+                ],
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
@@ -347,32 +138,7 @@
                 "leftFilter": 0,
                 "rightFilter": 0
               },
-              "controllerUUID": "6bibvebgcpb4durymogn2dfm2stvs13v",
-              "renderer": null,
-              "controlsHeight": 200
-            },
-            {
-              "type": 11,
-              "title": "Points",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "plus",
-                    "logKey": "NT:/Vision/str_fl_camtargetCorners",
-                    "logType": "Translation2d[]",
-                    "visible": true,
-                    "options": {
-                      "size": "medium",
-                      "groupSize": "0"
-                    }
-                  }
-                ],
-                "width": 1280,
-                "height": 960,
-                "orientation": "xr,yd",
-                "origin": "ul"
-              },
-              "controllerUUID": "fhbirf8xuxtelqdm259dq7t79y9g89yq",
+              "controllerUUID": "eo0zs1ebjikjic88xe05uabgz33sxak8",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -393,16 +159,47 @@
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/Elevator/HeightSetpoint",
+                    "logKey": "NT:/Elevator/HeightPosSetpoint",
                     "logType": "Number",
                     "visible": true,
                     "options": {
                       "color": "#e5b31b",
                       "size": "normal"
                     }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Elevator/HeightGoal",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
                   }
                 ],
-                "rightSources": [],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Elevator/HeightVelSetpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Elevator/CurrentVelocity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
+                  }
+                ],
                 "discreteSources": [
                   {
                     "type": "stripes",
@@ -410,7 +207,7 @@
                     "logType": "Boolean",
                     "visible": true,
                     "options": {
-                      "color": "#af2437"
+                      "color": "#c0b487"
                     }
                   }
                 ],
@@ -427,9 +224,9 @@
                 "leftFilter": 0,
                 "rightFilter": 0
               },
-              "controllerUUID": "2egdbcs4yz64kmhdn00l3dk9g6ffxmod",
+              "controllerUUID": "sxe29pwoigzzlo80ayqfykl5uoxal5kj",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 278
             },
             {
               "type": 1,
@@ -438,7 +235,7 @@
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/Pivot/AngleSetpoint",
+                    "logKey": "NT:/Pivot/CurrentAngle",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -448,16 +245,57 @@
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/Pivot/CurrentAngle",
+                    "logKey": "NT:/Pivot/AngularPosSetpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Pivot/AngularGoal",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#c0b487",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Pivot/AppliedVoltage",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#858584",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Pivot/CurrentAngularVelocity",
                     "logType": "Number",
                     "visible": true,
                     "options": {
                       "color": "#e5b31b",
                       "size": "normal"
                     }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/Pivot/AngularVelSetpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
                   }
                 ],
-                "rightSources": [],
                 "discreteSources": [
                   {
                     "type": "stripes",
@@ -482,162 +320,254 @@
                 "leftFilter": 0,
                 "rightFilter": 0
               },
-              "controllerUUID": "02bs6llv1r6nvi26p2dzevq1fow7nne0",
+              "controllerUUID": "666bskk4us29y9jthny3clgrpo0ov2d4",
               "renderer": null,
               "controlsHeight": 200
             },
             {
-              "type": 1,
-              "title": "Manipulator",
+              "type": 2,
+              "title": "Odometry",
               "controller": {
-                "leftSources": [
+                "sources": [
                   {
-                    "type": "stepped",
-                    "logKey": "NT:/Manipulator/TorqueCurrent",
-                    "logType": "Number",
+                    "type": "robot",
+                    "logKey": "NT:/Swerve/PoseEstimatorPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/Swerve/CurrentStates",
+                    "logType": "SwerveModuleState[]",
                     "visible": true,
                     "options": {
-                      "color": "#e48b32",
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/Swerve/DesiredStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/Swerve/PathForcesPub",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Swerve/SingleTagPoseEstimatorPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "NT:/Swerve/ActivePath",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
                       "size": "normal"
                     }
                   },
                   {
-                    "type": "stepped",
-                    "logKey": "NT:/Manipulator/Velocity",
-                    "logType": "Number",
+                    "type": "ghost",
+                    "logKey": "NT:/Swerve/PIDToPoseSetpoint",
+                    "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "color": "#c0b487",
-                      "size": "normal"
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/PathPlanner/targetPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff"
                     }
                   }
                 ],
-                "rightSources": [],
-                "discreteSources": [
-                  {
-                    "type": "stripes",
-                    "logKey": "NT:/Manipulator/GotAlgae",
-                    "logType": "Boolean",
-                    "visible": true,
-                    "options": {
-                      "color": "#2b66a2"
-                    }
-                  },
-                  {
-                    "type": "stripes",
-                    "logKey": "NT:/Manipulator/GotCoral",
-                    "logType": "Boolean",
-                    "visible": true,
-                    "options": {
-                      "color": "#e5b31b"
-                    }
-                  },
-                  {
-                    "type": "stripes",
-                    "logKey": "NT:/Manipulator/HasAlgae",
-                    "logType": "Boolean",
-                    "visible": true,
-                    "options": {
-                      "color": "#af2437"
-                    }
-                  },
-                  {
-                    "type": "stripes",
-                    "logKey": "NT:/Manipulator/HasCoral",
-                    "logType": "Boolean",
-                    "visible": true,
-                    "options": {
-                      "color": "#80588e"
-                    }
-                  }
-                ],
-                "leftLockedRange": null,
-                "rightLockedRange": null,
-                "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "leftFilter": 0,
-                "rightFilter": 0
+                "game": "2025 Field (Welded)",
+                "bumpers": "auto",
+                "origin": "blue",
+                "orientation": 0,
+                "size": 30
               },
-              "controllerUUID": "73jgyyyb11k4gkvfoe0wo7uzp9agd2i2",
+              "controllerUUID": "fdzet80752lj7h8otqyuh29ypwcdmexz",
               "renderer": null,
-              "controlsHeight": 258
+              "controlsHeight": 370
             },
             {
-              "type": 1,
-              "title": "Algae Intake",
+              "type": 3,
+              "title": "3D Field",
               "controller": {
-                "leftSources": [
+                "sources": [
                   {
-                    "type": "stepped",
-                    "logKey": "NT:/Algae/AlgaePivotAngleSetpoint",
-                    "logType": "Number",
+                    "type": "robot",
+                    "logKey": "NT:/Swerve/PoseEstimatorPose",
+                    "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "color": "#2b66a2",
+                      "model": "20532025"
+                    }
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/3DDisplay/Superstructure",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/Swerve/CurrentStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/Swerve/DesiredStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/Swerve/PathForcesPub",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff8c00",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Swerve/SingleTagPoseEstimatorPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "20532025",
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Swerve/PIDToPoseSetpoint",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "20532025",
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "axes",
+                    "logKey": "NT:/Vision/CameraLocations",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "aprilTag",
+                    "logKey": "NT:/Vision/str_fl_camtargetPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "family": "36h11"
+                    }
+                  },
+                  {
+                    "type": "aprilTag",
+                    "logKey": "NT:/Vision/str_fr_camtargetPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "family": "36h11"
+                    }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "NT:/Swerve/ActivePath",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
                       "size": "normal"
                     }
                   },
                   {
-                    "type": "stepped",
-                    "logKey": "NT:/Algae/CurrentAlgaePivotAngle",
-                    "logType": "Number",
+                    "type": "ghost",
+                    "logKey": "NT:/PathPlanner/targetPose",
+                    "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "color": "#e5b31b",
-                      "size": "normal"
+                      "model": "20532025",
+                      "color": "#00ffff"
                     }
-                  }
-                ],
-                "rightSources": [],
-                "discreteSources": [
+                  },
                   {
-                    "type": "stripes",
-                    "logKey": "NT:/Algae/IsAtRequestedPivotAngle",
-                    "logType": "Boolean",
+                    "type": "gamePiece",
+                    "logKey": "NT:/3DDisplay/Algae",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "color": "#af2437"
+                      "variant": "Algae"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/3DDisplay/Coral",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
                     }
                   }
                 ],
-                "leftLockedRange": null,
-                "rightLockedRange": null,
-                "leftUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "rightUnitConversion": {
-                  "type": null,
-                  "factor": 1
-                },
-                "leftFilter": 0,
-                "rightFilter": 0
+                "game": "2025 Field (Welded)",
+                "origin": "blue"
               },
-              "controllerUUID": "fcbl5utjcx34gfv9pwfx46mp7nxog31a",
-              "renderer": null,
-              "controlsHeight": 200
-            },
-            {
-              "type": 10,
-              "title": "Mechanism",
-              "controller": [
-                {
-                  "type": "mechanism",
-                  "logKey": "NT:/SmartDashboard/Superstructure Display",
-                  "logType": "Mechanism2d",
-                  "visible": true,
-                  "options": {}
-                }
-              ],
-              "controllerUUID": "5sr3a60crcbvxk0iukd2zw1cf6uj7li4",
-              "renderer": null,
-              "controlsHeight": 200
+              "controllerUUID": "km5l3xsxdyajiem1hxg23t5vpgmwtpyr",
+              "renderer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  5.961396287465716,
+                  1.785413723971159,
+                  2.563393174383685
+                ],
+                "cameraTarget": [
+                  4.831729347104771,
+                  0.6496396409519236,
+                  0.9295935128481861
+                ]
+              },
+              "controlsHeight": 535
             }
           ]
         }
@@ -645,5 +575,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.2"
+  "version": "4.1.4"
 }
