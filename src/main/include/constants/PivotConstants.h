@@ -27,14 +27,14 @@ inline constexpr int PIVOT_ENC = 18;
 
 namespace current_limits {
 inline constexpr units::ampere_t SUPPLY_LIMIT = 40_A;
-inline constexpr units::ampere_t STATOR_LIMIT = 40_A;
+inline constexpr units::ampere_t STATOR_LIMIT = 60_A;
 }  // namespace current_limits
 
 namespace physical {
-inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(1);
+inline constexpr frc::DCMotor MOTOR = frc::DCMotor::KrakenX60FOC(1);
 inline constexpr bool INVERT_PIVOT = false;
 
-inline constexpr units::scalar_t GEARING = (64.0 / 12.0) * (48.0 / 12.0);
+inline constexpr units::scalar_t GEARING = (64.0 / 14.0) * (48.0 / 12.0);
 
 inline constexpr units::kilogram_t MASS = 7.602434_lb;
 inline constexpr units::kilogram_square_meter_t MOI = 0.12009477_kg_sq_m;
@@ -53,7 +53,7 @@ inline constexpr units::radian_t CLEAR_OF_FUNNEL_ANGLE = 45_deg;
 
 namespace gains {
 
-inline constexpr units::radian_t ANGLE_TOLERANCE = 2.5_deg;
+inline constexpr units::radian_t ANGLE_TOLERANCE = 1_deg;
 
 inline constexpr units::turns_per_second_t INTERMEDIATE_STATE_MAX_VEL =
     180_deg_per_s;

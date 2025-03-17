@@ -155,6 +155,15 @@ void RobotContainer::ConfigureSysIdBinds() {
 
   coastElevatorBtn.WhileTrue(elevatorSub.Coast());
   coastPivotBtn.WhileTrue(pivotSub.Coast());
+
+  driverJoystick.A().WhileTrue(
+      PivotVoltsSysIdCommands([] { return true; }, [] { return true; }));
+  driverJoystick.B().WhileTrue(
+      PivotVoltsSysIdCommands([] { return false; }, [] { return true; }));
+  driverJoystick.X().WhileTrue(
+      PivotVoltsSysIdCommands([] { return true; }, [] { return false; }));
+  driverJoystick.Y().WhileTrue(
+      PivotVoltsSysIdCommands([] { return false; }, [] { return false; }));
 }
 
 frc2::CommandPtr RobotContainer::SteerVoltsSysIdCommands(

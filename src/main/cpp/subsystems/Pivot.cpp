@@ -21,6 +21,7 @@
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
+#include "frc2/command/sysid/SysIdRoutine.h"
 #include "str/GainTypes.h"
 #include "str/Units.h"
 #include "units/angle.h"
@@ -176,14 +177,28 @@ frc2::CommandPtr Pivot::SysIdPivotQuasistaticVoltage(
     frc2::sysid::Direction dir) {
   return pivotSysIdVoltage.Quasistatic(dir)
       .WithName("Pivot Quasistatic Voltage")
-      .BeforeStarting([this] { isCharacterizing = true; })
+      .BeforeStarting([this, dir] {
+        std::string dirStr = "Rev";
+        if (dir == frc2::sysid::Direction::kForward) {
+          dirStr = "Fwd";
+        }
+        fmt::print("Pivot Sysid Quasi {}\n", dirStr);
+        isCharacterizing = true;
+      })
       .AndThen([this] { isCharacterizing = false; });
   ;
 }
 frc2::CommandPtr Pivot::SysIdPivotDynamicVoltage(frc2::sysid::Direction dir) {
   return pivotSysIdVoltage.Dynamic(dir)
       .WithName("Pivot Dynamic Voltage")
-      .BeforeStarting([this] { isCharacterizing = true; })
+      .BeforeStarting([this, dir] {
+        std::string dirStr = "Rev";
+        if (dir == frc2::sysid::Direction::kForward) {
+          dirStr = "Fwd";
+        }
+        fmt::print("Pivot Sysid Dynamic {}\n", dirStr);
+        isCharacterizing = true;
+      })
       .AndThen([this] { isCharacterizing = false; });
 }
 
@@ -347,6 +362,10 @@ void Pivot::ConfigureMotors() {
   config.TorqueCurrent.PeakReverseTorqueCurrent =
       -consts::pivot::current_limits::STATOR_LIMIT;
 
+  config.CurrentLimits.StatorCurrentLimitEnable = true;
+  config.CurrentLimits.StatorCurrentLimit =
+      consts::pivot::current_limits::STATOR_LIMIT;
+
   config.CurrentLimits.SupplyCurrentLimitEnable = true;
   config.CurrentLimits.SupplyCurrentLimit =
       consts::pivot::current_limits::SUPPLY_LIMIT;
@@ -358,7 +377,7 @@ void Pivot::ConfigureMotors() {
 
   config.Feedback.FeedbackRemoteSensorID = pivotEncoder.GetDeviceID();
   config.Feedback.FeedbackSensorSource =
-      ctre::phoenix6::signals::FeedbackSensorSourceValue::RemoteCANcoder;
+      ctre::phoenix6::signals::FeedbackSensorSourceValue::FusedCANcoder;
   config.Feedback.SensorToMechanismRatio = 1.0;
   config.Feedback.RotorToSensorRatio = consts::pivot::physical::GEARING;
 
