@@ -27,24 +27,11 @@ VisionSystem::VisionSystem(
           Camera{consts::vision::FR_CAM_NAME, consts::vision::FR_ROBOT_TO_CAM,
                  consts::vision::SINGLE_TAG_STD_DEV,
                  consts::vision::MULTI_TAG_STD_DEV, true, visionConsumer,
-                 singleTagConsumer},
-          // Dont let back cameras contribute to singleTag
-          Camera{consts::vision::BL_CAM_NAME, consts::vision::BL_ROBOT_TO_CAM,
-                 consts::vision::SINGLE_TAG_STD_DEV,
-                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer,
-                 [](const frc::Pose2d&, units::second_t,
-                    const Eigen::Vector3d&) {}},
-          Camera{consts::vision::BR_CAM_NAME, consts::vision::BR_ROBOT_TO_CAM,
-                 consts::vision::SINGLE_TAG_STD_DEV,
-                 consts::vision::MULTI_TAG_STD_DEV, false, visionConsumer,
-                 [](const frc::Pose2d&, units::second_t,
-                    const Eigen::Vector3d&) {}}} {}
+                 singleTagConsumer}} {}
 
 void VisionSystem::UpdateCameraPositionVis(frc::Pose3d robotPose) {
   cameraLocations[0] = robotPose.TransformBy(consts::vision::FL_ROBOT_TO_CAM);
   cameraLocations[1] = robotPose.TransformBy(consts::vision::FR_ROBOT_TO_CAM);
-  cameraLocations[2] = robotPose.TransformBy(consts::vision::BL_ROBOT_TO_CAM);
-  cameraLocations[3] = robotPose.TransformBy(consts::vision::BR_ROBOT_TO_CAM);
 
   cameraLocationsPub.Set(cameraLocations);
 }

@@ -27,13 +27,13 @@ class VisionSystem {
   void UpdatePoseEstimators(frc::Pose3d robotPose);
 
  private:
-  std::array<frc::Pose3d, 4> cameraLocations;
+  std::array<frc::Pose3d, 2> cameraLocations;
   nt::StructArrayPublisher<frc::Pose3d> cameraLocationsPub{
       nt::NetworkTableInstance::GetDefault()
           .GetTable("Vision")
           ->GetStructArrayTopic<frc::Pose3d>("CameraLocations")
           .Publish()};
 
-  std::array<Camera, 4> cameras;
+  std::array<Camera, 2> cameras;
 };
 }  // namespace str::vision
