@@ -7,6 +7,7 @@
 #include <frc2/command/SubsystemBase.h>
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <ctre/phoenix6/TalonFX.hpp>
@@ -56,6 +57,8 @@ class Pivot : public frc2::SubsystemBase {
   frc2::CommandPtr SysIdPivotDynamicVoltage(frc2::sysid::Direction dir);
   frc2::CommandPtr TunePivotPID(std::function<bool()> isDone);
   void SetToStartingPosition();
+  bool HasHitFwdSoftLimit();
+  bool HasHitRevSoftLimit();
 
  private:
   void ConfigureMotors();
@@ -145,6 +148,8 @@ class Pivot : public frc2::SubsystemBase {
       nt->GetStringTopic("PivotSysIdState").Publish()};
   nt::DoublePublisher appliedVoltagePub{
       nt->GetDoubleTopic("AppliedVoltage").Publish()};
+  nt::DoublePublisher currentAngleRawPub{
+      nt->GetDoubleTopic("CurrentAngleRaw").Publish()};
   nt::DoublePublisher currentAnglePub{
       nt->GetDoubleTopic("CurrentAngle").Publish()};
   nt::DoublePublisher currentVelPub{

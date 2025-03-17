@@ -72,6 +72,14 @@ void Pivot::Periodic() {
   trapSetpoint = next;
 }
 
+bool Pivot::HasHitFwdSoftLimit() {
+  return positionSig.GetValue() >= consts::pivot::physical::SOFT_LIMIT_FWD;
+}
+
+bool Pivot::HasHitRevSoftLimit() {
+  return positionSig.GetValue() <= consts::pivot::physical::SOFT_LIMIT_REV;
+}
+
 void Pivot::SetToStartingPosition() {
   pivotSim.SetInputVoltage(0_V);
   encoderSim.SetRawPosition(83.3_deg);
@@ -86,6 +94,8 @@ void Pivot::SetToStartingPosition() {
 
 void Pivot::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
+  currentAngleRawPub.Set(
+      positionSig.GetValue().convert<units::degrees>().value());
   currentVelPub.Set(GetPivotVel().convert<units::degrees_per_second>().value());
   angularPosSetpointPub.Set(
       trapSetpoint.position.convert<units::degrees>().value());
