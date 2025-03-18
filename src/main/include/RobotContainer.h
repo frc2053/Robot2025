@@ -67,7 +67,6 @@ class RobotContainer {
   Elevator elevatorSub{display};
   Pivot pivotSub{display};
   Manipulator manipSub{display};
-  AlgaeIntake algaeintakeSub{display};
   Coordinator coordinator{elevatorSub, pivotSub, manipSub};
 
   str::vision::VisionSystem vision{

@@ -64,7 +64,7 @@ frc2::CommandPtr Manipulator::StopCmd() {
 }
 
 frc2::CommandPtr Manipulator::HoldCoralCmd() {
-  return frc2::cmd::Run([this] { SetVoltage(-.5_V); }, {this});
+  return frc2::cmd::RunOnce([this] { SetVoltage(-3_V); }, {this});
 }
 
 frc2::CommandPtr Manipulator::HoldCmd() {

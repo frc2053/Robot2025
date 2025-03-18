@@ -61,7 +61,7 @@ frc2::CommandPtr Coordinator::GoToCoralPrime() {
 frc2::CommandPtr Coordinator::GoToLoading(bool override) {
   return frc2::cmd::Either(
       frc2::cmd::Parallel(
-          manip.StopCmd(),
+          manip.HoldCoralCmd(),
           frc2::cmd::Print("I have a coral, going to primed position"),
           piv.GoToAngleCmd([] { return presets::wrist::primed; }),
           elev.GoToHeightCmd([] { return presets::elev::coral::loading; })),
