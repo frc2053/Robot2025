@@ -67,9 +67,8 @@ class SuperstructureDisplay {
     uShapeBack->SetColor(frc::Color::kOrange);
     uShapeAround->SetColor(frc::Color::kOrange);
 
-    algaeIntakeUpright->SetColor(frc::Color::kDarkGreen);
-    algaeIntakeArmFirstPart->SetColor(frc::Color::kGreen);
-    algaeIntakeArmSecondPart->SetColor(frc::Color::kGreen);
+    climberUpright->SetColor(frc::Color::kDarkGreen);
+    climberArm->SetColor(frc::Color::kGreen);
   }
   void SetRobotPose(frc::Pose2d robotPose) { currentPose = robotPose; }
   void SetElevatorHeight(units::meter_t newHeight) {
@@ -93,25 +92,11 @@ class SuperstructureDisplay {
                          frc::Rotation3d{currentAngle, 0_rad, 0_rad}});
   }
 
-  void SetAlgaeIntakeAngle(units::radian_t newAngle) {
-    algaeIntakeArmFirstPart->SetAngle(-(newAngle - 90_deg));
+  void SetClimberAngle(units::radian_t newAngle) {
+    climberArm->SetAngle(newAngle - 90_deg);
 
-    superstructurePoses[4] =
-        frc::Pose3d{-0.3048_m, 0.11_m, 0.530225_m, frc::Rotation3d{}}
-            .TransformBy(frc::Transform3d{
-                frc::Translation3d{}, frc::Rotation3d{0_rad, newAngle, 0_rad}});
-  }
-
-  void AlgaeIntakeGamePiece(bool hasAlgae) {
-    if (hasAlgae) {
-      algae[1] = frc::Pose3d{frc::Translation3d{currentPose.Translation()},
-                             frc::Rotation3d{currentPose.Rotation()}}
-                     .TransformBy(frc::Transform3d{-20_in, 0_in, 12_in,
-                                                   frc::Rotation3d{}});
-    } else {
-      algae[1] = frc::Pose3d{};
-    }
-    aScopeAlgae.Set(algae);
+    // Too lazy to update ascope
+    superstructurePoses[4] = frc::Pose3d{};
   }
 
   void GamePieceSet(bool hasCoral, bool hasAlgae) {
@@ -180,9 +165,8 @@ class SuperstructureDisplay {
 
   inline static constexpr units::meter_t ALGAE_INTAKE =
       MIDDLE_OF_SWERVE + 12_in;
-  inline static constexpr units::meter_t ALGAE_INTAKE_UPRIGHT = 14.812851_in;
-  inline static constexpr units::meter_t ALGAE_ARM_FIRST_PART = 7.193467_in;
-  inline static constexpr units::meter_t ALGAE_ARM_SECOND_PART = 6.534639_in;
+  inline static constexpr units::meter_t ALGAE_INTAKE_UPRIGHT = 10_in;
+  inline static constexpr units::meter_t CLIMBER_ARM = 4_in;
 
   frc::Mechanism2d superstructureDisplay{TOTAL_SCREEN_WIDTH.value(),
                                          TOTAL_SCREEN_HEIGHT.value()};
@@ -243,18 +227,15 @@ class SuperstructureDisplay {
           "DTRight", TOP_OF_SWERVE.value(), -90_deg)};
 
   // ALGAE INTAKE
-  frc::MechanismRoot2d* algaeIntakeRoot{superstructureDisplay.GetRoot(
-      "AlgaeIntakeRoot", TOTAL_SCREEN_WIDTH.value() - ALGAE_INTAKE.value(),
+  frc::MechanismRoot2d* climberRoot{superstructureDisplay.GetRoot(
+      "ClimberRoot", TOTAL_SCREEN_WIDTH.value() - ALGAE_INTAKE.value(),
       TOP_OF_SWERVE.value())};
-  frc::MechanismLigament2d* algaeIntakeUpright{
-      algaeIntakeRoot->Append<frc::MechanismLigament2d>(
-          "AlgaeIntakeUpright", ALGAE_INTAKE_UPRIGHT.value(), 90_deg)};
-  frc::MechanismLigament2d* algaeIntakeArmFirstPart{
-      algaeIntakeUpright->Append<frc::MechanismLigament2d>(
-          "AlgaeIntakeArmFirst", ALGAE_ARM_FIRST_PART.value(), -109.5_deg)};
-  frc::MechanismLigament2d* algaeIntakeArmSecondPart{
-      algaeIntakeArmFirstPart->Append<frc::MechanismLigament2d>(
-          "AlgaeIntakeArmSecond", ALGAE_ARM_SECOND_PART.value(), 10.5_deg)};
+  frc::MechanismLigament2d* climberUpright{
+      climberRoot->Append<frc::MechanismLigament2d>(
+          "ClimberUpright", ALGAE_INTAKE_UPRIGHT.value(), 90_deg)};
+  frc::MechanismLigament2d* climberArm{
+      climberUpright->Append<frc::MechanismLigament2d>(
+          "ClimberArm", CLIMBER_ARM.value(), -90_deg)};
 
   // Elevator
   frc::MechanismRoot2d* elevatorRoot{superstructureDisplay.GetRoot(

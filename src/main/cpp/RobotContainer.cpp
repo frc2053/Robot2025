@@ -103,8 +103,7 @@ void RobotContainer::ConfigureSysIdBinds() {
   tuningTable->PutBoolean("ElevatorSysIdVolts", false);
   tuningTable->PutBoolean("PivotPidTuning", false);
   tuningTable->PutBoolean("PivotSysIdVolts", false);
-  tuningTable->PutBoolean("AlgaePivotSysIdVolts", false);
-  tuningTable->PutBoolean("AlgaePivotPidTuning", false);
+  tuningTable->PutBoolean("ClimbPidTuning", false);
   tuningTable->PutBoolean("CoastElevator", false);
   tuningTable->PutBoolean("CoastPivot", false);
   tuningTable->PutBoolean("Quasistatic", true);
@@ -118,6 +117,8 @@ void RobotContainer::ConfigureSysIdBinds() {
       elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get(); }));
   pivotTuneBtn.OnTrue(
       pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
+  climbTuneBtn.OnTrue(
+      climberSub.TuneClimberPID([this] { return !climbTuneBtn.Get(); }));
 
   steerSysIdVoltsBtn.WhileTrue(SteerVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
@@ -144,19 +145,6 @@ void RobotContainer::ConfigureSysIdBinds() {
 
   coastElevatorBtn.WhileTrue(elevatorSub.Coast());
   coastPivotBtn.WhileTrue(pivotSub.Coast());
-
-  driverJoystick.A().WhileTrue(
-      PivotVoltsSysIdCommands([] { return true; }, [] { return true; })
-          .Until([this] { return pivotSub.HasHitFwdSoftLimit(); }));
-  driverJoystick.B().WhileTrue(
-      PivotVoltsSysIdCommands([] { return false; }, [] { return true; })
-          .Until([this] { return pivotSub.HasHitRevSoftLimit(); }));
-  driverJoystick.X().WhileTrue(
-      PivotVoltsSysIdCommands([] { return true; }, [] { return false; })
-          .Until([this] { return pivotSub.HasHitFwdSoftLimit(); }));
-  driverJoystick.Y().WhileTrue(
-      PivotVoltsSysIdCommands([] { return false; }, [] { return false; })
-          .Until([this] { return pivotSub.HasHitRevSoftLimit(); }));
 }
 
 frc2::CommandPtr RobotContainer::SteerVoltsSysIdCommands(
@@ -264,6 +252,10 @@ Pivot& RobotContainer::GetPivot() {
 
 Manipulator& RobotContainer::GetManipulator() {
   return manipSub;
+}
+
+Climber& RobotContainer::GetClimber() {
+  return climberSub;
 }
 
 str::vision::VisionSystem& RobotContainer::GetVision() {

@@ -94,7 +94,8 @@
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/str_bl_cam-processed",
-              "period": 0.06
+              "period": 0.06,
+              "rotation_turns": 0
             }
           },
           {
@@ -106,7 +107,8 @@
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/str_br_cam-processed",
-              "period": 0.06
+              "period": 0.06,
+              "rotation_turns": 0
             }
           },
           {
@@ -118,7 +120,8 @@
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/str_fl_cam-processed",
-              "period": 0.06
+              "period": 0.06,
+              "rotation_turns": 0
             }
           },
           {
@@ -130,7 +133,8 @@
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/str_fr_cam-processed",
-              "period": 0.06
+              "period": 0.06,
+              "rotation_turns": 0
             }
           },
           {
@@ -421,38 +425,25 @@
             ]
           },
           {
-            "title": "Algae Intake",
-            "x": 0.0,
-            "y": 768.0,
+            "title": "List Layout",
+            "x": 768.0,
+            "y": 0.0,
             "width": 384.0,
-            "height": 384.0,
+            "height": 256.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
             },
             "children": [
               {
-                "title": "AlgaePivotPidTuning",
+                "title": "ClimberPidTuning",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Toggle Button",
                 "properties": {
-                  "topic": "/Tuning/AlgaePivotPidTuning",
-                  "period": 0.06,
-                  "data_type": "boolean"
-                }
-              },
-              {
-                "title": "AlgaePivotSysIdVolts",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Toggle Button",
-                "properties": {
-                  "topic": "/Tuning/AlgaePivotSysIdVolts",
+                  "topic": "/Tuning/ClimberPidTuning",
                   "period": 0.06,
                   "data_type": "boolean"
                 }

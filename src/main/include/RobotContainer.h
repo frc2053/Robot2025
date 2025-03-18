@@ -18,7 +18,7 @@
 #include "frc2/command/button/Trigger.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
-#include "subsystems/AlgaeIntake.h"
+#include "subsystems/Climber.h"
 #include "subsystems/Coordinator.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
@@ -36,7 +36,7 @@ class RobotContainer {
   Manipulator& GetManipulator();
   Coordinator& GetCoordinator();
   str::vision::VisionSystem& GetVision();
-  AlgaeIntake& GetAlgaeIntake();
+  Climber& GetClimber();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
  private:
@@ -67,7 +67,8 @@ class RobotContainer {
   Elevator elevatorSub{display};
   Pivot pivotSub{display};
   Manipulator manipSub{display};
-  Coordinator coordinator{elevatorSub, pivotSub, manipSub};
+  Climber climberSub{display};
+  Coordinator coordinator{elevatorSub, pivotSub, manipSub, climberSub};
 
   str::vision::VisionSystem vision{
       [this](const frc::Pose2d& pose, units::second_t time,
@@ -94,9 +95,7 @@ class RobotContainer {
   frc2::NetworkButton elevatorSysIdVoltsBtn{tuningTable, "ElevatorSysIdVolts"};
   frc2::NetworkButton pivotTuneBtn{tuningTable, "PivotPidTuning"};
   frc2::NetworkButton pivotSysIdVoltsBtn{tuningTable, "PivotSysIdVolts"};
-  frc2::NetworkButton algaePivotTuneBtn{tuningTable, "AlgaePivotPidTuning"};
-  frc2::NetworkButton algaePivotSysIdVoltsBtn{tuningTable,
-                                              "AlgaePivotSysIdVolts"};
+  frc2::NetworkButton climbTuneBtn{tuningTable, "ClimbPidTuning"};
   frc2::NetworkButton coastElevatorBtn{tuningTable, "CoastElevator"};
   frc2::NetworkButton coastPivotBtn{tuningTable, "CoastPivot"};
 };

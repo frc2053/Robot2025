@@ -10,8 +10,8 @@
 #include "subsystems/Manipulator.h"
 
 Coordinator::Coordinator(Elevator& elevator, Pivot& pivot,
-                         Manipulator& manipulator)
-    : elev{elevator}, piv{pivot}, manip{manipulator} {}
+                         Manipulator& manipulator, Climber& climber)
+    : elev{elevator}, piv{pivot}, manip{manipulator}, climb{climber} {}
 
 frc2::CommandPtr Coordinator::GoToL1() {
   return frc2::cmd::Either(GoToAlgaeProcess(), GoToAlgaeProcess(),
