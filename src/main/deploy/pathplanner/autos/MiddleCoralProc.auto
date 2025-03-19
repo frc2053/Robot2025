@@ -5,19 +5,63 @@
     "data": {
       "commands": [
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MiddleToGH.0"
+                  "pathName": "MiddleToH"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "GetOutOfStarting"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "L4Coral"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToLeftReef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "HToApproach.0"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "GetOutOfStarting"
+                  "name": "L2Algae"
                 }
               }
             ]
@@ -28,30 +72,48 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "L4Coral"
+                  "pathName": "ApproachToGHAlgae.0"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "DriveToLeftReef"
+                  "name": "Suck"
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Score"
+            "waitTime": 1.0
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 0.1
+            "pathName": "GHAlgaeToNet.0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NetApproach.0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreAlgae"
           }
         },
         {
