@@ -21,7 +21,7 @@ inline constexpr units::radian_t algaeHold = 10_deg;
 inline constexpr units::radian_t algaeProcess = -30_deg;
 inline constexpr units::radian_t algaeGrab = 45_deg;
 inline constexpr units::radian_t algaeNet = 80_deg;
-inline constexpr units::radian_t primed = 45_deg;
+inline constexpr units::radian_t primed = 30_deg;
 
 inline constexpr units::radian_t outofstarting = 35_deg;
 }  // namespace wrist

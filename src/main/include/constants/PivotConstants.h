@@ -74,16 +74,16 @@ inline constexpr units::volt_t kG = .27_V;
 #else
 inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     consts::pivot::physical::MOTOR.freeSpeed / consts::pivot::physical::GEARING,
-    str::gains::radial::turn_volt_ka_unit_t{1},
-    str::gains::radial::turn_volt_kv_unit_t{10},
+    str::gains::radial::turn_volt_ka_unit_t{0},
+    str::gains::radial::turn_volt_kv_unit_t{0},
     str::gains::radial::turn_volt_ka_unit_t{0},
     str::gains::radial::turn_volt_kv_unit_t{0},
     0_V,
-    str::gains::radial::turn_volt_kp_unit_t{10},
+    str::gains::radial::turn_volt_kp_unit_t{20},
     str::gains::radial::turn_volt_ki_unit_t{0},
-    str::gains::radial::turn_volt_kd_unit_t{0},
+    str::gains::radial::turn_volt_kd_unit_t{1},
 };
-inline constexpr units::volt_t kG = 1.553_V;
+inline constexpr units::volt_t kG = 1.2_V;
 #endif
 }  // namespace gains
 }  // namespace consts::pivot

@@ -150,7 +150,7 @@ class SuperstructureDisplay {
   units::radian_t currentAngle{};
 
   frc::Pose3d iHonestlyForgetWhatThisRepresents =
-      frc::Pose3d{frc::Translation3d{0.1016508_m, -0.117274594_m, 0.263525_m},
+      frc::Pose3d{frc::Translation3d{0.1016508_m, -0.1651_m, 0.263525_m},
                   frc::Rotation3d{0_deg, 0_deg, -90_deg}};
 
   inline static constexpr units::meter_t TOTAL_SCREEN_WIDTH = 60_in;
