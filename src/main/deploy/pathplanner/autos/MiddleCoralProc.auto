@@ -121,6 +121,12 @@
           "data": {
             "name": "Loading"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NetLeave.0"
+          }
         }
       ]
     }
