@@ -39,6 +39,8 @@ class RobotContainer {
   Climber& GetClimber();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
+  frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
+
  private:
   void ConfigureBindings();
   void ConfigureSysIdBinds();

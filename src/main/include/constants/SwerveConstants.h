@@ -162,12 +162,12 @@ inline const str::gains::radial::VoltRadialGainsHolder STEER{
         consts::swerve::physical::STEER_GEARING,
     str::gains::radial::turn_volt_ka_unit_t{0.095481},
     str::gains::radial::turn_volt_kv_unit_t{2.606},
-    str::gains::radial::turn_volt_ka_unit_t{0.095481},
+    str::gains::radial::turn_volt_ka_unit_t{0},
     str::gains::radial::turn_volt_kv_unit_t{2.606},
     0.24038_V,
-    str::gains::radial::turn_volt_kp_unit_t{176},
+    str::gains::radial::turn_volt_kp_unit_t{100},
     str::gains::radial::turn_volt_ki_unit_t{0},
-    str::gains::radial::turn_volt_kd_unit_t{.2},
+    str::gains::radial::turn_volt_kd_unit_t{.05},
 };
 
 inline const str::swerve::DriveGains DRIVE{
@@ -190,11 +190,11 @@ inline constexpr units::scalar_t ROTATION_P = 5;
 inline constexpr units::scalar_t ROTATION_I = 0;
 inline constexpr units::scalar_t ROTATION_D = 0;
 
-inline constexpr units::scalar_t RAW_POSE_P = 8;
+inline constexpr units::scalar_t RAW_POSE_P = 5;
 inline constexpr units::scalar_t RAW_POSE_I = 0;
 inline constexpr units::scalar_t RAW_POSE_D = 0;
 
-inline constexpr units::scalar_t RAW_ROTATION_P = 8;
+inline constexpr units::scalar_t RAW_ROTATION_P = 5;
 inline constexpr units::scalar_t RAW_ROTATION_I = 0;
 inline constexpr units::scalar_t RAW_ROTATION_D = 0;
 
@@ -208,12 +208,12 @@ inline pathplanner::RobotConfig config;
 
 inline constexpr units::meter_t translationalPIDTolerance = .5_in;
 inline constexpr units::meters_per_second_t translationalVelPIDTolerance =
-    .25_fps;
-inline constexpr units::radian_t rotationalPIDTolerance = 1_deg;
+    .5_fps;
+inline constexpr units::radian_t rotationalPIDTolerance = 2_deg;
 inline constexpr units::radians_per_second_t rotationalVelPIDTolerance =
     1_deg_per_s;
 inline constexpr units::meters_per_second_t translationalVelPIDDeadband =
-    0.1_fps;
+    0.12_fps;
 inline constexpr units::radians_per_second_t rotationalVelPIDDeadband =
     0.5_deg_per_s;
 }  // namespace pathplanning

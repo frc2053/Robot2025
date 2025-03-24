@@ -56,15 +56,15 @@ inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
         (consts::elevator::physical::PULLEY_DIAM / 2.0),
     str::gains::linear::meter_volt_ka_unit_t{0},
     str::gains::linear::meter_volt_kv_unit_t{0},
-    str::gains::linear::meter_volt_ka_unit_t{0.1},
-    str::gains::linear::meter_volt_kv_unit_t{2.6},
-    0.047698_V,
-    str::gains::linear::meter_volt_kp_unit_t{120},
+    str::gains::linear::meter_volt_ka_unit_t{.075087},
+    str::gains::linear::meter_volt_kv_unit_t{2.3327},
+    0.076596_V,
+    str::gains::linear::meter_volt_kp_unit_t{100},
     str::gains::linear::meter_volt_ki_unit_t{0},
-    str::gains::linear::meter_volt_kd_unit_t{.1},
+    str::gains::linear::meter_volt_kd_unit_t{.2},
 };
 
-inline constexpr units::volt_t kG = 0.40627_V;
+inline constexpr units::volt_t kG = 0.39551_V;
 #else
 inline const str::gains::linear::VoltLinearGainsHolder ELEVATOR_GAINS{
     ((consts::elevator::physical::MOTOR.freeSpeed /

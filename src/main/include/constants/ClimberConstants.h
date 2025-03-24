@@ -44,8 +44,8 @@ inline constexpr units::meter_t ARM_LENGTH = 3.9944802402_in;
 inline constexpr units::radian_t MIN_ANGLE = -90_deg;
 inline constexpr units::radian_t MAX_ANGLE = 180_deg;
 
-inline constexpr units::radian_t CLIMB_OUT_ANGLE = 90_deg;
-inline constexpr units::radian_t CLIMB_STOW_ANGLE = 50_deg;
+inline constexpr units::radian_t CLIMB_OUT_ANGLE = .275_tr;
+inline constexpr units::radian_t CLIMB_STOW_ANGLE = 0.09_tr;
 }  // namespace physical
 
 namespace gains {

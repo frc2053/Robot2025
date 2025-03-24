@@ -102,7 +102,7 @@ class Pivot : public frc2::SubsystemBase {
                          currentGains.kA};
 
   units::degrees_per_second_t maxProfVel = 10000_deg_per_s;
-  units::degrees_per_second_squared_t maxProfAccel = 10000_deg_per_s_sq;
+  units::degrees_per_second_squared_t maxProfAccel = 2000_deg_per_s_sq;
 
   frc::TrapezoidProfile<units::turns> trapProf{
       frc::TrapezoidProfile<units::turns>::Constraints{maxProfVel,

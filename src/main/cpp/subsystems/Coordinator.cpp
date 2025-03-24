@@ -35,6 +35,7 @@ frc2::CommandPtr Coordinator::GoToL4() {
 
 frc2::CommandPtr Coordinator::GetOutOfStartingConfig() {
   return frc2::cmd::Sequence(
+      climb.Stow(),
       frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
       piv.GoToAngleCmd([] { return presets::wrist::outofstarting; }),
       frc2::cmd::Print("Done with pivot!\n"),

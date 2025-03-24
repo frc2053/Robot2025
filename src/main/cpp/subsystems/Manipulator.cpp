@@ -64,7 +64,7 @@ frc2::CommandPtr Manipulator::StopCmd() {
 }
 
 frc2::CommandPtr Manipulator::HoldCoralCmd() {
-  return frc2::cmd::RunOnce([this] { SetVoltage(-3_V); }, {this});
+  return frc2::cmd::RunOnce([this] { SetVoltage(-.5_V); }, {this});
 }
 
 frc2::CommandPtr Manipulator::HoldCmd() {
@@ -234,7 +234,7 @@ void Manipulator::ConfigureMotors() {
   config.CurrentLimits.StatorCurrentLimit =
       consts::manip::current_limits::STATOR_LIMIT;
 
-  config.OpenLoopRamps.VoltageOpenLoopRampPeriod = .25_s;
+  config.OpenLoopRamps.VoltageOpenLoopRampPeriod = .05_s;
 
   config.HardwareLimitSwitch.ForwardLimitEnable = false;
   config.HardwareLimitSwitch.ReverseLimitEnable = false;

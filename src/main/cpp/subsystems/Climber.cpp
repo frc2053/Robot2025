@@ -69,14 +69,14 @@ void Climber::SimulationPeriodic() {
   climberMotorSim.SetRotorVelocity(encVel * consts::climber::physical::GEARING);
 }
 
-units::radian_t Climber::GetClimberAngle() {
+units::turn_t Climber::GetClimberAngle() {
   units::turn_t latencyCompPosition =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(positionSig,
                                                                    velocitySig);
   return latencyCompPosition;
 }
 
-units::radians_per_second_t Climber::GetClimberVel() {
+units::turns_per_second_t Climber::GetClimberVel() {
   return velocitySig.GetValue();
 }
 
@@ -89,17 +89,23 @@ frc2::CommandPtr Climber::Stow() {
       [] { return consts::climber::physical::CLIMB_STOW_ANGLE; });
 }
 
+frc2::CommandPtr Climber::Deploy() {
+  return GoToAngleCmd(
+      [] { return consts::climber::physical::CLIMB_OUT_ANGLE; });
+}
+
+frc2::CommandPtr Climber::Climb(std::function<units::volt_t()> volts) {
+  return frc2::cmd::Run([this, volts] { SetClimberVoltage(volts()); }, {this});
+}
+
 frc2::CommandPtr Climber::GoToAngleCmd(
-    std::function<units::radian_t()> newAngle) {
+    std::function<units::turn_t()> newAngle) {
   return frc2::cmd::Run([this, newAngle] { GoToAngle(newAngle()); }, {this})
       .Until([this] { return isAtGoalAngle; });
 }
 
-void Climber::GoToAngle(units::radian_t newAngle) {
-  if (!units::essentiallyEqual(goalAngle, newAngle, 1e-6)) {
-    isAtGoalAngle = false;
-    goalAngle = newAngle;
-  }
+void Climber::GoToAngle(units::turn_t newAngle) {
+  goalAngle = newAngle;
   climberMotor.SetControl(
       climberAngleSetter.WithPosition(newAngle).WithEnableFOC(true));
 }

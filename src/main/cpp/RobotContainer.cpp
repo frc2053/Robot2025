@@ -45,10 +45,13 @@ void RobotContainer::ConfigureBindings() {
   frc2::RobotModeTriggers::Teleop().OnTrue(
       coordinator.GetOutOfStartingConfig());
 
-  (manipSub.GotCoralFR() && frc2::RobotModeTriggers::Teleop())
+  (driveSub.IsAligned() && frc2::RobotModeTriggers::Teleop())
+      .WhileTrue(RumbleDriver([] { return .25_s; }));
+
+  (manipSub.GotCoral() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(coordinator.GoToCoralPrime());
 
-  (manipSub.GotCoralFR() && frc2::RobotModeTriggers::Teleop())
+  (manipSub.GotCoral() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(manipSub.HoldCoralCmd());
 
   driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilCoral());
@@ -65,6 +68,11 @@ void RobotContainer::ConfigureBindings() {
 
   operatorJoystick.Back().OnTrue(
       frc2::cmd::RunOnce([this] { manipSub.OverrideHasCoral(false); }));
+
+  operatorJoystick.RightBumper().WhileTrue(
+      climberSub.Climb([] { return -12_V; }));
+  operatorJoystick.RightBumper().OnFalse(climberSub.Climb([] { return 0_V; }));
+  operatorJoystick.LeftBumper().WhileTrue(climberSub.Deploy());
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
@@ -277,4 +285,20 @@ frc2::Trigger RobotContainer::NoButtonsPressed() {
     return !operatorJoystick.A().Get() && !operatorJoystick.B().Get() &&
            !operatorJoystick.X().Get() && !operatorJoystick.Y().Get();
   }};
+}
+
+frc2::CommandPtr RobotContainer::RumbleDriver(
+    std::function<units::second_t()> timeToRumble) {
+  return frc2::cmd::Sequence(
+             frc2::cmd::RunOnce([this] {
+               driverJoystick.SetRumble(
+                   frc::GenericHID::RumbleType::kBothRumble, 1.0);
+             }),
+             frc2::cmd::Wait(timeToRumble()), frc2::cmd::RunOnce([this] {
+               driverJoystick.SetRumble(
+                   frc::GenericHID::RumbleType::kBothRumble, 0.0);
+             }))
+      .FinallyDo([this] {
+        driverJoystick.SetRumble(frc::GenericHID::RumbleType::kBothRumble, 0.0);
+      });
 }

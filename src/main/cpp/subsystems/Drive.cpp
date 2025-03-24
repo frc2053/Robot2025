@@ -23,6 +23,7 @@
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
+#include "frc2/command/button/Trigger.h"
 #include "pathplanner/lib/util/DriveFeedforwards.h"
 #include "pathplanner/lib/util/FlippingUtil.h"
 #include "str/DriverstationUtils.h"
@@ -108,6 +109,10 @@ frc2::CommandPtr Drive::DriveRobotRel(
       .WithName("DriveRobotRel");
 }
 
+frc2::Trigger Drive::IsAligned() {
+  return frc2::Trigger{[this] { return isAtGoalState; }};
+}
+
 void Drive::SetPosePids() {
   double newTP = frc::SmartDashboard::GetNumber(
       "GOTOPOSETRANSP", consts::swerve::pathplanning::RAW_POSE_P);
@@ -190,7 +195,7 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                    double directionX = 0;
                    double directionY = 0;
 
-                   if (distanceToTarget > 0.25_in) {
+                   if (distanceToTarget > 0.75_in) {
                      directionX =
                          vectorToTarget.X().value() / distanceToTarget.value();
                      directionY =
@@ -242,13 +247,11 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                  .Until([this] {
                    bool isAtGoal = translationController.AtGoal() &&
                                    thetaController.AtGoal();
+                   isAtGoalState = isAtGoal;
                    isAtGoalPosePub.Set(isAtGoal);
                    return isAtGoal;
                  })
-                 .WithName("PIDToPose Run"),
-             frc2::cmd::RunOnce([this] {
-               swerveDrive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
-             }).WithName("PIDToPose Stop"))
+                 .WithName("PIDToPose Run"))
       .WithName("PIDToPose");
 }
 

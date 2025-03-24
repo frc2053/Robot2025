@@ -38,28 +38,29 @@ class Climber : public frc2::SubsystemBase {
   void OptimizeBusSignals();
   void Periodic() override;
   void SimulationPeriodic() override;
-  units::radian_t GetClimberAngle();
-  void GoToAngle(units::radian_t newAngle);
+  units::turn_t GetClimberAngle();
+  void GoToAngle(units::turn_t newAngle);
   frc2::Trigger IsAtGoalAngle();
   void SetClimberVoltage(units::volt_t volts);
   frc2::CommandPtr Stow();
-
-  frc2::CommandPtr GoToAngleCmd(std::function<units::radian_t()> newAngle);
+  frc2::CommandPtr Deploy();
+  frc2::CommandPtr Climb(std::function<units::volt_t()> volts);
+  frc2::CommandPtr GoToAngleCmd(std::function<units::turn_t()> newAngle);
   frc2::CommandPtr TuneClimberPID(std::function<bool()> isDone);
 
  private:
   void ConfigureMotors();
   void ConfigureControlSignals();
   void UpdateNTEntries();
-  units::radians_per_second_t GetClimberVel();
+  units::turns_per_second_t GetClimberVel();
   void SetClimberGains(str::gains::radial::VoltRadialGainsHolder newGains,
                        units::volt_t kg);
 
   ctre::phoenix6::hardware::TalonFX climberMotor{
       consts::climber::can_ids::CLIMBER_MOTOR};
 
-  units::radian_t goalAngle = 0_rad;
-  units::radian_t currentAngle = 0_rad;
+  units::turn_t goalAngle = 0_rad;
+  units::turn_t currentAngle = 0_rad;
   bool isAtGoalAngle = false;
 
   ctre::phoenix6::sim::TalonFXSimState& climberMotorSim =
