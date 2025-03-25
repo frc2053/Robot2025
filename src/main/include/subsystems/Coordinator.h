@@ -27,6 +27,7 @@ class Coordinator {
   frc2::CommandPtr GoToCoralPrime();
   frc2::CommandPtr GoToL4Coral();
   frc2::CommandPtr GoToL2AlgaeAUTO();
+  frc2::CommandPtr Climb();
 
  private:
   frc2::CommandPtr GoToL1Coral();

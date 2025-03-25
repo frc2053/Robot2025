@@ -188,6 +188,12 @@ frc2::CommandPtr Coordinator::GoToL4Coral() {
           piv.GoToAngleCmd([] { return presets::wrist::coral::l4; })));
 }
 
+frc2::CommandPtr Coordinator::Climb() {
+  return frc2::cmd::Sequence(manip.PoopPiece([] { return .5_s; }),
+                             piv.GoToAngleCmd([] { return 45_deg; }),
+                             elev.GoToHeightCmd([] { return 0_in; }));
+}
+
 frc2::CommandPtr Coordinator::GoToNet() {
   return frc2::cmd::Sequence(
       piv.GoToAngleCmd([] { return presets::wrist::algaeHold; }),

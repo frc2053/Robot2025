@@ -28,6 +28,8 @@ Climber::Climber(str::SuperstructureDisplay& display) : display{display} {
   ConfigureControlSignals();
 
   OptimizeBusSignals();
+
+  climberLock.Set(0);
 }
 
 void Climber::Periodic() {
@@ -53,6 +55,19 @@ void Climber::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
   angleSetpointPub.Set(goalAngle.convert<units::degrees>().value());
   isAtSetpointPub.Set(isAtGoalAngle);
+}
+
+frc2::CommandPtr Climber::Lock() {
+  return frc2::cmd::RunOnce(
+      [this] {
+        SetClimberVoltage(0_V);
+        climberLock.Set(1);
+      },
+      {this});
+}
+
+frc2::CommandPtr Climber::Unlock() {
+  return frc2::cmd::RunOnce([this] { climberLock.Set(0); }, {this});
 }
 
 void Climber::SimulationPeriodic() {
@@ -95,7 +110,9 @@ frc2::CommandPtr Climber::Deploy() {
 }
 
 frc2::CommandPtr Climber::Climb(std::function<units::volt_t()> volts) {
-  return frc2::cmd::Run([this, volts] { SetClimberVoltage(volts()); }, {this});
+  return frc2::cmd::Run([this, volts] { SetClimberVoltage(volts()); }, {this})
+      .Until([this] { return currentAngle < 0.07_tr; })
+      .AndThen(Lock());
 }
 
 frc2::CommandPtr Climber::GoToAngleCmd(

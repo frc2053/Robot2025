@@ -72,7 +72,8 @@ void RobotContainer::ConfigureBindings() {
   operatorJoystick.RightBumper().WhileTrue(
       climberSub.Climb([] { return -12_V; }));
   operatorJoystick.RightBumper().OnFalse(climberSub.Climb([] { return 0_V; }));
-  operatorJoystick.LeftBumper().WhileTrue(climberSub.Deploy());
+  operatorJoystick.LeftBumper().OnTrue(
+      frc2::cmd::Sequence(coordinator.Climb(), climberSub.Deploy()));
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 

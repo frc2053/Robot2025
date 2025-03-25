@@ -30,6 +30,7 @@
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/voltage.h"
+#include "frc/Servo.h"
 
 class Climber : public frc2::SubsystemBase {
  public:
@@ -47,6 +48,8 @@ class Climber : public frc2::SubsystemBase {
   frc2::CommandPtr Climb(std::function<units::volt_t()> volts);
   frc2::CommandPtr GoToAngleCmd(std::function<units::turn_t()> newAngle);
   frc2::CommandPtr TuneClimberPID(std::function<bool()> isDone);
+  frc2::CommandPtr Lock();
+  frc2::CommandPtr Unlock();
 
  private:
   void ConfigureMotors();
@@ -58,6 +61,8 @@ class Climber : public frc2::SubsystemBase {
 
   ctre::phoenix6::hardware::TalonFX climberMotor{
       consts::climber::can_ids::CLIMBER_MOTOR};
+
+  frc::Servo climberLock{1};
 
   units::turn_t goalAngle = 0_rad;
   units::turn_t currentAngle = 0_rad;
