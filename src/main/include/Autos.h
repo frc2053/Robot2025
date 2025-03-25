@@ -83,6 +83,15 @@ class Autos {
     pathplanner::NamedCommands::registerCommand(
         "DriveToRightReef",
         m_driveSub.AlignToReef([] { return false; }).WithTimeout(1.5_s));
+
+    pathplanner::NamedCommands::registerCommand(
+        "DesiredTagFL", m_driveSub.SetDesiredTag("Tag19"));
+    pathplanner::NamedCommands::registerCommand(
+        "DesiredTagBL", m_driveSub.SetDesiredTag("Tag20"));
+    pathplanner::NamedCommands::registerCommand(
+        "DesiredTagFR", m_driveSub.SetDesiredTag("Tag17"));
+    pathplanner::NamedCommands::registerCommand(
+        "DesiredTagBR", m_driveSub.SetDesiredTag("Tag22"));
   }
 
   enum AutoSelector {

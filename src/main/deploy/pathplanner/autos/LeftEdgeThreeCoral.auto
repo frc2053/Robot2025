@@ -26,14 +26,14 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DesiredTagBL"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DriveToLeftReef"
           }
         },
         {
@@ -100,14 +100,14 @@
                 "data": {
                   "name": "L4Coral"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DesiredTagFL"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DriveToLeftReef"
           }
         },
         {
@@ -176,12 +176,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DriveToRightReef"
           }
         },
         {

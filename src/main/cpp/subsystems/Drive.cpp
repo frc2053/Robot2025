@@ -240,6 +240,12 @@ frc2::CommandPtr Drive::DriveToPose(std::function<frc::Pose2d()> goalPose,
                    pidPoseGoalPub.Set(target);
                    pidPoseSetpointPub.Set(setpointPose);
 
+                   pidPoseSpeeds.Set(frc::ChassisSpeeds{
+                       xSpeed +
+                           units::meters_per_second_t{
+                               setpointTranslation.X().value()},
+                       ySpeed, thetaSpeed});
+
                    swerveDrive.DriveFieldRelative(xSpeed, ySpeed, thetaSpeed,
                                                   false);
                  },
@@ -424,6 +430,20 @@ int Drive::WhatReefZoneAmIIn() {
   return sliceIndex;
 }
 
+frc2::CommandPtr Drive::SetDesiredTag(const std::string& newTag) {
+  return frc2::cmd::RunOnce([this, newTag] { tagStr = newTag; }, {});
+}
+
+bool Drive::IsCloseToDesiredTag() {
+  frc::Translation2d desiredTagTrans = importantPoses[tagStr].Translation();
+  if (str::IsOnRed()) {
+    desiredTagTrans =
+        pathplanner::FlippingUtil::flipFieldPosition(desiredTagTrans);
+  }
+
+  return swerveDrive.GetPose().Translation().Distance(desiredTagTrans) <= 3_ft;
+}
+
 void Drive::SetupPathplanner() {
   consts::swerve::pathplanning::config =
       pathplanner::RobotConfig::fromGUISettings();
@@ -436,7 +456,14 @@ void Drive::SetupPathplanner() {
                                 consts::swerve::pathplanning::ROTATION_D});
 
   pathplanner::AutoBuilder::configure(
-      [this]() { return swerveDrive.GetSingleTagPose(); },
+      [this]() {
+        if (IsCloseToDesiredTag()) {
+          fmt::print("close enough, using single tag!\n");
+          return swerveDrive.GetSingleTagPose();
+        } else {
+          return swerveDrive.GetPose();
+        }
+      },
       [this](frc::Pose2d pose) { swerveDrive.ResetPose(pose); },
       [this]() { return swerveDrive.GetRobotRelativeSpeeds(); },
       [this](frc::ChassisSpeeds speeds, pathplanner::DriveFeedforwards ff) {

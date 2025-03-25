@@ -19,6 +19,7 @@
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Translation2d.h"
+#include "frc/kinematics/ChassisSpeeds.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/button/Trigger.h"
 #include "networktables/BooleanTopic.h"
@@ -42,7 +43,10 @@ class Drive : public frc2::SubsystemBase {
   units::radian_t GetGyroYaw() const {
     return swerveDrive.GetOdomPose().Rotation().Radians();
   }
+  std::string tagStr = "Tag20";
   frc2::Trigger IsAligned();
+  frc2::CommandPtr SetDesiredTag(const std::string& newTag);
+  bool IsCloseToDesiredTag();
   void SetupPathplanner();
   void AddVisionMeasurement(const frc::Pose2d& measurement,
                             units::second_t timestamp,
@@ -116,6 +120,8 @@ class Drive : public frc2::SubsystemBase {
       nt->GetStructTopic<frc::Pose2d>("PIDToPoseSetpoint").Publish()};
   nt::BooleanPublisher isAtGoalPosePub{
       nt->GetBooleanTopic("PIDToPoseIsAtGoal").Publish()};
+  nt::StructPublisher<frc::ChassisSpeeds> pidPoseSpeeds{
+      nt->GetStructTopic<frc::ChassisSpeeds>("PIDToPoseSpeeds").Publish()};
 
   str::swerve::WheelRadiusCharData wheelRadiusData{};
 
