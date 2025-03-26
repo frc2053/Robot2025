@@ -69,6 +69,9 @@ void RobotContainer::ConfigureBindings() {
   operatorJoystick.Back().OnTrue(
       frc2::cmd::RunOnce([this] { manipSub.OverrideHasCoral(false); }));
 
+  operatorJoystick.RightTrigger().WhileTrue(climberSub.Lock());
+  operatorJoystick.LeftTrigger().WhileTrue(climberSub.Unlock());
+
   operatorJoystick.RightBumper().WhileTrue(
       climberSub.Climb([] { return -12_V; }));
   operatorJoystick.RightBumper().OnFalse(climberSub.Climb([] { return 0_V; }));

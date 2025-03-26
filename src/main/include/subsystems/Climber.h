@@ -62,7 +62,7 @@ class Climber : public frc2::SubsystemBase {
   ctre::phoenix6::hardware::TalonFX climberMotor{
       consts::climber::can_ids::CLIMBER_MOTOR};
 
-  frc::Servo climberLock{1};
+  frc::Servo climberLock{9};
 
   units::turn_t goalAngle = 0_rad;
   units::turn_t currentAngle = 0_rad;

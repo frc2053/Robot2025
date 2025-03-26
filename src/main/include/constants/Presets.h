@@ -10,7 +10,7 @@
 namespace presets {
 namespace wrist {
 namespace coral {
-inline constexpr units::radian_t loading = 90_deg;
+inline constexpr units::radian_t loading = 87_deg;
 inline constexpr units::radian_t l1 = -56_deg;
 inline constexpr units::radian_t l2 = -85_deg;
 inline constexpr units::radian_t l3 = -85_deg;
@@ -37,13 +37,13 @@ inline constexpr units::meter_t net = 75_in;
 
 namespace coral {
 inline constexpr units::meter_t loading = 7_in;
-inline constexpr units::meter_t l1 = 12_in;
-inline constexpr units::meter_t l2 = 34_in;
-inline constexpr units::meter_t l3 = 50_in;
-inline constexpr units::meter_t l4 = 75_in;
+inline constexpr units::meter_t l1 = 13.5_in;
+inline constexpr units::meter_t l2 = 35.5_in;
+inline constexpr units::meter_t l3 = 51.5_in;
+inline constexpr units::meter_t l4 = 76.5_in;
 }  // namespace coral
 
-inline constexpr units::meter_t outofstarting = 15_in;
-inline constexpr units::meter_t clearOfChassis = 14_in;
+inline constexpr units::meter_t outofstarting = 16.5_in;
+inline constexpr units::meter_t clearOfChassis = 15_in;
 }  // namespace elev
 }  // namespace presets

@@ -21,6 +21,12 @@
                     {
                       "type": "named",
                       "data": {
+                        "name": "GetOutOfStarting"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
                         "name": "L4Coral"
                       }
                     }
@@ -39,7 +45,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.25
+            "waitTime": 0.15
           }
         },
         {
@@ -59,15 +65,28 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Suck"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Loading"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Suck"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -113,7 +132,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.25
+            "waitTime": 0.2
           }
         },
         {
@@ -133,15 +152,28 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Loading"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Suck"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Loading"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Suck"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -181,7 +213,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.25
+            "waitTime": 0.15
           }
         },
         {

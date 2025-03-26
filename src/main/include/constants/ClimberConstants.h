@@ -60,7 +60,7 @@ inline const str::gains::radial::VoltRadialGainsHolder CLIMBER_GAINS{
     str::gains::radial::turn_volt_ka_unit_t{0},
     str::gains::radial::turn_volt_kv_unit_t{0},
     0.0_V,
-    str::gains::radial::turn_volt_kp_unit_t{50},
+    str::gains::radial::turn_volt_kp_unit_t{100},
     str::gains::radial::turn_volt_ki_unit_t{0},
     str::gains::radial::turn_volt_kd_unit_t{0},
 };
