@@ -13,6 +13,7 @@
 #include "frc/DataLogManager.h"
 #include "frc/RobotBase.h"
 #include "frc/RobotController.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
@@ -49,11 +50,12 @@ void Climber::Periodic() {
 
   display.SetClimberAngle(currentAngle);
   UpdateNTEntries();
+  frc::SmartDashboard::PutBoolean("WantToLock", wantToLock);
 }
 
 void Climber::UpdateNTEntries() {
-  currentAnglePub.Set(currentAngle.convert<units::degrees>().value());
-  angleSetpointPub.Set(goalAngle.convert<units::degrees>().value());
+  currentAnglePub.Set(currentAngle.value());
+  angleSetpointPub.Set(goalAngle.value());
   isAtSetpointPub.Set(isAtGoalAngle);
 }
 
@@ -61,13 +63,19 @@ frc2::CommandPtr Climber::Lock() {
   return frc2::cmd::RunOnce(
       [this] {
         SetClimberVoltage(0_V);
+        wantToLock = true;
         climberLock.Set(1);
       },
       {this});
 }
 
 frc2::CommandPtr Climber::Unlock() {
-  return frc2::cmd::RunOnce([this] { climberLock.Set(0); }, {this});
+  return frc2::cmd::RunOnce(
+      [this] {
+        climberLock.Set(0);
+        wantToLock = false;
+      },
+      {this});
 }
 
 void Climber::SimulationPeriodic() {

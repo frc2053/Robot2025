@@ -80,6 +80,8 @@ void RobotContainer::ConfigureBindings() {
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
+  driverJoystick.Start().OnTrue(driveSub.OhShitButton());
+
   driverJoystick.LeftTrigger().WhileTrue(frc2::cmd::Either(
       driveSub.AlignToAlgae(), driveSub.AlignToReef([] { return true; }),
       [this] { return !manipSub.HasCoral(); }));

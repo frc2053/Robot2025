@@ -280,6 +280,10 @@ frc2::CommandPtr Drive::AlignToAlgae() {
       true);
 }
 
+frc2::CommandPtr Drive::OhShitButton() {
+  return frc2::cmd::RunOnce([this] { swerveDrive.ZeroYaw(); });
+}
+
 frc2::CommandPtr Drive::AlignToProcessor() {
   return DriveToPose(
       [this] {

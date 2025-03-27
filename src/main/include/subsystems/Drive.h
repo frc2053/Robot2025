@@ -44,6 +44,7 @@ class Drive : public frc2::SubsystemBase {
     return swerveDrive.GetOdomPose().Rotation().Radians();
   }
   std::string tagStr = "Tag20";
+  frc2::CommandPtr OhShitButton();
   frc2::Trigger IsAligned();
   frc2::CommandPtr SetDesiredTag(const std::string& newTag);
   bool IsCloseToDesiredTag();

@@ -97,6 +97,8 @@ class Climber : public frc2::SubsystemBase {
 
   str::SuperstructureDisplay& display;
 
+  bool wantToLock{false};
+
   std::shared_ptr<nt::NetworkTable> nt{
       nt::NetworkTableInstance::GetDefault().GetTable("Climber")};
   nt::DoublePublisher currentAnglePub{
