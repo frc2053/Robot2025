@@ -110,9 +110,7 @@ frc2::CommandPtr Climber::Deploy() {
 }
 
 frc2::CommandPtr Climber::Climb(std::function<units::volt_t()> volts) {
-  return frc2::cmd::Run([this, volts] { SetClimberVoltage(volts()); }, {this})
-      .Until([this] { return currentAngle < -0.1_tr; })
-      .AndThen(Lock());
+  return frc2::cmd::Run([this, volts] { SetClimberVoltage(volts()); }, {this});
 }
 
 frc2::CommandPtr Climber::GoToAngleCmd(
