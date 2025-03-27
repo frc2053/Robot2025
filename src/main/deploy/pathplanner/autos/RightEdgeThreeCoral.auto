@@ -21,6 +21,12 @@
                     {
                       "type": "named",
                       "data": {
+                        "name": "GetOutOfStarting"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
                         "name": "L4Coral"
                       }
                     }
@@ -76,7 +82,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.75
           }
         },
         {
@@ -150,7 +156,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.75
           }
         },
         {
