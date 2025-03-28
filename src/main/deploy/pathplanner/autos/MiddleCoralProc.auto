@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "MiddleToH"
-                }
-              },
               {
                 "type": "sequential",
                 "data": {
@@ -31,6 +25,12 @@
                       }
                     }
                   ]
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "MiddleToH"
                 }
               }
             ]
@@ -90,42 +90,6 @@
           "type": "wait",
           "data": {
             "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "GHAlgaeToNet.0"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NetApproach.0"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ScoreAlgae"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Loading"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NetLeave.0"
           }
         }
       ]
