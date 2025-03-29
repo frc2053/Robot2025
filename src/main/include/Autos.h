@@ -22,7 +22,7 @@ class Autos {
 
     selectCommand = frc2::cmd::Select<AutoSelector>(
         [this] { return autoChooser.GetSelected(); },
-        std::pair{NOTHING, frc2::cmd::None()},
+        std::pair{NOTHING, m_coordinator.GetOutOfStartingConfig()},
         std::pair{TEST, pathplanner::PathPlannerAuto("Test").ToPtr()},
         std::pair{LEFT_EDGE_THREE_CORAL,
                   pathplanner::PathPlannerAuto("LeftEdgeThreeCoral").ToPtr()},
