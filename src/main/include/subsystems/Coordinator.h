@@ -5,10 +5,10 @@
 #pragma once
 
 #include "frc2/command/CommandPtr.h"
+#include "subsystems/Climber.h"
 #include "subsystems/Elevator.h"
 #include "subsystems/Manipulator.h"
 #include "subsystems/Pivot.h"
-#include "subsystems/Climber.h"
 
 class Coordinator {
  public:

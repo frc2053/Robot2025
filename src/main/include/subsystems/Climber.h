@@ -15,6 +15,7 @@
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
 #include "frc/Alert.h"
+#include "frc/Servo.h"
 #include "frc/filter/LinearFilter.h"
 #include "frc/simulation/FlywheelSim.h"
 #include "frc/simulation/SingleJointedArmSim.h"
@@ -30,7 +31,6 @@
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/voltage.h"
-#include "frc/Servo.h"
 
 class Climber : public frc2::SubsystemBase {
  public:
