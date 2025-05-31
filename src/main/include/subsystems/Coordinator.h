@@ -6,14 +6,14 @@
 
 #include "frc2/command/CommandPtr.h"
 #include "subsystems/Elevator.h"
+#include "subsystems/L1.h"
 #include "subsystems/Manipulator.h"
 #include "subsystems/Pivot.h"
-#include "subsystems/Climber.h"
 
 class Coordinator {
  public:
   Coordinator(Elevator& elevator, Pivot& pivot, Manipulator& manipulator,
-              Climber& climber);
+              L1& l1Manip);
 
   frc2::CommandPtr GoToL1();
   frc2::CommandPtr GoToL2();
@@ -41,5 +41,5 @@ class Coordinator {
   Elevator& elev;
   Pivot& piv;
   Manipulator& manip;
-  Climber& climb;
+  L1& l1;
 };

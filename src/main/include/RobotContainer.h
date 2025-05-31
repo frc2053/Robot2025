@@ -18,10 +18,10 @@
 #include "frc2/command/button/Trigger.h"
 #include "str/SuperstructureDisplay.h"
 #include "str/vision/VisionSystem.h"
-#include "subsystems/Climber.h"
 #include "subsystems/Coordinator.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Elevator.h"
+#include "subsystems/L1.h"
 #include "subsystems/Manipulator.h"
 #include "subsystems/Pivot.h"
 
@@ -36,7 +36,7 @@ class RobotContainer {
   Manipulator& GetManipulator();
   Coordinator& GetCoordinator();
   str::vision::VisionSystem& GetVision();
-  Climber& GetClimber();
+  L1& GetL1();
   str::SuperstructureDisplay& GetSuperStructureDisplay();
 
   frc2::CommandPtr RumbleDriver(std::function<units::second_t()> timeToRumble);
@@ -69,8 +69,8 @@ class RobotContainer {
   Elevator elevatorSub{display};
   Pivot pivotSub{display};
   Manipulator manipSub{display};
-  Climber climberSub{display};
-  Coordinator coordinator{elevatorSub, pivotSub, manipSub, climberSub};
+  L1 l1Sub{display};
+  Coordinator coordinator{elevatorSub, pivotSub, manipSub, l1Sub};
 
   str::vision::VisionSystem vision{
       [this](const frc::Pose2d& pose, units::second_t time,
@@ -82,7 +82,7 @@ class RobotContainer {
         driveSub.AddSingleTagVisionMeasurement(pose, time, stdDevs);
       }};
 
-  Autos autos{driveSub, coordinator, manipSub};
+  Autos autos{driveSub, coordinator, manipSub, l1Sub};
 
   std::shared_ptr<nt::NetworkTable> tuningTable{
       nt::NetworkTableInstance::GetDefault().GetTable("Tuning")};

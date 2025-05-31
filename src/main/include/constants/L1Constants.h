@@ -15,12 +15,12 @@
 #include "units/dimensionless.h"
 #include "units/moment_of_inertia.h"
 
-namespace consts::climber {
+namespace consts::l1 {
 
 inline constexpr units::hertz_t BUS_UPDATE_FREQ = 100_Hz;
 
 namespace can_ids {
-inline constexpr int CLIMBER_MOTOR = 20;
+inline constexpr int PIVOT_MOTOR = 20;
 }  // namespace can_ids
 
 namespace current_limits {
@@ -34,7 +34,7 @@ inline constexpr frc::DCMotor CLIMBER_MOTOR = frc::DCMotor::Falcon500FOC(1);
 inline constexpr bool INVERT_CLIMBER = false;
 
 inline constexpr units::scalar_t GEARING =
-    (3 / 1) * (3 / 1) * (3 / 1) * (3 / 1) * (32 / 10);
+    (5 / 1) * (4 / 1) * (3 / 1) * (54 / 18);
 
 inline constexpr units::kilogram_t MASS = 4.5930353_lb;
 inline constexpr units::kilogram_square_meter_t MOI = 0.015957496_kg_sq_m;
@@ -52,9 +52,9 @@ namespace gains {
 
 inline constexpr units::radian_t ANGLE_TOLERANCE = 1_deg;
 
-inline const str::gains::radial::VoltRadialGainsHolder CLIMBER_GAINS{
-    consts::climber::physical::CLIMBER_MOTOR.freeSpeed /
-        consts::climber::physical::GEARING,
+inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
+    consts::l1::physical::CLIMBER_MOTOR.freeSpeed /
+        consts::l1::physical::GEARING,
     str::gains::radial::turn_volt_ka_unit_t{0},
     str::gains::radial::turn_volt_kv_unit_t{0},
     str::gains::radial::turn_volt_ka_unit_t{0},
@@ -68,4 +68,4 @@ inline const str::gains::radial::VoltRadialGainsHolder CLIMBER_GAINS{
 inline constexpr units::volt_t kG = 0_V;
 
 }  // namespace gains
-}  // namespace consts::climber
+}  // namespace consts::l1

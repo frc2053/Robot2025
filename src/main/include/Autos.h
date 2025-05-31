@@ -12,12 +12,17 @@
 
 #include "subsystems/Coordinator.h"
 #include "subsystems/Drive.h"
+#include "subsystems/L1.h"
 #include "subsystems/Manipulator.h"
 
 class Autos {
  public:
-  explicit Autos(Drive& driveSub, Coordinator& coordinator, Manipulator& manip)
-      : m_driveSub{driveSub}, m_coordinator{coordinator}, m_manipSub{manip} {
+  explicit Autos(Drive& driveSub, Coordinator& coordinator, Manipulator& manip,
+                 L1& l1Sub)
+      : m_driveSub{driveSub},
+        m_coordinator{coordinator},
+        m_manipSub{manip},
+        m_l1Sub(l1Sub) {
     BindCommandsAndTriggers();
 
     selectCommand = frc2::cmd::Select<AutoSelector>(
@@ -108,6 +113,7 @@ class Autos {
   Drive& m_driveSub;
   Coordinator& m_coordinator;
   Manipulator& m_manipSub;
+  L1& m_l1Sub;
 
   frc2::CommandPtr selectCommand{frc2::cmd::None()};
 };

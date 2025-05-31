@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the MIT License file in the root of this project
 
-#include "subsystems/Climber.h"
+#include "subsystems/L1.h"
 
 #include <string>
 
-#include "constants/ClimberConstants.h"
+#include "constants/L1Constants.h"
 #include "ctre/phoenix/StatusCodes.h"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/signals/SpnEnums.hpp"
@@ -24,155 +24,123 @@
 #include "units/current.h"
 #include "units/voltage.h"
 
-Climber::Climber(str::SuperstructureDisplay& display) : display{display} {
+L1::L1(str::SuperstructureDisplay& display) : display{display} {
   ConfigureMotors();
   ConfigureControlSignals();
 
   OptimizeBusSignals();
-
-  climberLock.Set(0);
 }
 
-void Climber::Periodic() {
+void L1::Periodic() {
   ctre::phoenix::StatusCode status =
       ctre::phoenix6::BaseStatusSignal::RefreshAll(positionSig, velocitySig,
                                                    voltageSig);
 
   if (!status.IsOK()) {
     frc::DataLogManager::Log(fmt::format(
-        "Error updating Climber positions! Error was: {}", status.GetName()));
+        "Error updating L1 positions! Error was: {}", status.GetName()));
   }
 
-  currentAngle = GetClimberAngle();
+  currentAngle = GetPivotAngle();
 
   isAtGoalAngle = units::math::abs(goalAngle - currentAngle) <
-                  consts::climber::gains::ANGLE_TOLERANCE;
+                  consts::l1::gains::ANGLE_TOLERANCE;
 
   display.SetClimberAngle(currentAngle);
   UpdateNTEntries();
-  frc::SmartDashboard::PutBoolean("WantToLock", wantToLock);
 }
 
-void Climber::UpdateNTEntries() {
+void L1::UpdateNTEntries() {
   currentAnglePub.Set(currentAngle.value());
   angleSetpointPub.Set(goalAngle.value());
   isAtSetpointPub.Set(isAtGoalAngle);
 }
 
-frc2::CommandPtr Climber::Lock() {
-  return frc2::cmd::RunOnce(
-      [this] {
-        SetClimberVoltage(0_V);
-        wantToLock = true;
-        climberLock.Set(1);
-      },
-      {this});
+void L1::SimulationPeriodic() {
+  pivotMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
+  l1Sim.SetInputVoltage(pivotMotorSim.GetMotorVoltage());
+
+  l1Sim.Update(20_ms);
+
+  units::turn_t encPos = l1Sim.GetAngle();
+  units::turns_per_second_t encVel = l1Sim.GetVelocity();
+
+  pivotMotorSim.SetRawRotorPosition(encPos * consts::l1::physical::GEARING);
+  pivotMotorSim.SetRotorVelocity(encVel * consts::l1::physical::GEARING);
 }
 
-frc2::CommandPtr Climber::Unlock() {
-  return frc2::cmd::RunOnce(
-      [this] {
-        climberLock.Set(0);
-        wantToLock = false;
-      },
-      {this});
-}
-
-void Climber::SimulationPeriodic() {
-  climberMotorSim.SetSupplyVoltage(frc::RobotController::GetBatteryVoltage());
-  climberSim.SetInputVoltage(climberMotorSim.GetMotorVoltage());
-
-  climberSim.Update(20_ms);
-
-  units::turn_t encPos = climberSim.GetAngle();
-  units::turns_per_second_t encVel = climberSim.GetVelocity();
-
-  climberMotorSim.SetRawRotorPosition(encPos *
-                                      consts::climber::physical::GEARING);
-  climberMotorSim.SetRotorVelocity(encVel * consts::climber::physical::GEARING);
-}
-
-units::turn_t Climber::GetClimberAngle() {
+units::turn_t L1::GetPivotAngle() {
   units::turn_t latencyCompPosition =
       ctre::phoenix6::BaseStatusSignal::GetLatencyCompensatedValue(positionSig,
                                                                    velocitySig);
   return latencyCompPosition;
 }
 
-units::turns_per_second_t Climber::GetClimberVel() {
+units::turns_per_second_t L1::GetL1Vel() {
   return velocitySig.GetValue();
 }
 
-frc2::Trigger Climber::IsAtGoalAngle() {
+frc2::Trigger L1::IsAtGoalAngle() {
   return frc2::Trigger{[this] { return isAtGoalAngle; }};
 }
 
-frc2::CommandPtr Climber::Stow() {
-  return GoToAngleCmd(
-      [] { return consts::climber::physical::CLIMB_STOW_ANGLE; });
+frc2::CommandPtr L1::Stow() {
+  return GoToAngleCmd([] { return consts::l1::physical::CLIMB_STOW_ANGLE; });
 }
 
-frc2::CommandPtr Climber::Deploy() {
-  return GoToAngleCmd(
-      [] { return consts::climber::physical::CLIMB_OUT_ANGLE; });
+frc2::CommandPtr L1::Deploy() {
+  return GoToAngleCmd([] { return consts::l1::physical::CLIMB_OUT_ANGLE; });
 }
 
-frc2::CommandPtr Climber::Climb(std::function<units::volt_t()> volts) {
-  return frc2::cmd::Run([this, volts] { SetClimberVoltage(volts()); }, {this});
+frc2::CommandPtr L1::Climb(std::function<units::volt_t()> volts) {
+  return frc2::cmd::Run([this, volts] { SetPivotVoltage(volts()); }, {this});
 }
 
-frc2::CommandPtr Climber::GoToAngleCmd(
-    std::function<units::turn_t()> newAngle) {
+frc2::CommandPtr L1::GoToAngleCmd(std::function<units::turn_t()> newAngle) {
   return frc2::cmd::Run([this, newAngle] { GoToAngle(newAngle()); }, {this})
       .Until([this] { return isAtGoalAngle; });
 }
 
-void Climber::GoToAngle(units::turn_t newAngle) {
+void L1::GoToAngle(units::turn_t newAngle) {
   goalAngle = newAngle;
-  climberMotor.SetControl(
-      climberAngleSetter.WithPosition(newAngle).WithEnableFOC(true));
+  pivotMotor.SetControl(
+      pivotAngleSetter.WithPosition(newAngle).WithEnableFOC(true));
 }
 
-void Climber::SetClimberVoltage(units::volt_t volts) {
-  climberMotor.SetControl(
-      climberVoltageSetter.WithEnableFOC(true).WithOutput(volts));
+void L1::SetPivotVoltage(units::volt_t volts) {
+  pivotMotor.SetControl(
+      pivotVoltageSetter.WithEnableFOC(true).WithOutput(volts));
 }
 
-frc2::CommandPtr Climber::TuneClimberPID(std::function<bool()> isDone) {
-  std::string tablePrefix = "Climber/gains/";
+frc2::CommandPtr L1::TuneL1PID(std::function<bool()> isDone) {
+  std::string tablePrefix = "L1/gains/";
   return frc2::cmd::Sequence(
       frc2::cmd::RunOnce(
           [tablePrefix, this] {
             frc::SmartDashboard::PutNumber(tablePrefix + "setpoint", 0);
-            frc::SmartDashboard::PutNumber(tablePrefix + "mmCruiseVel",
-                                           consts::climber::gains::CLIMBER_GAINS
-                                               .motionMagicCruiseVel.value());
-            frc::SmartDashboard::PutNumber(tablePrefix + "mmKA",
-                                           consts::climber::gains::CLIMBER_GAINS
-                                               .motionMagicExpoKa.value());
-            frc::SmartDashboard::PutNumber(tablePrefix + "mmKV",
-                                           consts::climber::gains::CLIMBER_GAINS
-                                               .motionMagicExpoKv.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kA",
-                consts::climber::gains::CLIMBER_GAINS.kA.value());
+                tablePrefix + "mmCruiseVel",
+                consts::l1::gains::PIVOT_GAINS.motionMagicCruiseVel.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kV",
-                consts::climber::gains::CLIMBER_GAINS.kV.value());
+                tablePrefix + "mmKA",
+                consts::l1::gains::PIVOT_GAINS.motionMagicExpoKa.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kS",
-                consts::climber::gains::CLIMBER_GAINS.kS.value());
+                tablePrefix + "mmKV",
+                consts ::l1::gains::PIVOT_GAINS.motionMagicExpoKv.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kP",
-                consts::climber::gains::CLIMBER_GAINS.kP.value());
+                tablePrefix + "kA", consts::l1::gains::PIVOT_GAINS.kA.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kI",
-                consts::climber::gains::CLIMBER_GAINS.kI.value());
+                tablePrefix + "kV", consts::l1::gains::PIVOT_GAINS.kV.value());
             frc::SmartDashboard::PutNumber(
-                tablePrefix + "kD",
-                consts::climber::gains::CLIMBER_GAINS.kD.value());
+                tablePrefix + "kS", consts::l1::gains::PIVOT_GAINS.kS.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kP", consts::l1::gains::PIVOT_GAINS.kP.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kI", consts::l1::gains::PIVOT_GAINS.kI.value());
+            frc::SmartDashboard::PutNumber(
+                tablePrefix + "kD", consts::l1::gains::PIVOT_GAINS.kD.value());
             frc::SmartDashboard::PutNumber(tablePrefix + "kG",
-                                           consts::climber::gains::kG.value());
+                                           consts::l1::gains::kG.value());
             GoToAngle(0_rad);
           },
           {this}),
@@ -203,7 +171,7 @@ frc2::CommandPtr Climber::TuneClimberPID(std::function<bool()> isDone) {
 
             if (newGains != currentGains ||
                 !(units::essentiallyEqual(newKg, currentKg, 1e-6))) {
-              SetClimberGains(newGains, newKg);
+              SetL1Gains(newGains, newKg);
             }
 
             GoToAngle(units::degree_t{
@@ -213,28 +181,27 @@ frc2::CommandPtr Climber::TuneClimberPID(std::function<bool()> isDone) {
           .Until(isDone));
 }
 
-void Climber::OptimizeBusSignals() {
+void L1::OptimizeBusSignals() {
   ctre::phoenix::StatusCode freqSetterStatus =
       ctre::phoenix6::BaseStatusSignal::SetUpdateFrequencyForAll(
-          consts::climber::BUS_UPDATE_FREQ, positionSig, velocitySig,
-          voltageSig);
+          consts::l1::BUS_UPDATE_FREQ, positionSig, velocitySig, voltageSig);
 
   frc::DataLogManager::Log(
-      fmt::format("Set bus signal frequenceies for climber. Result was: {}",
+      fmt::format("Set bus signal frequenceies for L1. Result was: {}",
                   freqSetterStatus.GetName()));
 
   signalFrequencyAlert.Set(!freqSetterStatus.IsOK());
 
   ctre::phoenix::StatusCode optimizeAlgaeIntakeResult =
-      climberMotor.OptimizeBusUtilization();
+      pivotMotor.OptimizeBusUtilization();
   frc::DataLogManager::Log(
-      fmt::format("Optimized bus signals for climber motor. Result was: {}",
+      fmt::format("Optimized bus signals for L1 motor. Result was: {}",
                   optimizeAlgaeIntakeResult.GetName()));
-  optiClimberAlert.Set(!optimizeAlgaeIntakeResult.IsOK());
+  optiL1Alert.Set(!optimizeAlgaeIntakeResult.IsOK());
 }
 
-void Climber::SetClimberGains(
-    str::gains::radial::VoltRadialGainsHolder newGains, units::volt_t kg) {
+void L1::SetL1Gains(str::gains::radial::VoltRadialGainsHolder newGains,
+                    units::volt_t kg) {
   currentGains = newGains;
   currentKg = kg;
   ctre::phoenix6::configs::Slot0Configs slotConfig{};
@@ -255,25 +222,25 @@ void Climber::SetClimberGains(
   mmConfig.MotionMagicExpo_kA = currentGains.motionMagicExpoKa;
 
   ctre::phoenix::StatusCode statusGains =
-      climberMotor.GetConfigurator().Apply(slotConfig);
+      pivotMotor.GetConfigurator().Apply(slotConfig);
   if (!statusGains.IsOK()) {
     frc::DataLogManager::Log(
-        fmt::format("Climber Motor was unable to set new gains! "
+        fmt::format("L1 Pivot Motor was unable to set new gains! "
                     "Error: {}, More Info: {}",
                     statusGains.GetName(), statusGains.GetDescription()));
   }
 
   ctre::phoenix::StatusCode statusMM =
-      climberMotor.GetConfigurator().Apply(mmConfig);
+      pivotMotor.GetConfigurator().Apply(mmConfig);
   if (!statusMM.IsOK()) {
     frc::DataLogManager::Log(
-        fmt::format("Climber Motor was unable to set new motion magic config! "
+        fmt::format("L1 Pivot Motor was unable to set new motion magic config! "
                     "Error: {}, More Info: {}",
                     statusMM.GetName(), statusMM.GetDescription()));
   }
 }
 
-void Climber::ConfigureMotors() {
+void L1::ConfigureMotors() {
   ctre::phoenix6::configs::TalonFXConfiguration config{};
   ctre::phoenix6::configs::Slot0Configs gains{};
 
@@ -295,40 +262,39 @@ void Climber::ConfigureMotors() {
   config.MotorOutput.NeutralMode =
       ctre::phoenix6::signals::NeutralModeValue::Brake;
   config.MotorOutput.Inverted =
-      consts::climber::physical::INVERT_CLIMBER
+      consts::l1::physical::INVERT_CLIMBER
           ? ctre::phoenix6::signals::InvertedValue::Clockwise_Positive
           : ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
 
   config.TorqueCurrent.PeakForwardTorqueCurrent =
-      consts::climber::current_limits::STATOR_LIMIT;
+      consts::l1::current_limits::STATOR_LIMIT;
   config.TorqueCurrent.PeakReverseTorqueCurrent =
-      -consts::climber::current_limits::STATOR_LIMIT;
+      -consts::l1::current_limits::STATOR_LIMIT;
 
   config.CurrentLimits.StatorCurrentLimit =
-      consts::climber::current_limits::STATOR_LIMIT;
+      consts::l1::current_limits::STATOR_LIMIT;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
 
   config.CurrentLimits.SupplyCurrentLimitEnable = true;
   config.CurrentLimits.SupplyCurrentLimit =
-      consts::climber::current_limits::SUPPLY_LIMIT;
+      consts::l1::current_limits::SUPPLY_LIMIT;
 
   if (frc::RobotBase::IsSimulation()) {
     config.MotorOutput.Inverted =
         ctre::phoenix6::signals::InvertedValue::CounterClockwise_Positive;
   }
-  config.Feedback.SensorToMechanismRatio = consts::climber::physical::GEARING;
+  config.Feedback.SensorToMechanismRatio = consts::l1::physical::GEARING;
 
   ctre::phoenix::StatusCode configClimberResult =
-      climberMotor.GetConfigurator().Apply(config);
+      pivotMotor.GetConfigurator().Apply(config);
 
-  frc::DataLogManager::Log(
-      fmt::format("Configured climber motor. Result was: {}",
-                  configClimberResult.GetName()));
+  frc::DataLogManager::Log(fmt::format("Configured l1 motor. Result was: {}",
+                                       configClimberResult.GetName()));
 
-  configureClimberAlert.Set(!configClimberResult.IsOK());
+  configureL1Alert.Set(!configClimberResult.IsOK());
 }
 
-void Climber::ConfigureControlSignals() {
-  climberAngleSetter.UpdateFreqHz = 100_Hz;
-  climberVoltageSetter.UpdateFreqHz = 100_Hz;
+void L1::ConfigureControlSignals() {
+  pivotAngleSetter.UpdateFreqHz = 100_Hz;
+  pivotVoltageSetter.UpdateFreqHz = 100_Hz;
 }

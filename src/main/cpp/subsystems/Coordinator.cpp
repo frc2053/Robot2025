@@ -10,8 +10,8 @@
 #include "subsystems/Manipulator.h"
 
 Coordinator::Coordinator(Elevator& elevator, Pivot& pivot,
-                         Manipulator& manipulator, Climber& climber)
-    : elev{elevator}, piv{pivot}, manip{manipulator}, climb{climber} {}
+                         Manipulator& manipulator, L1& l1Manip)
+    : elev{elevator}, piv{pivot}, manip{manipulator}, l1{l1Manip} {}
 
 frc2::CommandPtr Coordinator::GoToL1() {
   return frc2::cmd::Either(GoToAlgaeProcess(), GoToAlgaeProcess(),
@@ -35,7 +35,6 @@ frc2::CommandPtr Coordinator::GoToL4() {
 
 frc2::CommandPtr Coordinator::GetOutOfStartingConfig() {
   return frc2::cmd::Sequence(
-      climb.Stow(),
       frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
       piv.GoToAngleCmd([] { return presets::wrist::outofstarting; }),
       frc2::cmd::Print("Done with pivot!\n"),

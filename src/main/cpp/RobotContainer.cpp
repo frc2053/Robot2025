@@ -69,14 +69,10 @@ void RobotContainer::ConfigureBindings() {
   operatorJoystick.Back().OnTrue(
       frc2::cmd::RunOnce([this] { manipSub.OverrideHasCoral(false); }));
 
-  operatorJoystick.RightTrigger().WhileTrue(climberSub.Lock());
-  operatorJoystick.LeftTrigger().WhileTrue(climberSub.Unlock());
-
-  operatorJoystick.RightBumper().WhileTrue(
-      climberSub.Climb([] { return -12_V; }));
-  operatorJoystick.RightBumper().OnFalse(climberSub.Climb([] { return 0_V; }));
+  operatorJoystick.RightBumper().WhileTrue(l1Sub.Climb([] { return -12_V; }));
+  operatorJoystick.RightBumper().OnFalse(l1Sub.Climb([] { return 0_V; }));
   operatorJoystick.LeftBumper().OnTrue(
-      frc2::cmd::Sequence(coordinator.Climb(), climberSub.Deploy()));
+      frc2::cmd::Sequence(coordinator.Climb(), l1Sub.Deploy()));
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 
@@ -131,8 +127,7 @@ void RobotContainer::ConfigureSysIdBinds() {
       elevatorSub.TuneElevatorPID([this] { return !elevatorTuneBtn.Get(); }));
   pivotTuneBtn.OnTrue(
       pivotSub.TunePivotPID([this] { return !pivotTuneBtn.Get(); }));
-  climbTuneBtn.OnTrue(
-      climberSub.TuneClimberPID([this] { return !climbTuneBtn.Get(); }));
+  climbTuneBtn.OnTrue(l1Sub.TuneL1PID([this] { return !climbTuneBtn.Get(); }));
 
   steerSysIdVoltsBtn.WhileTrue(SteerVoltsSysIdCommands(
       [this] { return tuningTable->GetBoolean("Forward", true); },
@@ -268,8 +263,8 @@ Manipulator& RobotContainer::GetManipulator() {
   return manipSub;
 }
 
-Climber& RobotContainer::GetClimber() {
-  return climberSub;
+L1& RobotContainer::GetL1() {
+  return l1Sub;
 }
 
 str::vision::VisionSystem& RobotContainer::GetVision() {
