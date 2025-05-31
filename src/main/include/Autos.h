@@ -84,6 +84,8 @@ class Autos {
         m_driveSub.AlignToReef([] { return false; }).WithTimeout(1.5_s));
 
     pathplanner::NamedCommands::registerCommand(
+        "DesiredTagBack", m_driveSub.SetDesiredTag("Tag21"));
+    pathplanner::NamedCommands::registerCommand(
         "DesiredTagFL", m_driveSub.SetDesiredTag("Tag19"));
     pathplanner::NamedCommands::registerCommand(
         "DesiredTagBL", m_driveSub.SetDesiredTag("Tag20"));

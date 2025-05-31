@@ -32,14 +32,20 @@
                 "data": {
                   "pathName": "MiddleToH"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DesiredTagBack"
+                }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "DriveToLeftReef"
+            "waitTime": 0.75
           }
         },
         {
@@ -57,14 +63,14 @@
                 "data": {
                   "pathName": "HToApproach.0"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2Algae"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L2Algae"
           }
         },
         {
