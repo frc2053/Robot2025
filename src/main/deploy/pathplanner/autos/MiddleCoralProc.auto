@@ -21,7 +21,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "L4Coral"
+                        "name": "L2Algae"
                       }
                     }
                   ]
@@ -43,15 +43,22 @@
           }
         },
         {
-          "type": "wait",
+          "type": "race",
           "data": {
-            "waitTime": 0.75
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L1Score"
+                }
+              }
+            ]
           }
         },
         {
@@ -68,12 +75,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "L2Algae"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -86,16 +87,41 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Suck"
+                  "name": "SuckUntilAlgae"
                 }
               }
             ]
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.0
+            "pathName": "GHAlgaeToNet.0"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "GHAlgaeToNet.1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreAlgae"
           }
         }
       ]

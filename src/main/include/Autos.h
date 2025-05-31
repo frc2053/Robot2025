@@ -56,8 +56,8 @@ class Autos {
                                                 m_coordinator.GoToCoralPrime());
     pathplanner::NamedCommands::registerCommand("L1", m_coordinator.GoToL1());
     pathplanner::NamedCommands::registerCommand("L2", m_coordinator.GoToL2());
-    pathplanner::NamedCommands::registerCommand(
-        "L2Algae", m_coordinator.GoToL2AlgaeAUTO());
+    pathplanner::NamedCommands::registerCommand("L2Algae",
+                                                m_coordinator.GoToL2());
     pathplanner::NamedCommands::registerCommand("L3", m_coordinator.GoToL3());
     pathplanner::NamedCommands::registerCommand("L4Coral",
                                                 m_coordinator.GoToL4Coral());
@@ -72,6 +72,9 @@ class Autos {
           fmt::print("test: {}\n", test);
           return test;
         }));
+
+    pathplanner::NamedCommands::registerCommand("L1Score", m_l1Sub.Score());
+    pathplanner::NamedCommands::registerCommand("L1Stow", m_l1Sub.Stow());
 
     pathplanner::NamedCommands::registerCommand("SuckUntilAlgae",
                                                 m_manipSub.SuckUntilAlgae());
