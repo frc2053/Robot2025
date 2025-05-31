@@ -85,11 +85,18 @@ frc2::Trigger L1::IsAtGoalAngle() {
 }
 
 frc2::CommandPtr L1::Stow() {
-  return GoToAngleCmd([] { return consts::l1::physical::CLIMB_STOW_ANGLE; });
+  return GoToAngleCmd([] { return consts::l1::physical::STOW_ANGLE; })
+      .AlongWith(frc2::cmd::RunOnce([this] { rollerMotor.Set(0); }));
 }
 
 frc2::CommandPtr L1::Deploy() {
-  return GoToAngleCmd([] { return consts::l1::physical::CLIMB_OUT_ANGLE; });
+  return GoToAngleCmd([] { return consts::l1::physical::OUT_ANGLE; })
+      .AlongWith(frc2::cmd::RunOnce([this] { rollerMotor.Set(.1); }));
+}
+
+frc2::CommandPtr L1::Score() {
+  return GoToAngleCmd([] { return consts::l1::physical::SCORE_ANGLE; })
+      .AlongWith(frc2::cmd::RunOnce([this] { rollerMotor.Set(-.5); }));
 }
 
 frc2::CommandPtr L1::Climb(std::function<units::volt_t()> volts) {

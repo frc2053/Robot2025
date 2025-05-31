@@ -14,6 +14,7 @@
 #include "constants/L1Constants.h"
 #include "ctre/phoenix6/SignalLogger.hpp"
 #include "ctre/phoenix6/controls/MotionMagicExpoVoltage.hpp"
+#include "ctre/phoenix6/controls/PositionVoltage.hpp"
 #include "frc/Alert.h"
 #include "frc/filter/LinearFilter.h"
 #include "frc/simulation/FlywheelSim.h"
@@ -43,6 +44,7 @@ class L1 : public frc2::SubsystemBase {
   frc2::Trigger IsAtGoalAngle();
   void SetPivotVoltage(units::volt_t volts);
   frc2::CommandPtr Stow();
+  frc2::CommandPtr Score();
   frc2::CommandPtr Deploy();
   frc2::CommandPtr Climb(std::function<units::volt_t()> volts);
   frc2::CommandPtr GoToAngleCmd(std::function<units::turn_t()> newAngle);
@@ -58,6 +60,7 @@ class L1 : public frc2::SubsystemBase {
 
   ctre::phoenix6::hardware::TalonFX pivotMotor{
       consts::l1::can_ids::PIVOT_MOTOR};
+  ctre::phoenix6::hardware::TalonFX rollerMotor{55};
 
   units::turn_t goalAngle = 0_rad;
   units::turn_t currentAngle = 0_rad;
@@ -73,7 +76,7 @@ class L1 : public frc2::SubsystemBase {
   ctre::phoenix6::StatusSignal<units::volt_t> voltageSig =
       pivotMotor.GetMotorVoltage();
 
-  ctre::phoenix6::controls::MotionMagicVoltage pivotAngleSetter{0_rad};
+  ctre::phoenix6::controls::PositionVoltage pivotAngleSetter{0_rad};
   ctre::phoenix6::controls::VoltageOut pivotVoltageSetter{0_V};
 
   str::gains::radial::VoltRadialGainsHolder currentGains{

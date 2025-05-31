@@ -54,8 +54,11 @@ void RobotContainer::ConfigureBindings() {
   (manipSub.GotCoral() && frc2::RobotModeTriggers::Teleop())
       .OnTrue(manipSub.HoldCoralCmd());
 
-  driverJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilCoral());
-  driverJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
+  driverJoystick.LeftBumper().WhileTrue(l1Sub.Deploy());
+  driverJoystick.LeftBumper().OnFalse(l1Sub.Stow());
+
+  driverJoystick.RightBumper().WhileTrue(l1Sub.Score());
+  driverJoystick.RightBumper().OnFalse(l1Sub.Stow());
 
   operatorJoystick.A().OnTrue(coordinator.GoToL1());
   operatorJoystick.B().OnTrue(coordinator.GoToL2());

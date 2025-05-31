@@ -44,8 +44,9 @@ inline constexpr units::meter_t ARM_LENGTH = 3.9944802402_in;
 inline constexpr units::radian_t MIN_ANGLE = -90_deg;
 inline constexpr units::radian_t MAX_ANGLE = 180_deg;
 
-inline constexpr units::radian_t CLIMB_OUT_ANGLE = .275_tr;
-inline constexpr units::radian_t CLIMB_STOW_ANGLE = 0.09_tr;
+inline constexpr units::radian_t OUT_ANGLE = .365_tr;
+inline constexpr units::radian_t SCORE_ANGLE = .15_tr;
+inline constexpr units::radian_t STOW_ANGLE = 0.0_tr;
 }  // namespace physical
 
 namespace gains {
@@ -60,7 +61,7 @@ inline const str::gains::radial::VoltRadialGainsHolder PIVOT_GAINS{
     str::gains::radial::turn_volt_ka_unit_t{0},
     str::gains::radial::turn_volt_kv_unit_t{0},
     0.0_V,
-    str::gains::radial::turn_volt_kp_unit_t{100},
+    str::gains::radial::turn_volt_kp_unit_t{1000},
     str::gains::radial::turn_volt_ki_unit_t{0},
     str::gains::radial::turn_volt_kd_unit_t{0},
 };
