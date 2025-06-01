@@ -147,7 +147,7 @@ frc2::CommandPtr Coordinator::GoToL2AlgaeAUTO() {
       frc2::cmd::RunOnce([this] { manip.SetTryingForCoral(false); }),
       frc2::cmd::Sequence(
           frc2::cmd::WaitUntil([this] { return piv.IsClearOfFunnel().Get(); }),
-          elev.GoToHeightCmd([] { return presets::elev::algae::l2 - 8_in; })),
+          elev.GoToHeightCmd([] { return presets::elev::algae::l2; })),
       piv.GoToAngleCmd([] { return presets::wrist::algaeGrab; }));
 }
 

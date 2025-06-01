@@ -56,8 +56,8 @@ class Autos {
                                                 m_coordinator.GoToCoralPrime());
     pathplanner::NamedCommands::registerCommand("L1", m_coordinator.GoToL1());
     pathplanner::NamedCommands::registerCommand("L2", m_coordinator.GoToL2());
-    pathplanner::NamedCommands::registerCommand("L2Algae",
-                                                m_coordinator.GoToL2());
+    pathplanner::NamedCommands::registerCommand(
+        "L2Algae", m_coordinator.GoToL2AlgaeAUTO());
     pathplanner::NamedCommands::registerCommand("L3", m_coordinator.GoToL3());
     pathplanner::NamedCommands::registerCommand("L4Coral",
                                                 m_coordinator.GoToL4Coral());
@@ -86,7 +86,8 @@ class Autos {
         "DriveToLeftReef",
         m_driveSub.AlignToReef([] { return true; }).WithTimeout(1.5_s));
     pathplanner::NamedCommands::registerCommand(
-        "DriveToClosestAlgae", m_driveSub.AlignToAlgae().WithTimeout(1.5_s));
+        "DriveToClosestAlgae",
+        m_driveSub.AlignToAlgae([] { return false; }).WithTimeout(1.5_s));
     pathplanner::NamedCommands::registerCommand(
         "DriveToRightReef",
         m_driveSub.AlignToReef([] { return false; }).WithTimeout(1.5_s));

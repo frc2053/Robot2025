@@ -68,7 +68,7 @@ class Drive : public frc2::SubsystemBase {
 
   frc2::CommandPtr AlignToReefSegment(std::function<bool()> leftSide, int zone);
   frc2::CommandPtr AlignToReef(std::function<bool()> leftSide);
-  frc2::CommandPtr AlignToAlgae();
+  frc2::CommandPtr AlignToAlgae(std::function<bool()> shouldSpin);
   frc2::CommandPtr AlignToProcessor();
   frc2::CommandPtr DriveToPose(std::function<frc::Pose2d()> goalPose,
                                bool useSingleTagEstimator);
