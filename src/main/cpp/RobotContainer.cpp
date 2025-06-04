@@ -66,16 +66,17 @@ void RobotContainer::ConfigureBindings() {
   operatorJoystick.X().OnTrue(coordinator.GoToL3());
   operatorJoystick.Y().OnTrue(coordinator.GoToL4());
 
+  operatorJoystick.LeftBumper().WhileTrue(manipSub.SuckUntilAlgae());
+  operatorJoystick.LeftBumper().OnFalse(manipSub.HoldCmd());
+
+  operatorJoystick.RightBumper().WhileTrue(manipSub.PoopPiece());
+  operatorJoystick.RightBumper().OnFalse(manipSub.HoldCmd());
+
   operatorJoystick.Start().OnTrue(
       frc2::cmd::RunOnce([this] { manipSub.OverrideHasCoral(true); }));
 
   operatorJoystick.Back().OnTrue(
       frc2::cmd::RunOnce([this] { manipSub.OverrideHasCoral(false); }));
-
-  operatorJoystick.RightBumper().WhileTrue(l1Sub.Climb([] { return -12_V; }));
-  operatorJoystick.RightBumper().OnFalse(l1Sub.Climb([] { return 0_V; }));
-  operatorJoystick.LeftBumper().OnTrue(
-      frc2::cmd::Sequence(coordinator.Climb(), l1Sub.Deploy()));
 
   NoButtonsPressed().OnTrue(HandleReturnToNeutralPosition());
 

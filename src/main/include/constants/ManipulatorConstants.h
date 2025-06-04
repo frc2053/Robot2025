@@ -30,7 +30,7 @@ inline constexpr units::ampere_t STATOR_LIMIT = 100_A;
 
 namespace physical {
 inline constexpr frc::DCMotor MOTOR = frc::DCMotor::Falcon500FOC(1);
-inline constexpr bool INVERT_ROLLER = true;
+inline constexpr bool INVERT_ROLLER = false;
 inline constexpr units::dimensionless::scalar_t CORAL_REDUCTION = 36.0 / 30.0;
 inline constexpr units::moment_of_inertia::kilogram_square_meter_t MOI =
     0.0001_kg_sq_m;

@@ -14,23 +14,19 @@ Coordinator::Coordinator(Elevator& elevator, Pivot& pivot,
     : elev{elevator}, piv{pivot}, manip{manipulator}, l1{l1Manip} {}
 
 frc2::CommandPtr Coordinator::GoToL1() {
-  return frc2::cmd::Either(GoToAlgaeProcess(), GoToAlgaeProcess(),
-                           [this] { return manip.HasCoral(); });
+  return GoToAlgaeProcess();
 }
 
 frc2::CommandPtr Coordinator::GoToL2() {
-  return frc2::cmd::Either(GoToL2Coral(), GoToL2Algae(),
-                           [this] { return manip.HasCoral(); });
+  return GoToL2Algae();
 }
 
 frc2::CommandPtr Coordinator::GoToL3() {
-  return frc2::cmd::Either(GoToL3Coral(), GoToL3Algae(),
-                           [this] { return manip.HasCoral(); });
+  return GoToL3Algae();
 }
 
 frc2::CommandPtr Coordinator::GoToL4() {
-  return frc2::cmd::Either(GoToL4Coral(), GoToNet(),
-                           [this] { return manip.HasCoral(); });
+  return GoToNet();
 }
 
 frc2::CommandPtr Coordinator::GetOutOfStartingConfig() {
