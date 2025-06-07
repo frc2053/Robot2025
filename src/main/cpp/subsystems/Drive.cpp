@@ -9,6 +9,7 @@
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/util/PathPlannerLogging.h>
 
+#include <functional>
 #include <memory>
 #include <numbers>
 #include <string>
@@ -21,6 +22,7 @@
 #include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/SwerveModuleState.h"
 #include "frc2/command/CommandPtr.h"
 #include "frc2/command/Commands.h"
 #include "frc2/command/button/Trigger.h"
@@ -111,6 +113,20 @@ frc2::CommandPtr Drive::DriveRobotRel(
 
 frc2::Trigger Drive::IsAligned() {
   return frc2::Trigger{[this] { return isAtGoalState; }};
+}
+
+frc2::CommandPtr Drive::LockWheels(std::function<bool()> override) {
+  return frc2::cmd::Run(
+             [this] {
+               swerveDrive.SetModuleStates(
+                   {frc::SwerveModuleState{0_mps, 45_deg},
+                    frc::SwerveModuleState{0_mps, -45_deg},
+                    frc::SwerveModuleState{0_mps, -45_deg},
+                    frc::SwerveModuleState{0_mps, 45_deg}},
+                   false, true, {0_A, 0_A, 0_A, 0_A});
+             },
+             {this})
+      .Until(override);
 }
 
 void Drive::SetPosePids() {

@@ -49,6 +49,7 @@ class Drive : public frc2::SubsystemBase {
   frc2::CommandPtr SetDesiredTag(const std::string& newTag);
   bool IsCloseToDesiredTag();
   void SetupPathplanner();
+  frc2::CommandPtr LockWheels(std::function<bool()> override);
   void AddVisionMeasurement(const frc::Pose2d& measurement,
                             units::second_t timestamp,
                             const Eigen::Vector3d& stdDevs);

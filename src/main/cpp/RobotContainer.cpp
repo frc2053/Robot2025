@@ -82,6 +82,12 @@ void RobotContainer::ConfigureBindings() {
 
   driverJoystick.Start().OnTrue(driveSub.OhShitButton());
 
+  driverJoystick.Back().OnTrue(driveSub.LockWheels([this] {
+    return std::fabs(driverJoystick.GetLeftX()) > .1 ||
+           std::fabs(driverJoystick.GetRightX()) > .1 ||
+           std::fabs(driverJoystick.GetLeftY()) > .1;
+  }));
+
   driverJoystick.LeftTrigger().WhileTrue(
       driveSub.AlignToAlgae([] { return false; }));
   driverJoystick.RightTrigger().WhileTrue(
@@ -90,16 +96,16 @@ void RobotContainer::ConfigureBindings() {
   //   elevatorSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {
   //         elevatorSub.SetVoltage(
-  //             frc::ApplyDeadband<double>(-operatorJoystick.GetRightY(), .1) *
-  //             12_V);
+  //             frc::ApplyDeadband<double>(-operatorJoystick.GetRightY(), .1)
+  //             * 12_V);
   //       },
   //       {&elevatorSub}));
 
   //   pivotSub.SetDefaultCommand(frc2::cmd::Run(
   //       [this] {
   //         pivotSub.SetVoltage(
-  //             frc::ApplyDeadband<double>(-operatorJoystick.GetRightX(), .1) *
-  //             12_V);
+  //             frc::ApplyDeadband<double>(-operatorJoystick.GetRightX(), .1)
+  //             * 12_V);
   //       },
   //       {&pivotSub}));
 }
