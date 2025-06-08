@@ -288,16 +288,16 @@ frc2::CommandPtr Drive::AlignToAlgae(std::function<bool()> shouldSpin) {
             frc::Transform2d{0_m, lOffset, frc::Rotation2d{}});
 
         if (str::IsOnRed()) {
-          return shouldSpin
+          return shouldSpin()
                      ? pathplanner::FlippingUtil::flipFieldPose(
                            clawPos.RotateAround(clawPos.Translation(),
                                                 frc::Rotation2d{180_deg}))
                      : pathplanner::FlippingUtil::flipFieldPose(clawPos);
 
         } else {
-          return shouldSpin ? clawPos.RotateAround(clawPos.Translation(),
-                                                   frc::Rotation2d{180_deg})
-                            : clawPos;
+          return shouldSpin() ? clawPos.RotateAround(clawPos.Translation(),
+                                                     frc::Rotation2d{180_deg})
+                              : clawPos;
         }
       },
       true);
