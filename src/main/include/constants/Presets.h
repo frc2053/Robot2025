@@ -10,14 +10,14 @@
 namespace presets {
 namespace wrist {
 namespace coral {
-inline constexpr units::radian_t loading = 87_deg;
+inline constexpr units::radian_t loading = 84_deg;
 inline constexpr units::radian_t l1 = -56_deg;
 inline constexpr units::radian_t l2 = -83_deg;
 inline constexpr units::radian_t l3 = -83_deg;
 inline constexpr units::radian_t l4 = -85_deg;
 }  // namespace coral
 
-inline constexpr units::radian_t algaeHold = 10_deg;
+inline constexpr units::radian_t algaeHold = 7_deg;
 inline constexpr units::radian_t algaeProcess = -30_deg;
 inline constexpr units::radian_t algaeGrab = 45_deg;
 inline constexpr units::radian_t algaeNet = 80_deg;
